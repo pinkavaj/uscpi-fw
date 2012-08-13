@@ -1,4 +1,3 @@
-
 #include <ctype.h>
 #include <string.h>
 
@@ -6,7 +5,6 @@
 #include "scpi_cc.h"
 #include "scpi_cmd.h"
 #include "scpi_tree.h"
-
 
 /* 
  * get - command has query form (keyword followed by '?')

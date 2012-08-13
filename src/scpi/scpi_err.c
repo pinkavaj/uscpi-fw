@@ -8,6 +8,7 @@
 	static const char SCPI_err ## n ## s_P[] PROGMEM = t; \
 	const SCPI_err_t SCPI_err_ ## n PROGMEM = \
 		{ .str_P = SCPI_err ## n ## s_P, .SES_P = esr }
+
 _SCPI_ERR_(1, SCPI_SESR_CERR,    "1,\"Not implemented\"");
 _SCPI_ERR_(0, 0,                 "0,\"OK\"");
 _SCPI_ERR_(100, SCPI_SESR_CERR, "-100,\"Command error\"");
