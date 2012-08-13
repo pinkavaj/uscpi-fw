@@ -2,8 +2,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "scpi_cmd.h"
-
+#include "status_reporting.h"
 
 /* SCPI errors */
 /* SCPI_SES_QERR
@@ -47,11 +46,18 @@ void SCPI_err_set(const SCPI_err_t *e)
 		if (SCPI_err_count < SCPI_ERR_MAX) {
 			SCPI_err[SCPI_err_count++] = e;
 			SCPI_SESR_set(pgm_read_byte(&e->SES_P));
+			SCPI_STB_set(SCPI_STB_EEQ);
 		} else if (SCPI_err_count == SCPI_ERR_MAX) {
 			SCPI_err_count++;
 			SCPI_SESR_set(pgm_read_byte(&SCPI_err_350.SES_P));
 		}
 	}
+}
+
+void SCPI_err_queue_reset(void)
+{
+	SCPI_err_count = 0;
+	SCPI_STB_reset(SCPI_STB_EEQ);
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

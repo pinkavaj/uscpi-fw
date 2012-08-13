@@ -5,7 +5,6 @@
 #include "scpi_cmd.h"
 #include "lib/extlib.h"
 
-
 /* Small hack to jup to reset vector */
 SCPI_parse_t __vectors(void);
 
@@ -13,8 +12,7 @@ SCPI_parse_t __vectors(void);
 SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		SCPI_err_count = 0;
-		SCPI_STB_reset(SCPI_STB_EEQ);
+		SCPI_err_queue_reset();
 		SCPI_SESR_get();
 		SCPI_OPER_even_get();
 		SCPI_QUES_even_get();
@@ -27,15 +25,16 @@ SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SESR_enab());
+		print_uint32(SCPI_SESR_enab_get());
 		return SCPI_parse_end;
 	} 
 	if (SCPI_params_count != 1)
 		return SCPI_cmd_err_108();
 	uint8_t val = 0;
 	SCPI_parse_t ret = SCPI_in_uint8(&val);
-	SCPI_SESR_set_(val);
-	SCPI_SESR_enab_update();
+	if (ret == SCPI_parse_err)
+		return ret;
+	SCPI_SESR_enab_set(val);
 	return ret;
 }
 
@@ -83,23 +82,21 @@ SCPI_parse_t SCPI_CC_rst(char UNUSED(c))
 SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SRE());
+		print_uint32(SCPI_SRE_get());
 		return SCPI_parse_end;
 	}
 	uint8_t val = 0;
 	SCPI_parse_t ret = SCPI_in_uint8(&val);
-	SCPI_SRE_set_(val);
-	SCPI_SRE_update();
+	if (ret == SCPI_parse_err)
+		return ret;
+	SCPI_SRE_set(val);
 	return ret;
 }
 
 /* Read Status Byte Query */
 SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
 {
-	uint8_t x = SCPI_STB() & SCPI_SRE();
-	if (x)
-		x |= SCPI_STB_RQS;
-	print_uint32(x);
+	print_uint32(SCPI_STB_get());
 	return SCPI_parse_end;
 }
 
