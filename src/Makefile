@@ -67,7 +67,7 @@ ver:
 		config.h || true
 
 dump:
-	$(OBJDUMP) -d ${PROJECT}.out | vimpager -c "set syntax=asm" -
+	$(OBJDUMP) --source -d ${PROJECT}.out | vimpager -c "set syntax=asm" -
 
 size:
 	size ${PROJECT}.out
