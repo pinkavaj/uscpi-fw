@@ -4,7 +4,7 @@
 #include "scpi_cmd.h"
 
 
-/* Value of OPERationas Status Register */
+/* Value of OPERation Status Register */
 static SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
 {
 	SCPI_out_uint32(SCPI_OPER_cond);
@@ -145,7 +145,7 @@ static SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 	if (_SCPI_CMD_IS_QUEST())
 		SCPI_out_uint32(val);
 	else
-		SCPI_in_uint32(&val);
+		return SCPI_in_uint32(&val);
 	return SCPI_parse_end;
 }
 
