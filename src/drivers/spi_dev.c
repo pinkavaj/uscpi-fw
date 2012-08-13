@@ -31,11 +31,11 @@ void SPI_dev_select(uint8_t dev_num)
 	switch(SPI_dev_current)
 	{
 		case SPI_DEV_AD974_0:
-			SPCR = ad974_spi_cfg();
+			SPCR = ad974_spi_mode();
 //			spi_devs[dev_num].select(1);
 			break;
 		case SPI_DEV_MCP4922_0:
-			SPCR = mcp4922_spi_cfg();
+			SPCR = mcp4922_spi_mode();
 //			spi_devs[dev_num].select(1);
 			break;
 		default:

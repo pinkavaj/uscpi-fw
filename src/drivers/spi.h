@@ -2,7 +2,6 @@
 #define __SPI_H__
 
 #include <avr/io.h>
-#include <avr/sfr_defs.h>
 #include <inttypes.h>
 
 #define SPI_CLOCK (3<<SPR0)

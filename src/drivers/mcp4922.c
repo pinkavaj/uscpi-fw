@@ -9,7 +9,6 @@
  * published by the Free Software Foundation.
  *****************************************************************************/
 
-#include <util/delay.h>
 #include <util/delay_basic.h>
 
 #include "iodef.h"
@@ -41,7 +40,7 @@ void mcp4922_io_init(void)
 }
 
 /*****************************************************************************/
-uint8_t mcp4922_spi_cfg(void)
+uint8_t mcp4922_spi_mode(void)
 {
 	return SPI_CLOCK_1_4 |
 		SPI_PHASE_LEAD |
@@ -54,15 +53,15 @@ uint8_t mcp4922_spi_cfg(void)
 /*****************************************************************************/
 static void mcp4922_write(uint16_t datastring)
 {
-	PORT_MODIFY(MCP4922_PORT, MCP4922_CS, 0);
+	BIT_CLR(MCP4922_PORT, MCP4922_CS);
 	/* send new value to latch, Hi Lo */ 
 	SPI_transfer8b(datastring >> 8);
 	SPI_transfer8b(datastring);
 	/* send latch to output 40ns to setup, 100ns width */
-	PORT_MODIFY(MCP4922_PORT, MCP4922_LD, 0);
+	BIT_CLR(MCP4922_PORT, MCP4922_LD);
 	_delay_loop_1(1);
-	PORT_MODIFY(MCP4922_PORT, MCP4922_LD, MCP4922_LD);
-	PORT_MODIFY(MCP4922_PORT, MCP4922_CS, MCP4922_CS);
+	BIT_SET(MCP4922_PORT, MCP4922_LD);
+	BIT_SET(MCP4922_PORT, MCP4922_CS);
 }
 
 /*****************************************************************************/

@@ -2,6 +2,8 @@
 #define __IODEF_H__
 
 /* Tools */
+#define BIT_CLR(port, bit) (port &= ~bit)
+#define BIT_SET(port, bit) (port |= bit)
 #define PORT_MODIFY(port, mask, set) (port = (port & ~mask) | (set & mask))
 #define DDR_IN(b) (0)
 #define DDR_OUT(b) (b)
