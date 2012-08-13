@@ -32,6 +32,12 @@ typedef struct {
         uint16_t Ucode_offs;
 } daq_limits_t;
 
+typedef enum {
+        daq_status_valid = 0,
+        daq_status_shortcut = 1,
+        daq_status_invalid = 2,
+} daq_status_t;
+
 typedef struct {
         daq_param_t daq;
         pic16_param_t pic;
@@ -106,9 +112,22 @@ void heating_daq_test(uint8_t channel, uint16_t *Icode, uint16_t *Ucode)
         *Ucode = daq_data.Ucode;
 }
 
-daq_data_t heating_check_daq_data(daq_data_t daq_data)
+daq_status_t heating_daq_status(daq_data_t daq_data)
 {
-        return daq_data;
+        daq_status_t status;
+        uint16_t Imin, Imax, Umin;
+
+        if (daq_data.Icode > Imax) {
+                if (daq_data.Ucode < Umin) {
+                        status = daq_status_shortcut;
+                }
+                else
+                        status =daq_status_invalid;
+
+        } else if (daq_data.Icode < Imin) {
+        }
+
+        return status;
 }
 
 void heating(void)
@@ -116,6 +135,6 @@ void heating(void)
         daq_data_t daq_data;
 
         daq_data = heating_daq(0);
-        daq_data = heating_check_daq_data(daq_data);
+        heating_daq_status(daq_data);
 }
 
