@@ -1,7 +1,7 @@
 /*****************************************************************************
  *     ***  Digital-to-Analog Converter MCP4922  ***
  *
- * Copyright (c) 2010 Lukas Kucera <kuceral@vscht.cz>, 
+ * Copyright (c) 2010 Lukas Kucera <lukas.kucera@vscht.cz>,
  * 	Jiri Pinkava <jiri.pinkava@vscht.cz>
  *
  * This program is free software; you can redistribute it and/or modify
