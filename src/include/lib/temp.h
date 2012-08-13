@@ -31,6 +31,7 @@ pic16_param_t temp_pic_params_get(uint8_t channel);
 void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param);
 temp_1_20_t temp_slope_get(uint8_t channel);
 void temp_slope_set(uint8_t channel, temp_1_20_t slope);
+void temp_trg(void);
 temp_1_20_t temp_want_get(uint8_t channel);
 void temp_want_set(uint8_t channel, temp_1_20_t T);
 

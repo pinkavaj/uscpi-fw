@@ -36,6 +36,7 @@ _SCPI_CMD_(opc, GET(YES, PARAMS_N), SET(YES, PARAMS(0, OPT_0)));
 _SCPI_CMD_(rst, GET(NO_, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(sre, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0)));
 _SCPI_CMD_(stb, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(trg, GET(NO_, PARAMS_N), SET(YES, PARAMS_N));
 _SCPI_CMD_(tst, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0)));
 
@@ -50,6 +51,7 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 	_SCPI_BRANCH_(key_rst_P, &SCPI_cmd_rst_P, NULL),
 	_SCPI_BRANCH_(key_sre_P, &SCPI_cmd_sre_P, NULL),
 	_SCPI_BRANCH_(key_stb_P, &SCPI_cmd_stb_P, NULL),
+	_SCPI_BRANCH_(key_trg_P, &SCPI_cmd_trg_P, NULL),
 	_SCPI_BRANCH_(key_tst_P, &SCPI_cmd_tst_P, NULL),
 	_SCPI_BRANCH_(key_wai_P, &SCPI_cmd_wai_P, NULL),
 	_SCPI_branch_END_,

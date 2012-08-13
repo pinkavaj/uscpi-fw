@@ -29,6 +29,9 @@ SCPI_parse_t SCPI_CC_sre(void);
 /* Read Status Byte Query */
 SCPI_parse_t SCPI_CC_stb(void);
 
+/* *TRG - trigger */
+SCPI_parse_t SCPI_CC_trg(void);
+
 /* Self-Test Query  */
 SCPI_parse_t SCPI_CC_tst(void);
 

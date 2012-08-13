@@ -5,6 +5,7 @@
 #include "lib/math_cust.h"
 #include "lib/temp.h"
 #include "lib/thermometer_pt.h"
+#include "stat_report.h"
 
 /* FIXME: debug only */
 #include "lib/iobuf.h"
@@ -159,6 +160,11 @@ void temp_slope_set(uint8_t channel, temp_1_20_t slope)
 {
         slope = (slope + 2) / 4;
         temp_data[channel].T_slope = slope;
+}
+
+void temp_trg(void)
+{
+        //SCPI_OPER_cond_set(SCPI_OPER_SWE);
 }
 
 temp_data_IU_t temp_meas_IU(uint8_t channel)

@@ -60,6 +60,7 @@ extern const SCPI_key_t key_stat_P PROGMEM;
 extern const SCPI_key_t key_syst_P PROGMEM;
 extern const SCPI_key_t key_temp_P PROGMEM;
 extern const SCPI_key_t key_test_P PROGMEM;
+extern const SCPI_key_t key_trg_P PROGMEM;
 extern const SCPI_key_t key_vers_P PROGMEM;
  
 extern const SCPI_key_t key_adc_P PROGMEM;

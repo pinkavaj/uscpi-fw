@@ -52,6 +52,7 @@ _key_(stat, "STATUS",       SHORT4B);
 _key_(syst, "SYSTEM",       SHORT4B);
 _key_(temp, "TEMPERATURE",  SHORT4B);
 _key_(test, "TEST",         SHORT4B);
+_key_(trg,  "TRG",          SHORT3B);
 _key_(vers, "VERSION",      SHORT4B);
 
 _key_(adc, "ADC",  SHORT3B);

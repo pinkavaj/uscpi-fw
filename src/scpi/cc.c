@@ -7,6 +7,7 @@
 #include "stat_report.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
+#include "lib/temp.h"
 
 /* TODO: přesunout sem strom */
 
@@ -110,6 +111,13 @@ SCPI_parse_t SCPI_CC_sre(void)
 SCPI_parse_t SCPI_CC_stb(void)
 {
 	SCPI_print_uint16(SCPI_STB_get());
+        return SCPI_parse_end;
+}
+
+/* *TRG */
+SCPI_parse_t SCPI_CC_trg(void)
+{
+        temp_trg();
         return SCPI_parse_end;
 }
 
