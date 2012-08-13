@@ -34,33 +34,48 @@ uint8_t SCPI_STB_get(void)
 /* Set bit(s) in Operation Status Register */
 void SCPI_OPER_cond_set(uint16_t val)
 {
+        uint16_t condition_old;
+
+        condition_old = SCPI_OPER.condition;
 	SCPI_OPER.condition |= val;
-	/* Fixme: má reagovat na změnu ne na pokus o změnu (ne na 1 -> 1 ...) */
-	val &= SCPI_OPER.transition_up;
-	SCPI_OPER.event |= val;
+        
+        val = condition_old ^ SCPI_OPER.condition;
+	SCPI_OPER.event |= val & SCPI_OPER.transition_up;
 }
 
 /* Reset bit(s) in Operation Status Register */
 void SCPI_OPER_cond_reset(uint16_t val)
 {
+        uint16_t condition_old;
+
+        condition_old = SCPI_OPER.condition;
 	SCPI_OPER.condition &= ~val;
-	val &= SCPI_OPER.transition_down;
-	SCPI_OPER.event |= val;
+
+        val = condition_old ^ SCPI_OPER.condition;
+	SCPI_OPER.event |= val & SCPI_OPER.transition_down;
 }
 
 /* Set bit(s) in Operation Status Register */
 void SCPI_QUES_cond_set(uint16_t val)
 {
+        uint16_t condition_old;
+
+        condition_old = SCPI_QUES.condition;
 	SCPI_QUES.condition |= val;
-	val &= SCPI_QUES.transition_up;
-	SCPI_QUES.event |= val;
+
+        val = condition_old ^ SCPI_QUES.condition;
+	SCPI_QUES.event |= val & SCPI_QUES.transition_up;
 }
 
 void SCPI_QUES_cond_reset(uint16_t val)
 {
+        uint16_t condition_old;
+
+        condition_old = SCPI_QUES.condition;
 	SCPI_QUES.condition &= ~val;
-	val &= SCPI_QUES.transition_down;
-	SCPI_QUES.event |= val;
+
+        val = condition_old ^ SCPI_QUES.condition;
+	SCPI_QUES.event |= val & SCPI_QUES.transition_down;
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
