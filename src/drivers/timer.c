@@ -1,67 +1,108 @@
+/*****************************************************************************
+ *     ***  TIM1  16-bit Timer1 A & B  ***
+ *
+ * Copyright (c) 2010 Lukas Kucera <lukas.kucera@vscht.cz>, 
+ * 	Jiri Pinkava <jiri.pinkava@vscht.cz>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *****************************************************************************/
+
 #include "drivers/timer.h"
 
 #include <avr/interrupt.h>
 
-/* Timer 1 */
-/* 2**14 3**3 5**2 */
-#define TIM1_PERIOD_PER_SEC 32 /* timer 1 periods per second */
-#define TIM1_PERIOD 43200 /* 31.25ms @ f0/8 */
-#define TIM1_PERIOD_DAQ 1728 /* 1.25ms @ f0/8 */
-volatile uint32_t time_sec;	// MCU s counter
-volatile uint8_t loop_counter;	// 0-31 (4x 8x 31.25 ms = 1000 ms)
+#define TIMER1_CLK_DISABLE	(0<<CS10)
+#define TIMER1_CLK_f_1		(1<<CS10)
+#define TIMER1_CLK_f_8		(2<<CS10)
+#define TIMER1_CLK_f_64		(3<<CS10)
+#define TIMER1_CLK_f_256	(4<<CS10)
+#define TIMER1_CLK_f_1024	(5<<CS10)
+#define TIMER1_CLK_EXT_FALL	(6<<CS10)
+#define TIMER1_CLK_EXT_RAISE	(7<<CS10)
+#define TIMER1_CLK_MASK		(7<<CS10)
+
+#define SPIN_LOCK(sl) do { while(!sl) ;; sl = 0; } while(0)
+
+volatile uint8_t period_counter;	// 0-31 (4x 8x 31.25 ms = 1000 ms)
+volatile uint32_t time_sec;
 volatile uint8_t timer1A_spinlock;
 volatile uint8_t timer1B_spinlock;
 
-/*
- TIMER0_COMP_vect
- TIMER0_OVF_vect
- TIMER1_CAPT_vect
- TIMER1_COMPA_vect
-*/
+/*****************************************************************************/
+void TIMER1_mode_CTC_A(void)
+{
+	TCCR1A = TCCR1A & ~(_BV(WGM11) | _BV(WGM10));
+	TCCR1B = (TCCR1B & ~_BV(WGM13)) | _BV(WGM12);
+}
 
+/*****************************************************************************/
+void TIMER1_init(void)
+{
+	TCNT1 = 0;
+	OCR1A = TIMER1_TICKS_PER_PERIOD;
+	TIMER1_mode_CTC_A();
+	TIMSK = _BV(OCIE1A);
+//	TIMSK = _BV(TOIE1);
+
+	time_sec = 0;
+	period_counter = 0;
+
+	timer1A_spinlock = 0;
+	timer1B_spinlock = 0;
+}
+
+/*****************************************************************************/
+void TIMER1_start(void)
+{
+	TCCR1B = (TCCR1B & ~TIMER1_CLK_MASK) | TIMER1_CLK_f_8;
+}
+
+/*****************************************************************************/
+void TIMER1_jiff_alarm(uint8_t jiffer_idx)
+{
+	OCR1B = (uint16_t)TIMER1_TICKS_PER_JIFFER * jiffer_idx;
+	TIFR |= _BV(OCF1B);
+	TIMSK |= _BV(OCIE1B);
+	SPIN_LOCK(timer1B_spinlock);
+	TIMSK &= ~_BV(OCIE1B);
+}
+
+/*****************************************************************************/
+void TIMER1_delay_rel(uint16_t ticks)
+{
+	ticks += OCR1B;
+	OCR1B = ticks;
+	TIFR |= _BV(OCF1B);
+	TIMSK |= _BV(OCIE1B);
+	timer1B_spinlock = 0;
+	SPIN_LOCK(timer1B_spinlock);
+}
+
+/*****************************************************************************/
+void TIMER1_delay_rel_reset(void)
+{
+	OCR1B = TCNT1;
+}
+
+/*****************************************************************************/
 /* Called in 1.25ms interval */
 ISR(TIMER1_COMPB_vect)
 {
 	timer1B_spinlock = 1;
 }
 
+/*****************************************************************************/
 /* Called in 31.25ms */
-ISR(TIMER1_OVF_vect)
+ISR(TIMER1_COMPA_vect)
+//ISR(TIMER1_OVF_vect)
 {
 	timer1A_spinlock = 1;
-	loop_counter++;
-	if (loop_counter == TIM1_PERIOD_PER_SEC) {
-		loop_counter = 0;
+	period_counter++;
+	if (period_counter == TIMER1_PERIODS_PER_SEC) {
+		period_counter = 0;
 		time_sec++;
 	}
-}
-/*
- TIMER2_COMP_vect
- TIMER2_OVF_vect
- TIMER3_CAPT_vect
- TIMER3_COMPA_vect
- TIMER3_COMPB_vect
- TIMER3_OVF_vect
- */
-
-void TIMER1_init(void)
-{
-	/* OC1A, OC1B disconnected, no force output compare */
-	/* fast PWM, TOP = ICR1 */
-	TCCR1A = _BV(WGM11) | _BV(WGM10);
-	/* fast PWM, TOP = ICR1 */
-	TCCR1B = _BV(WGM12) | _BV(WGM13);
-	TCNT1 = 0;
-	/* Timer period settings */
-	OCR1A = TIM1_PERIOD;
-	OCR1B = TIM1_PERIOD_DAQ;
-	/* enable interrupts for time overflow, compare match A and B */
-	TIMSK = _BV(TOIE1) | _BV(OCIE1B);
-}
-
-void TIMER1_start(void)
-{
-	/* clk source f/8 */
-	TCCR1B |= _BV(CS11);
 }
 

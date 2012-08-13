@@ -11,13 +11,15 @@
 #define VER_MAJ 0
 #define VER_MINOR 0
 #define VER_REV 0
-#define VER_BUILD 677M
+#define VER_BUILD 678M
 #define INFO_AUTHOR Lukas-Kucera_Jiri-Pinkava
 #define INFO_COMPANY VSCHT
 #ifndef INFO_MODEL
 #define INFO_MODEL M162board-dev00
 #endif
 
+/* If defined SCPI is build including tests */
+#define SCPI_TEST
 
 #endif
 

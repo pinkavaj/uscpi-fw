@@ -147,6 +147,13 @@ static SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
+#include "drivers/timer.h"
+static SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
+{
+	SCPI_out_uint32(time_sec);
+	return SCPI_parse_end;
+}
+
 /* Get (next) error from error queue */
 static SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 {

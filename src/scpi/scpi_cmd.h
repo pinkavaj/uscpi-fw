@@ -109,6 +109,7 @@ static SCPI_parse_t SCPI_IC_test_adc(char c);
 static SCPI_parse_t SCPI_IC_test_div(char c);
 static SCPI_parse_t SCPI_IC_test_mul(char c);
 static SCPI_parse_t SCPI_IC_test_num(char c);
+static SCPI_parse_t SCPI_IC_test_time(char c);
 
 /* SCPI Tools */
 static SCPI_parse_t SCPI_in_uint8(uint8_t *x);
