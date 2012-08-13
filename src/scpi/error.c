@@ -152,7 +152,6 @@ void SCPI_err_set(const SCPI_err_t *e)
 		if (SCPI_err_count < ARRAY_SIZE(SCPI_err)) {
 			SCPI_err[SCPI_err_count++] = e;
 			SCPI_SESR_set(pgm_read_byte(&e->SES_P));
-			SCPI_STB_set(SCPI_STB_EEQ);
 		} else if (SCPI_err_count == ARRAY_SIZE(SCPI_err)) {
 			SCPI_err_count++;
 			SCPI_SESR_set(pgm_read_byte(&SCPI_err_350.SES_P));
@@ -175,18 +174,20 @@ const SCPI_err_t* SCPI_err_pop(void)
 			 * SCPI_err_count > ARRAY_SIZE(SCPI_err) */
 			if (--SCPI_err_count == ARRAY_SIZE(SCPI_err)) 
 				SCPI_err[ARRAY_SIZE(SCPI_err) - 1] = &SCPI_err_350;
-			if (!SCPI_err_count)
-				SCPI_STB_reset(SCPI_STB_EEQ);
 		}
 	}
 
 	return e;
 }
 
+uint8_t SCPI_err_queue_empty(void)
+{
+	return SCPI_err_count;
+}
+
 void SCPI_err_queue_reset(void)
 {
 	SCPI_err_count = 0;
-	SCPI_STB_reset(SCPI_STB_EEQ);
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

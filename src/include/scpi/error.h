@@ -131,6 +131,7 @@ extern const SCPI_err_t SCPI_err_700;
 extern const SCPI_err_t SCPI_err_800;
 
 const SCPI_err_t* SCPI_err_pop(void);
+uint8_t SCPI_err_queue_empty(void);
 void SCPI_err_queue_reset(void);
 void SCPI_err_set(const SCPI_err_t *e);
 SCPI_parse_t SCPI_err_set_(const SCPI_err_t *e);

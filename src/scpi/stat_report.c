@@ -3,17 +3,20 @@
 #include <string.h>
 
 #include "stat_report.h"
+#include "scpi.h"
 
 typedef struct {
 	/* TODO: add transition filter support */
 	uint16_t condition;
-/*	uint16_t transition_up;
-	uint16_t transition_down;*/
+	uint16_t transition_up;
+	uint16_t transition_down;
 	uint16_t enabled;
 	uint16_t event;
 } SCPI_status_reg_t;
 
-static SCPI_status_reg_t SCPI_OPER;
+static SCPI_status_reg_t SCPI_OPER = {
+        .transition_down = SCPI_OPER_SWE,
+};
 static SCPI_status_reg_t SCPI_QUES;
 
 static struct {
@@ -21,44 +24,38 @@ static struct {
 	uint8_t enabled;
 } SCPI_SESR;
 
-static struct {
-	uint8_t status;
-	uint8_t enabled;
-} SCPI_status_byte;
+uint8_t SCPI_STB_enabled;
 
 /* Return current value of status byte */
 uint8_t SCPI_STB_get(void)
 {
-	uint8_t status;
-	
-	status = SCPI_status_byte.status & SCPI_status_byte.enabled;
+	uint8_t status = 0;
+
+        if (SCPI_OPER.event & SCPI_OPER.enabled)
+                status |= SCPI_STB_OPER;
+        if (SCPI_QUES.event & SCPI_QUES.enabled)
+                status |= SCPI_STB_QUES;
+        if (SCPI_SESR.status & SCPI_SESR.enabled)
+                status |= SCPI_STB_SESR;
+        if (!SCPI_err_queue_empty())
+                status |= SCPI_STB_EEQ;
+        /* SCPI_STB_USER1 | SCPI_STB_USER2 | SCPI_STB_MAV */
+        
 	if(status)
 		status |= SCPI_STB_RQS;
 	return status;
 }
 
-/* Set selected bits in status byte */
-void SCPI_STB_set(uint8_t x)
-{
-	SCPI_status_byte.status |= x & ~SCPI_STB_RQS;
-}
-
-/* Clear selected bits in status byte */
-void SCPI_STB_reset(uint8_t x)
-{
-	SCPI_status_byte.status &= ~x;
-}
-
 /* Returns status register enabled, enabled bits in STB */
 uint8_t SCPI_SRE_get(void)
 {
-	return SCPI_status_byte.enabled;
+	return SCPI_STB_enabled;
 }
 
 /* Set enabled bits in STB */
 void SCPI_SRE_set(uint8_t val)
 {
-	SCPI_status_byte.enabled = val & ~SCPI_STB_RQS;
+	SCPI_STB_enabled = val & ~SCPI_STB_RQS;
 }
 
 /* Return operational condition register */
@@ -77,10 +74,6 @@ uint16_t SCPI_OPER_enab_get(void)
 void SCPI_OPER_enab_set(uint16_t val)
 {
 	SCPI_OPER.enabled = val;
-	if (SCPI_OPER.event & SCPI_OPER.enabled)
-		SCPI_STB_set(SCPI_STB_OPER);
-	else
-		SCPI_STB_reset(SCPI_STB_OPER);
 }
 
 /* Set bit(s) in Operation Status Register */
@@ -90,8 +83,6 @@ void SCPI_OPER_cond_set(uint16_t val)
 	/* Fixme: má reagovat na změnu ne na pokus o změnu (ne na 1 -> 1 ...) */
 	val &= SCPI_OPER_trans_to1;
 	SCPI_OPER.event |= val;
-	if (SCPI_OPER.event & SCPI_OPER.enabled)
-		SCPI_STB_set(SCPI_STB_OPER);
 }
 
 /* Reset bit(s) in Operation Status Register */
@@ -100,8 +91,6 @@ void SCPI_OPER_cond_reset(uint16_t val)
 	SCPI_OPER.condition &= ~val;
 	val &= SCPI_OPER_trans_to0;
 	SCPI_OPER.event |= val;
-	if (SCPI_OPER.event & SCPI_OPER.enabled)
-		SCPI_STB_set(SCPI_STB_OPER);
 }
 
 /* Get value from OPERation event register */
@@ -111,7 +100,6 @@ uint16_t SCPI_OPER_even_get(void)
 	
 	val = SCPI_OPER.event & SCPI_OPER.enabled;
 	SCPI_OPER.event = 0;
-	SCPI_STB_reset(SCPI_STB_OPER);
 	return val;
 }
 
@@ -126,8 +114,6 @@ void SCPI_QUES_cond_set(uint16_t val)
 	SCPI_QUES.condition |= val;
 	val &= SCPI_QUES_trans_to1;
 	SCPI_QUES.event |= val;
-	if (SCPI_QUES.event & SCPI_QUES.enabled)
-		SCPI_STB_set(SCPI_STB_QUES);
 }
 
 void SCPI_QUES_cond_reset(uint16_t val)
@@ -135,8 +121,6 @@ void SCPI_QUES_cond_reset(uint16_t val)
 	SCPI_QUES.condition &= ~val;
 	val &= SCPI_QUES_trans_to0;
 	SCPI_QUES.event |= val;
-	if (SCPI_QUES.event & SCPI_QUES.enabled)
-		SCPI_STB_set(SCPI_STB_QUES);
 }
 
 uint16_t SCPI_QUES_enab_get(void)
@@ -148,10 +132,6 @@ uint16_t SCPI_QUES_enab_get(void)
 void SCPI_QUES_enab_set(uint16_t enabled)
 {
 	SCPI_QUES.enabled = enabled;
-	if (SCPI_QUES.event & SCPI_QUES.enabled)
-		SCPI_STB_set(SCPI_STB_QUES);
-	else
-		SCPI_STB_reset(SCPI_STB_QUES);
 }
 
 /* Get value of QUEStionable event register */
@@ -161,17 +141,7 @@ uint16_t SCPI_QUES_even_get(void)
 	
 	val = SCPI_QUES.event & SCPI_QUES.enabled;
 	SCPI_QUES.event = 0;
-	SCPI_STB_reset(SCPI_STB_QUES);
 	return val;
-}
-
-/* Update sumary register when Stantard Event Status Enable Register changed */
-void SCPI_SESR_enab_update(void)
-{
-	if (SCPI_SESR.status & SCPI_SESR.enabled)
-		SCPI_STB_set(SCPI_STB_SESR);
-	else 
-		SCPI_STB_reset(SCPI_STB_SESR);
 }
 
 /* Get value of Standard Event Status Register */
@@ -181,22 +151,18 @@ uint8_t SCPI_SESR_get(void)
 	
 	val = SCPI_SESR.status & SCPI_SESR.enabled;
 	SCPI_SESR.status = 0;
-	SCPI_STB_reset(SCPI_STB_SESR);
 	return val;
 }
 
 void SCPI_SESR_enab_set(uint8_t val)
 {
 	SCPI_SESR.enabled = val;
-	SCPI_SESR_enab_update();
 }
 
 /* Set event bit in Standard Event Status Register */
 void SCPI_SESR_set(uint8_t val)
 {
 	SCPI_SESR.status |= val;
-	if (SCPI_SESR.status & SCPI_SESR.enabled)
-		SCPI_STB_set(SCPI_STB_SESR);
 }
 
 uint8_t SCPI_SESR_enab_get(void)
