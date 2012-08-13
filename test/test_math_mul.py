@@ -4,7 +4,6 @@ import math
 import random
 import serial
 import sys
-import time
 
 
 count=100
@@ -20,8 +19,6 @@ def test(mul1, mul2):
     expLo = int(exp % (2**32))
     try:
         port.write(cmd.encode('ascii'))
-        # FIXME: proč je potřeba tahle pauza?
-        time.sleep(0.01)
         port.write('test:mul?\n'.encode('ascii'))
         res = port.readline()
         res = res.strip()

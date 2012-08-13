@@ -2,7 +2,6 @@
 
 import serial
 import sys
-import time
 
 
 count=100
@@ -46,7 +45,6 @@ def test(count):
         raise
 
 port.write('test:adc 400,400\n'.encode('ascii'))
-time.sleep(0.01)
 
 # cmd burst
 while count > 0:

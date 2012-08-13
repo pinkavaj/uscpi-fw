@@ -4,7 +4,6 @@ import math
 import random
 import serial
 import sys
-import time
 
 
 count=100
@@ -17,8 +16,6 @@ def test(nomHi, nomLo, num):
     cmd = 'test:div %i,%i,%i\n' % (nomHi, nomLo, num, )
     try:
         port.write(cmd.encode('ascii'))
-        # FIXME: proč je potřeba tahle pauza?
-        time.sleep(0.005)
         port.write('test:div?\n'.encode('ascii'))
         res = port.readline()
         res = int(res)
