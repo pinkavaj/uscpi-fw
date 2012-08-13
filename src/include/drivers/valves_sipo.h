@@ -5,8 +5,8 @@
 
 #include <inttypes.h>
 
-
 void valves_sipo_init(void);
+void valves_sipo1_timeout(void);
 
 void valve_sipo1_0_close(void);
 void valve_sipo1_0_open(void);
