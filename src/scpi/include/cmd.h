@@ -29,7 +29,7 @@ typedef struct SCPI_cmd_struct {
 	const uint8_t set_params_min_P;
 	const uint8_t set_params_opt_P;
 	uint8_t num_suffix_max_P;
-	SCPI_parse_t(*parser_P)(char c);
+	SCPI_parse_t(*parser_P)(void);
 } SCPI_cmd_t;
 
 /*

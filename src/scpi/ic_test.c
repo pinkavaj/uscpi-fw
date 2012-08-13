@@ -15,7 +15,7 @@
 
 /* TODO: přemístit sem definici klíče */
 
-SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_adc(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		SPI_dev_select(SPI_DEV_AD974_0);
@@ -46,7 +46,7 @@ SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_div(void)
 {
 	static uint64_t nom;
 	static uint32_t num;
@@ -63,7 +63,7 @@ SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_mul(void)
 {
 	static uint32_t val1, val2;
 
@@ -82,7 +82,7 @@ SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_num(void)
 {
 	static uint32_t val;
 
@@ -93,7 +93,7 @@ SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_temp(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_temp(void)
 {
         uint16_t val;
 
@@ -107,7 +107,7 @@ SCPI_parse_t SCPI_IC_test_temp(char UNUSED(c))
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_temp_res(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_temp_res(void)
 {
         uint16_t val;
 
@@ -121,13 +121,13 @@ SCPI_parse_t SCPI_IC_test_temp_res(char UNUSED(c))
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_time(void)
 {
 	print_uint32(time_sec);
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_heat(char UNUSED(c))
+SCPI_parse_t SCPI_IC_test_heat(void)
 {
         for(uint8_t channel = 0; channel < 1; channel++)
         {

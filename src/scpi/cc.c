@@ -14,7 +14,7 @@
 SCPI_parse_t __vectors(void);
 
 /* Clear Status */
-SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
+SCPI_parse_t SCPI_CC_cls(void)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
 		SCPI_err_queue_reset();
@@ -27,7 +27,7 @@ SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 
 /* Standard Event Status Enable */
 /* Standard Event Status Enable Query  */
-SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
+SCPI_parse_t SCPI_CC_ese(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_SESR_enab_get());
@@ -44,14 +44,14 @@ SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
 }
 
 /* Event Status Register Query */
-SCPI_parse_t SCPI_CC_esr(char UNUSED(c))
+SCPI_parse_t SCPI_CC_esr(void)
 {
 	print_uint32(SCPI_SESR_get());
 	return SCPI_parse_end;
 }
 
 /* Identification Query */
-SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
+SCPI_parse_t SCPI_CC_idn(void)
 {
 	static const char IDN_P[] PROGMEM = 
 		STR(INFO_COMPANY) ","
@@ -66,7 +66,7 @@ SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
 
 /* Operation Complete Command  */
 /* Operation Complete Query */
-SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
+SCPI_parse_t SCPI_CC_opc(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		putc('1');
@@ -77,14 +77,14 @@ SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
 }
 
 /* Reset */
-SCPI_parse_t SCPI_CC_rst(char UNUSED(c))
+SCPI_parse_t SCPI_CC_rst(void)
 {
 	return __vectors();
 }
 
 /* Service Request Enable */
 /* Service Request Enable Query  */
-SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
+SCPI_parse_t SCPI_CC_sre(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_SRE_get());
@@ -99,14 +99,14 @@ SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
 }
 
 /* Read Status Byte Query */
-SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
+SCPI_parse_t SCPI_CC_stb(void)
 {
 	print_uint32(SCPI_STB_get());
 	return SCPI_parse_end;
 }
 
 /* Self-Test Query  */
-SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
+SCPI_parse_t SCPI_CC_tst(void)
 {
 	putc('1');
 	return SCPI_parse_end;
@@ -114,7 +114,7 @@ SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
 
 /* Wait-to-Continue - implementation is empty when operation executed 
  * synchronusly */
-SCPI_parse_t SCPI_CC_wai(char UNUSED(c))
+SCPI_parse_t SCPI_CC_wai(void)
 {
 	return SCPI_parse_end;
 }

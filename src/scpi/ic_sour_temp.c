@@ -19,7 +19,7 @@ static uint8_t get_temp_channel(void)
         return SCPI_num_suffixes[0];
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_dwel(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_dwel(void)
 {
         uint8_t channel;
 
@@ -62,17 +62,17 @@ static SCPI_parse_t temp_lcon(uint8_t gain)
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_lcon_gain(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_lcon_gain(void)
 {
         return temp_lcon(1);
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_lcon_int(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_lcon_int(void)
 {
         return temp_lcon(0);
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_mode(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_mode(void)
 {
         uint8_t channel;
 
@@ -83,7 +83,7 @@ SCPI_parse_t SCPI_IC_sour_temp_mode(char UNUSED(c))
         return SCPI_parse_err;
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_rtim(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_rtim(void)
 {
         uint8_t channel;
 
@@ -94,7 +94,7 @@ SCPI_parse_t SCPI_IC_sour_temp_rtim(char UNUSED(c))
         return SCPI_parse_err;
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_spo(char UNUSED(c))
+SCPI_parse_t SCPI_IC_sour_temp_spo(void)
 {
         uint8_t channel;
 

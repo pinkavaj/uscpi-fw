@@ -11,14 +11,14 @@
 /* TODO: přemístit sem definici klíče */
 
 /* Value of OPERation Status Register */
-SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_oper_cond(void)
 {
 	print_uint32(SCPI_OPER_cond_get());
 	return SCPI_parse_end;
 }
 
 /* Value of SCPI OPERation ENABled register */
-SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_oper_enab(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_OPER_enab_get());
@@ -33,27 +33,27 @@ SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
 }
 
 /* Value of SCPI OPERation Event register */
-SCPI_parse_t SCPI_IC_stat_oper_even(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_oper_even(void)
 {
 	print_uint32(SCPI_OPER_even_get());
 	return SCPI_parse_end;
 }
 
 /* Reset all status enable registers (and others) to default state */
-SCPI_parse_t SCPI_IC_stat_pres(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_pres(void)
 {
 	SCPI_QUES_enab_set(0);
 	SCPI_OPER_enab_set(0);
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_stat_ques_cond(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_ques_cond(void)
 {
 	print_uint32(SCPI_QUES_cond_get());
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_ques_enab(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_QUES_enab_get());
@@ -67,7 +67,7 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 	return ret;
 }
 
-SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
+SCPI_parse_t SCPI_IC_stat_ques_even(void)
 {
 	print_uint32(SCPI_QUES_even_get());
 	return SCPI_parse_end;

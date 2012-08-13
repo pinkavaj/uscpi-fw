@@ -7,25 +7,25 @@
 extern uint8_t SCPI_params_count;
 
 /* SCPI Instrument Commands */
-SCPI_parse_t SCPI_IC_stat_oper_cond(char c);
-SCPI_parse_t SCPI_IC_stat_oper_enab(char c);
-SCPI_parse_t SCPI_IC_stat_oper_even(char c);
-SCPI_parse_t SCPI_IC_stat_pres(char c);
-SCPI_parse_t SCPI_IC_stat_ques_cond(char c);
-SCPI_parse_t SCPI_IC_stat_ques_enab(char c);
-SCPI_parse_t SCPI_IC_stat_ques_even(char c);
-SCPI_parse_t SCPI_IC_syst_err_next(char c);
-SCPI_parse_t SCPI_IC_syst_vers(char c);
+SCPI_parse_t SCPI_IC_stat_oper_cond(void);
+SCPI_parse_t SCPI_IC_stat_oper_enab(void);
+SCPI_parse_t SCPI_IC_stat_oper_even(void);
+SCPI_parse_t SCPI_IC_stat_pres(void);
+SCPI_parse_t SCPI_IC_stat_ques_cond(void);
+SCPI_parse_t SCPI_IC_stat_ques_enab(void);
+SCPI_parse_t SCPI_IC_stat_ques_even(void);
+SCPI_parse_t SCPI_IC_syst_err_next(void);
+SCPI_parse_t SCPI_IC_syst_vers(void);
 
 #ifdef SCPI_TEST
-SCPI_parse_t SCPI_IC_test_adc(char c);
-SCPI_parse_t SCPI_IC_test_div(char c);
-SCPI_parse_t SCPI_IC_test_mul(char c);
-SCPI_parse_t SCPI_IC_test_num(char c);
-SCPI_parse_t SCPI_IC_test_temp(char c);
-SCPI_parse_t SCPI_IC_test_temp_res(char c);
-SCPI_parse_t SCPI_IC_test_time(char c);
-SCPI_parse_t SCPI_IC_test_heat(char c);
+SCPI_parse_t SCPI_IC_test_adc(void);
+SCPI_parse_t SCPI_IC_test_div(void);
+SCPI_parse_t SCPI_IC_test_mul(void);
+SCPI_parse_t SCPI_IC_test_num(void);
+SCPI_parse_t SCPI_IC_test_temp(void);
+SCPI_parse_t SCPI_IC_test_temp_res(void);
+SCPI_parse_t SCPI_IC_test_time(void);
+SCPI_parse_t SCPI_IC_test_heat(void);
 #endif
 
 #endif

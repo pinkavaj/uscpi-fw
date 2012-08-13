@@ -8,7 +8,7 @@
 
 /* TODO: přemístit sem definici klíče */
 
-SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
+SCPI_parse_t SCPI_IC_syst_err_next(void)
 {
 	const SCPI_err_t *e;
 
@@ -17,7 +17,7 @@ SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_syst_vers(char UNUSED(c))
+SCPI_parse_t SCPI_IC_syst_vers(void)
 {
 	print_P(SCPI_version_P);
 	return SCPI_parse_end;

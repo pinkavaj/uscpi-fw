@@ -11,19 +11,22 @@
 
 /* If c is command separator returns c, 0 othervise */
 #define SCPI_iscmdend(c) (c == '\n' || c == ';')
-static SCPI_parse_t SCPI_parse_keyword(char c);
-static SCPI_parse_t SCPI_parse_keyword_num(char c);
-static SCPI_parse_t SCPI_parse_keyword_question(char c);
-static SCPI_parse_t SCPI_parse_keyword_sep(char c);
-static SCPI_parse_t SCPI_parse_param_start(char c);
-static SCPI_parse_t SCPI_parse_param_str(char c);
-static SCPI_parse_t SCPI_parse_param_str_end(char c);
-static SCPI_parse_t SCPI_parse_param_nostr(char c);
-static SCPI_parse_t SCPI_parse_param_end(char c);
+static SCPI_parse_t SCPI_parse_keyword(void);
+static SCPI_parse_t SCPI_parse_keyword_num(void);
+static SCPI_parse_t SCPI_parse_keyword_question(void);
+static SCPI_parse_t SCPI_parse_keyword_sep(void);
+static SCPI_parse_t SCPI_parse_param_start(void);
+static SCPI_parse_t SCPI_parse_param_str(void);
+static SCPI_parse_t SCPI_parse_param_str_end(void);
+static SCPI_parse_t SCPI_parse_param_nostr(void);
+static SCPI_parse_t SCPI_parse_param_end(void);
 static void SCPI_parser_reset_(void) ;
 
 uint8_t SCPI_num_suffixes[2];
 uint8_t SCPI_num_suffixes_idx;
+
+/* Last character from input buffer, used only by local parser */
+static char last_char;
 
 /* Command for currently (last) selected branch item */
 static const SCPI_cmd_t *SCPI_cmd;
@@ -31,19 +34,19 @@ static const SCPI_cmd_t *SCPI_cmd;
 static const SCPI_branch_item_t *SCPI_branch;
 
 /* Current parser, changes during different stages of parsing input */
-static SCPI_parse_t (*_SCPI_parser)(char);
+static SCPI_parse_t (*_SCPI_parser)(void);
 
 /* Get SCPI keyword [a-zA-Z] or skip to next parser */
-static SCPI_parse_t SCPI_parse_keyword(char c)
+static SCPI_parse_t SCPI_parse_keyword(void)
 {
-	if (isalpha(c)) {
+	if (isalpha(last_char)) {
 		if (SCPI_in_len > 12)
 		{
 			SCPI_err_set(&SCPI_err_112);
 			return SCPI_parse_err;
 		}
-		c = toupper(c);
-		SCPI_in[SCPI_in_len - 1] = c;
+		last_char = toupper(last_char);
+		SCPI_in[SCPI_in_len - 1] = last_char;
 		return SCPI_parse_more;
 	}
         if (SCPI_num_suffixes_idx >= sizeof(SCPI_num_suffixes)) {
@@ -51,25 +54,25 @@ static SCPI_parse_t SCPI_parse_keyword(char c)
                 return SCPI_parse_err;
         }
         SCPI_num_suffixes[SCPI_num_suffixes_idx] = 0;
-	if (isdigit(c)) {
+	if (isdigit(last_char)) {
 		_SCPI_parser = SCPI_parse_keyword_num;
-		return SCPI_parse_keyword_num(c);
+		return SCPI_parse_keyword_num();
 	}
-	return SCPI_parse_keyword_question(c);
+	return SCPI_parse_keyword_question();
 }
 
 /* Parse numeric suffix after keyword */
-static SCPI_parse_t SCPI_parse_keyword_num(char c)
+static SCPI_parse_t SCPI_parse_keyword_num(void)
 {
 	uint8_t num_suffix;
         
         num_suffix= SCPI_num_suffixes[SCPI_num_suffixes_idx];
-	if (isdigit(c)) {
+	if (isdigit(last_char)) {
 		if (num_suffix >= (UINT8_MAX / 10)) {
 			SCPI_err_set(&SCPI_err_114);
 			return SCPI_parse_err;
 		}
-                num_suffix = num_suffix * 10 + (c - '0');
+                num_suffix = num_suffix * 10 + (last_char - '0');
 		SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix;
 		return SCPI_parse_drop_last;
 	}
@@ -80,14 +83,14 @@ static SCPI_parse_t SCPI_parse_keyword_num(char c)
 	}
 	/* Internal numbering is from 0 */
 	SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix - 1;
-	return SCPI_parse_keyword_question(c);
+	return SCPI_parse_keyword();
 }
 
 /* Just check whatever is keyword question (c == '?') */
-static SCPI_parse_t SCPI_parse_keyword_question(char c)
+static SCPI_parse_t SCPI_parse_keyword_question(void)
 {
 	_SCPI_parser = SCPI_parse_keyword_sep;
-	if (c == '?') {
+	if (last_char == '?') {
 		_SCPI_CMD_IS_QUEST_set();
 		if (_SCPI_PREV_RESULT())
 			putc(';');
@@ -95,12 +98,12 @@ static SCPI_parse_t SCPI_parse_keyword_question(char c)
 			_SCPI_PREV_RESULT_set();
 		return SCPI_parse_drop_last;
 	}
-	return SCPI_parse_keyword_sep(c);
+	return SCPI_parse_keyword_sep();
 }
 
 /* We have whole keyword, try find it in table and handle it (eg. call 
  * function or select new keyword table */
-static SCPI_parse_t SCPI_parse_keyword_sep(char c)
+static SCPI_parse_t SCPI_parse_keyword_sep(void)
 {
         uint8_t num_suffix;
 	uint8_t num_suffix_max;
@@ -152,7 +155,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
         }
 
 	/* try setup parsing of another keyword, if found in tree */
-	if (c == ':') {
+	if (last_char == ':') {
 		SCPI_branch = 
 			(SCPI_branch_item_t*)pgm_read_word(&branch->branch_P);
 		if (SCPI_branch == NULL) {
@@ -174,13 +177,13 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 			return SCPI_parse_err;
 		}
 	/* parameters separator must follow */
-	if (SCPI_iscmdend(c)) {
-		_SCPI_parser = (SCPI_parse_t (*)(char))
+	if (SCPI_iscmdend(last_char)) {
+		_SCPI_parser = (SCPI_parse_t (*)(void))
 			pgm_read_word(&SCPI_cmd->parser_P);
-		return _SCPI_parser(c);
+		return _SCPI_parser();
 	}
 	_SCPI_parser = SCPI_parse_param_start;
-	if (isspace(c))
+	if (isspace(last_char))
 		return SCPI_parse_drop_all;
 
 	SCPI_err_set(&SCPI_err_113);
@@ -189,30 +192,30 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 
 /* Normalize parameters recieved on input, convert tehm to zero terminated 
  * string, and fill parameter types into SCPI_param_types list */
-static SCPI_parse_t SCPI_parse_param_start(char c)
+static SCPI_parse_t SCPI_parse_param_start(void)
 {
-	if (SCPI_iscmdend(c))
-		return SCPI_parse_param_end(c);
+	if (SCPI_iscmdend(last_char))
+		return SCPI_parse_param_end();
 
-	if(isspace(c))
+	if(isspace(last_char))
 		return SCPI_parse_drop_last;
 
-	if (c == '"')
+	if (last_char == '"')
 		_SCPI_parser = SCPI_parse_param_str;
 	else
 		_SCPI_parser = SCPI_parse_param_nostr;
-	return _SCPI_parser(c);
+	return _SCPI_parser();
 }
 
-static SCPI_parse_t SCPI_parse_param_str(char c)
+static SCPI_parse_t SCPI_parse_param_str(void)
 {
 	/* TODO */
 	if (!_SCPI_PARSE_PARAM_PREF()) {
-		if (c == '"') {
+		if (last_char == '"') {
 			_SCPI_parser = SCPI_parse_param_str_end;
 			return SCPI_parse_more;
 		}
-		if (c == '\\')
+		if (last_char == '\\')
 			_SCPI_PARSE_PARAM_PREF_set();
 	} else
 		_SCPI_PARSE_PARAM_PREF_reset();
@@ -220,17 +223,17 @@ static SCPI_parse_t SCPI_parse_param_str(char c)
 	return SCPI_parse_more;
 }
 
-static SCPI_parse_t SCPI_parse_param_str_end(char c)
+static SCPI_parse_t SCPI_parse_param_str_end(void)
 {
-	if (SCPI_iscmdend(c)) {
+	if (SCPI_iscmdend(last_char)) {
 		SCPI_params_count++;
-		return SCPI_parse_param_end(c);
+		return SCPI_parse_param_end();
 	}
 
-	if (isspace(c))
+	if (isspace(last_char))
 		return SCPI_parse_drop_last;
 
-	if (c == ',') {
+	if (last_char == ',') {
 		SCPI_in[SCPI_in_len - 1] = 0;
 		SCPI_params_count++;
 		_SCPI_parser = SCPI_parse_param_start;
@@ -238,23 +241,23 @@ static SCPI_parse_t SCPI_parse_param_str_end(char c)
 	return SCPI_parse_err;
 }
 
-static SCPI_parse_t SCPI_parse_param_nostr(char c)
+static SCPI_parse_t SCPI_parse_param_nostr(void)
 {
-	if (SCPI_iscmdend(c)) {
+	if (SCPI_iscmdend(last_char)) {
 		if (isspace(SCPI_in[SCPI_in_len - 2]))
 			SCPI_in[SCPI_in_len - 2] = 0;
 		SCPI_params_count++;
-		return SCPI_parse_param_end(c);
+		return SCPI_parse_param_end();
 	}
 
-	if (isspace(c)) {
+	if (isspace(last_char)) {
 		if (isspace(SCPI_in[SCPI_in_len - 2])) {
 			SCPI_in[SCPI_in_len - 2] = ' ';
 			return SCPI_parse_drop_last;
 		} else
 			SCPI_in[SCPI_in_len - 1] = ' ';
 	} else
-	if (c == ',') {
+	if (last_char == ',') {
 		SCPI_in[SCPI_in_len - 1] = 0;
 		SCPI_params_count++;
 		_SCPI_parser = SCPI_parse_param_start;
@@ -263,13 +266,13 @@ static SCPI_parse_t SCPI_parse_param_nostr(char c)
 	return SCPI_parse_more;
 }
 
-static SCPI_parse_t SCPI_parse_param_end(char c)
+static SCPI_parse_t SCPI_parse_param_end(void)
 {
 	if (isspace(SCPI_in[SCPI_in_len - 1]))
 		SCPI_in[SCPI_in_len - 1] = 0;
-	_SCPI_parser = (SCPI_parse_t (*)(char))
+	_SCPI_parser = (SCPI_parse_t (*)(void))
 		pgm_read_word(&SCPI_cmd->parser_P);
-	return _SCPI_parser(c);
+	return _SCPI_parser();
 }
 
 /* Clean ups when no more input(=output) for this comman will be proceeded */
@@ -304,8 +307,9 @@ SCPI_parse_t SCPI_parse(char c)
 		}
 	}
 
+        last_char = c;
 	/* TODO: check whatever reset has been called */
-	SCPI_parse_t ret = _SCPI_parser(c);
+	SCPI_parse_t ret = _SCPI_parser();
 	/* End of command, but not of command sequence */
 	if (ret == SCPI_parse_end) {
 		if (c == ';') {
