@@ -129,7 +129,6 @@ math_mul_32_32_r64:
 	mul	reg0, temp1
 	add	acc1, R0
 	adc	acc2, R1
-	adc	acc3, dummy
 // 1x0
 	mul	reg1, temp0
 	add	acc1, R0
@@ -139,7 +138,6 @@ math_mul_32_32_r64:
 	mul	reg0, temp2
 	add	acc2, R0
 	adc	acc3, R1
-	adc	acc4, dummy
 // 1x1
 	mul	reg1, temp1
 	add	acc2, R0
