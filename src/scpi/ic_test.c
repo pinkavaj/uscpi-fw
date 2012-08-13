@@ -24,13 +24,11 @@ SCPI_parse_t SCPI_IC_test_adc(void)
 			uint16_t sample;
 
 			sample = SPI_dev_AD_get_sample(channel);
-			print_uint32(sample);
-			putc(',');
+			SCPI_print_uint16(sample);
 			sample = SPI_dev_AD_get_sample(channel);
-			print_uint32(sample);
+			SCPI_print_uint16(sample);
 			if (channel == 3)
 				break;
-			putc(',');
 		}
 	} else {
                 uint16_t val;
@@ -58,9 +56,9 @@ SCPI_parse_t SCPI_IC_test_func_div(void)
 	SCPI_in_uint32(&num);
 
 	val = math_div_64_32_r32(nom, num);
-	print_uint32(val);
+	SCPI_print_uint32(val);
 
-	return SCPI_parse_end;
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_func_mul(void)
@@ -74,11 +72,10 @@ SCPI_parse_t SCPI_IC_test_func_mul(void)
 
 	val = math_mul_32_32_r64(val1, val2);
 	p = (void*)&val;
-	print_uint32(*(p+1));
-	putc(',');
-	print_uint32(val);
+	SCPI_print_uint32(*(p+1));
+	SCPI_print_uint32(val);
 
-	return SCPI_parse_end;
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_func_dec(void)
@@ -90,8 +87,9 @@ SCPI_parse_t SCPI_IC_test_func_dec(void)
         if (ret == SCPI_parse_err)
                 return ret;
 
-	print_FP_16_16(x);
-	return SCPI_parse_end;
+	SCPI_print_FP_16_16(x);
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_func_int(void)
@@ -103,8 +101,9 @@ SCPI_parse_t SCPI_IC_test_func_int(void)
         if (ret == SCPI_parse_err)
                 return ret;
 
-	print_uint32(x);
-	return SCPI_parse_end;
+	SCPI_print_uint32(x);
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_temp(void)
@@ -116,7 +115,7 @@ SCPI_parse_t SCPI_IC_test_temp(void)
 
         SCPI_in_uint16(&val);
         val = Pt_RtoT(val);
-        print_uint32(val);
+        SCPI_print_uint16(val);
 
         return SCPI_parse_end;
 }
@@ -130,15 +129,16 @@ SCPI_parse_t SCPI_IC_test_temp_res(void)
 
         SCPI_in_uint16(&val);
         val = Pt_TtoR(val);
-        print_uint32(val);
+        SCPI_print_uint16(val);
 
         return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_time(void)
 {
-	print_uint32(time_sec);
-	return SCPI_parse_end;
+	SCPI_print_uint16(time_sec);
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_heat(void)
@@ -148,9 +148,8 @@ SCPI_parse_t SCPI_IC_test_heat(void)
 		temp_data_IU_t temp_data_IU;
 
                 temp_data_IU = temp_meas_IU(channel);
-                print_uint32(temp_data_IU.I);
-                putc(',');
-                print_uint32(temp_data_IU.U);
+                SCPI_print_uint16(temp_data_IU.I);
+                SCPI_print_uint16(temp_data_IU.U);
         }
         return SCPI_parse_end;
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "cmd_tools.h"
+#include "scpi_parser.h"
 #include "lib/math_cust.h"
 
 uint8_t SCPI_params_count;
@@ -100,16 +101,52 @@ SCPI_parse_t SCPI_in_FP_16_16(FP_16_16_t *x)
         return SCPI_parse_end;
 }
 
+static void SCPI_print_common(void)
+{
+        if (_SCPI_NEED_COMMA())
+                putc(',');
+        if (_SCPI_NEED_SEMICOLON())
+                putc(';');
+        _SCPI_NEED_SEMICOLON_reset();
+        _SCPI_NEED_COMMA_set();
+        _SCPI_NEED_NEWLINE_set();
+}
+
+void SCPI_print_FP_16_16(FP_16_16_t val)
+{
+        SCPI_print_common();
+        print_FP_16_16(val);
+}
+
+void SCPI_print_P(PGM_P s)
+{
+        SCPI_print_common();
+        print_P(s);
+}
+
 void SCPI_print_temp_1_20(temp_1_20_t T)
 {
         uint16_t T_fract;
 
+        SCPI_print_common();
+
         T_fract = T % 20;
         T = T / 20;
-
         print_uint32(T);
         putc('.');
         print_uint32f(T_fract * 5, 2);
+}
+
+void SCPI_print_uint16(uint16_t val)
+{
+        SCPI_print_common();
+        print_uint32(val);
+}
+
+void SCPI_print_uint32(uint32_t val)
+{
+        SCPI_print_common();
+        print_uint32(val);
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

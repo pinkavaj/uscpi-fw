@@ -13,8 +13,9 @@
 /* Value of OPERation Status Register */
 SCPI_parse_t SCPI_IC_stat_oper_cond(void)
 {
-	print_uint32(SCPI_OPER_cond_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_OPER_cond_get());
+
+        return SCPI_parse_end;
 }
 
 /* Value of SCPI OPERation ENABled register */
@@ -24,8 +25,9 @@ SCPI_parse_t SCPI_IC_stat_oper_enab(void)
         uint16_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_OPER_enab_get());
-		return SCPI_parse_end;
+		SCPI_print_uint16(SCPI_OPER_enab_get());
+
+                return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_err_set_(&SCPI_err_108);
@@ -40,8 +42,9 @@ SCPI_parse_t SCPI_IC_stat_oper_enab(void)
 /* Value of SCPI OPERation Event register */
 SCPI_parse_t SCPI_IC_stat_oper_even(void)
 {
-	print_uint32(SCPI_OPER_even_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_OPER_even_get());
+
+        return SCPI_parse_end;
 }
 
 /* Reset all status enable registers (and others) to default state */
@@ -54,8 +57,9 @@ SCPI_parse_t SCPI_IC_stat_pres(void)
 
 SCPI_parse_t SCPI_IC_stat_ques_cond(void)
 {
-	print_uint32(SCPI_QUES_cond_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_QUES_cond_get());
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_stat_ques_enab(void)
@@ -64,8 +68,9 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(void)
         uint16_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_QUES_enab_get());
-		return SCPI_parse_end;
+		SCPI_print_uint16(SCPI_QUES_enab_get());
+
+                return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_err_set_(&SCPI_err_108);
@@ -78,8 +83,9 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(void)
 
 SCPI_parse_t SCPI_IC_stat_ques_even(void)
 {
-	print_uint32(SCPI_QUES_even_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_QUES_even_get());
+
+        return SCPI_parse_end;
 }
 
 /* FIXME: just to hide warning, remove as soon as posible */

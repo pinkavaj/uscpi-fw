@@ -83,12 +83,12 @@ static SCPI_parse_t SCPI_parse_keyword_num(void)
 static SCPI_parse_t SCPI_parse_keyword_question(void)
 {
 	_SCPI_parser = SCPI_parse_keyword_sep;
+        if (_SCPI_NEED_COMMA()) {
+                _SCPI_NEED_COMMA_reset();
+                _SCPI_NEED_SEMICOLON_set();
+        }
 	if (last_char == '?') {
 		_SCPI_CMD_IS_QUEST_set();
-		if (_SCPI_PREV_RESULT())
-			putc(';');
-		else
-			_SCPI_PREV_RESULT_set();
 		return SCPI_parse_drop_last;
 	}
 	return SCPI_parse_keyword_sep();
@@ -251,12 +251,14 @@ static SCPI_parse_t SCPI_parse_param_end(void)
 	return _SCPI_parser();
 }
 
+//const char _nl[] PROGMEM = "\r\n";
 /* Clean ups when no more input(=output) for this comman will be proceeded */
 static SCPI_parse_t SCPI_parse_end_(SCPI_parse_t ret)
 {
-	/* TODO: mark parser as reset neede */
-	if (_SCPI_PREV_RESULT())
+
+	if (_SCPI_NEED_NEWLINE())
 	{
+//                SCPI_print_P(_nl);
 		putc('\r');
 		putc('\n');
 	}
@@ -378,11 +380,13 @@ void SCPI_loop(void)
 void SCPI_parser_reset(void) 
 {
 	SCPI_branch = SCPI_bt_ROOT;
-	_SCPI_PREV_RESULT_reset();
+	_SCPI_NEED_NEWLINE_reset();
+        _SCPI_NEED_COMMA_reset();
+        _SCPI_NEED_SEMICOLON_reset();
 	SCPI_parser_reset_();
 }
 
-/* Reset parser after end of command (when new command start */
+/* Reset parser after end of command (when new command starts) */
 static void SCPI_parser_reset_(void) 
 {
 	SCPI_cmd = NULL;

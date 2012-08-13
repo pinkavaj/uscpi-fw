@@ -33,8 +33,9 @@ SCPI_parse_t SCPI_CC_ese(void)
         uint8_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SESR_enab_get());
-		return SCPI_parse_end;
+		SCPI_print_uint16(SCPI_SESR_enab_get());
+
+                return SCPI_parse_end;
 	} 
 	if (SCPI_params_count != 1)
 		return SCPI_err_set_(&SCPI_err_108);
@@ -48,8 +49,9 @@ SCPI_parse_t SCPI_CC_ese(void)
 /* Event Status Register Query */
 SCPI_parse_t SCPI_CC_esr(void)
 {
-	print_uint32(SCPI_SESR_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_SESR_get());
+
+        return SCPI_parse_end;
 }
 
 /* Identification Query */
@@ -62,8 +64,9 @@ SCPI_parse_t SCPI_CC_idn(void)
 		STR(VER_MINOR) "." STR(VER_REV) "." STR(VER_BUILD)
 		"-avr_libc-" __AVR_LIBC_VERSION_STRING__ ;
 
-	print_P(IDN_P);
-	return SCPI_parse_end;
+	SCPI_print_P(IDN_P);
+
+        return SCPI_parse_end;
 }
 
 /* Operation Complete Command  */
@@ -71,7 +74,7 @@ SCPI_parse_t SCPI_CC_idn(void)
 SCPI_parse_t SCPI_CC_opc(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		putc('1');
+                SCPI_print_uint16(1);
 		return SCPI_parse_end;
 	}
 	SCPI_SESR_set(SCPI_SESR_OPC);
@@ -92,8 +95,9 @@ SCPI_parse_t SCPI_CC_sre(void)
         uint8_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SRE_get());
-		return SCPI_parse_end;
+		SCPI_print_uint16(SCPI_SRE_get());
+
+                return SCPI_parse_end;
 	}
 	ret = SCPI_in_uint8(&val);
 	if (ret == SCPI_parse_err)
@@ -105,14 +109,15 @@ SCPI_parse_t SCPI_CC_sre(void)
 /* Read Status Byte Query */
 SCPI_parse_t SCPI_CC_stb(void)
 {
-	print_uint32(SCPI_STB_get());
-	return SCPI_parse_end;
+	SCPI_print_uint16(SCPI_STB_get());
+        return SCPI_parse_end;
 }
 
 /* Self-Test Query  */
 SCPI_parse_t SCPI_CC_tst(void)
 {
-	putc('1');
+        /* FIXME: use common printing */
+        SCPI_print_uint16(1);
 	return SCPI_parse_end;
 }
 

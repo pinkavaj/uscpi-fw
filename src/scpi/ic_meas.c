@@ -22,9 +22,7 @@ static SCPI_parse_t SCPI_IC_meas_temp(void)
 
         channel = get_temp_channel();
         T = temp_get(channel);
-        print_uint32(T / 20);
-        putc('.');
-        print_uint32f((T % 20) * 5, 2);
+        SCPI_print_temp_1_20(T);
 
         return SCPI_parse_end;
 }

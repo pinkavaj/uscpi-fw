@@ -39,9 +39,10 @@ static SCPI_parse_t temp_lcon(uint8_t gain)
         pic_param = temp_pic_params_get(channel);
         if (_SCPI_CMD_IS_QUEST()) {
                 if (gain)
-                        print_FP_16_16(pic_param.gain_lin);
+                        SCPI_print_FP_16_16(pic_param.gain_lin);
                 else
-                        print_FP_16_16(pic_param.gain_int);
+                        SCPI_print_FP_16_16(pic_param.gain_int);
+
                 return SCPI_parse_end;
         }
 
@@ -81,13 +82,13 @@ SCPI_parse_t SCPI_IC_sour_temp_mode(void)
                 switch(temp_mode_get(channel)) {
                         default:
                         case temp_mode_fix:
-                                print_P(key_fix_P.keyword_P);
+                                SCPI_print_P(key_fix_P.keyword_P);
                                 break;
                         case temp_mode_list:
-                                print_P(key_list_P.keyword_P);
+                                SCPI_print_P(key_list_P.keyword_P);
                                 break;
                         case temp_mode_prog:
-                                print_P(key_prog_P.keyword_P);
+                                SCPI_print_P(key_prog_P.keyword_P);
                                 break;
                 }
                 return SCPI_parse_end;
@@ -118,6 +119,7 @@ SCPI_parse_t SCPI_IC_sour_temp_slop(void)
         if (_SCPI_CMD_IS_QUEST()) {        
                 slope = temp_slope_get(channel);
                 SCPI_print_temp_1_20(slope);
+
                 return SCPI_parse_end;
         }
         ret = SCPI_in_FP_16_16(&slope_);
@@ -140,6 +142,7 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
         if (_SCPI_CMD_IS_QUEST()) {
                 T = temp_want_get(channel);
                 SCPI_print_temp_1_20(T);
+
                 return SCPI_parse_end;
         }
         ret = SCPI_in_FP_16_16(&T);
