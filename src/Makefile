@@ -18,7 +18,7 @@ PROJECT=uSCPIfw
 # (NOT .s !!!) for assembly source code files.
 #INC="-I. -I/usr/lib/avr/include/"
 INC="-I. -I/usr/lib/avr/include/"
-SRC=-c main.c -c scpi.c -c usart.c -c timer.c -c spi.c
+SRC=-c main.c -c scpi.c -c usart.c -c timer.c -c spi.c -c math.S
 #OBJ=main.o scpi.o
 OBJ=main.o
 CC=avr-gcc
@@ -29,8 +29,8 @@ OBJDUMP=avr-objdump
 CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 	-Wall -Wstrict-prototypes -Wstrict-aliasing=1 -Wextra -pedantic \
 	-ffreestanding -fshort-enums -fstrict-aliasing -funsigned-char \
-	${INC} -DF_CPU=${F_CPU} \
-	--combine # -fwhole-program 
+	-funsigned-bitfields ${INC} -DF_CPU=${F_CPU} \
+	--combine -fwhole-program 
 # 
 # experimental stuff
 # 
@@ -41,7 +41,7 @@ CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 #  Make code a little bigger, but might be usefull
 #  -mcall-prologues
 # Deprecated, not working, broke program
-#CFLAGS+= --combine -fwhole-program -funsigned-bitfields
+#CFLAGS+= --combine -fwhole-program 
 
 all: hex
 
@@ -55,7 +55,7 @@ hex: link
 link: build
 	$(CC) $(CFLAGS) ${OBJ} -o ${PROJECT}.out
 
-build: ver
+build: ver clean
 	$(CC) $(CFLAGS) ${SRC}
 
 ver:
@@ -69,5 +69,8 @@ size:
 	size ${PROJECT}.out
 
 clean:
-	rm *.o *.out *.hex
+	for f in *.hex *.o *.out; do \
+		[ "${f}" != "" ] || continue; \
+		rm "${x}" || exit -1; \
+	done
 
