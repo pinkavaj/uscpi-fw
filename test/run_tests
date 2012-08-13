@@ -25,3 +25,5 @@ BAUDRATE=${BAUDRATE:=115200}
 
 stty -F ${DEV_PORT} ${BAUDRATE}
 
+./test_div.py ${DEV_PORT} ${BAUDRATE}
+
