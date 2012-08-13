@@ -62,8 +62,8 @@ ver:
 	sed -i "s/VER_BUILD .*/VER_BUILD `svnversion | sed "s/.*://"`/" \
 		config.h || true
 
-disas:
-	$(OBJDUMP) -d ${PROJECT}.out
+dump:
+	$(OBJDUMP) -d ${PROJECT}.out | vimpager -c "set syntax=asm" -
 
 size:
 	size ${PROJECT}.out
