@@ -21,7 +21,7 @@ static SCPI_parse_t SCPI_parse_param_start(void);
 static SCPI_parse_t SCPI_parse_param_str(void);
 static SCPI_parse_t SCPI_parse_param_str_end(void);
 static SCPI_parse_t SCPI_parse_param_nostr(void);
-static SCPI_parse_t SCPI_parse_param_end(void);
+static SCPI_parse_t SCPI_parse_params_end(void);
 static void SCPI_parser_reset_(void) ;
 
 uint8_t SCPI_num_suffixes[2];
@@ -154,11 +154,9 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
 		(!_SCPI_CMD_IS_QUEST() && !pgm_read_byte(&SCPI_cmd->set_P)))
 			return SCPI_err_set_(&SCPI_err_102);
 	/* parameters separator must follow */
-	if (SCPI_iscmdend(last_char)) {
-		_SCPI_parser = (SCPI_parse_t (*)(void))
-			pgm_read_word(&SCPI_cmd->parser_P);
-		return _SCPI_parser();
-	}
+	if (SCPI_iscmdend(last_char))
+		return SCPI_parse_params_end();
+
 	_SCPI_parser = SCPI_parse_param_start;
 	if (isspace(last_char))
 		return SCPI_parse_drop_all;
@@ -171,7 +169,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
 static SCPI_parse_t SCPI_parse_param_start(void)
 {
 	if (SCPI_iscmdend(last_char))
-		return SCPI_parse_param_end();
+		return SCPI_parse_params_end();
 
 	if(isspace(last_char))
 		return SCPI_parse_drop_last;
@@ -203,7 +201,7 @@ static SCPI_parse_t SCPI_parse_param_str_end(void)
 {
 	if (SCPI_iscmdend(last_char)) {
 		SCPI_params_count++;
-		return SCPI_parse_param_end();
+		return SCPI_parse_params_end();
 	}
 
 	if (isspace(last_char))
@@ -223,7 +221,7 @@ static SCPI_parse_t SCPI_parse_param_nostr(void)
 		if (isspace(SCPI_in[SCPI_in_len - 2]))
 			SCPI_in[SCPI_in_len - 2] = 0;
 		SCPI_params_count++;
-		return SCPI_parse_param_end();
+		return SCPI_parse_params_end();
 	}
 
 	if (isspace(last_char)) {
@@ -242,12 +240,25 @@ static SCPI_parse_t SCPI_parse_param_nostr(void)
 	return SCPI_parse_more;
 }
 
-static SCPI_parse_t SCPI_parse_param_end(void)
+static SCPI_parse_t SCPI_parse_params_end(void)
 {
+        uint8_t params_min, params_opt;
+
 	if (isspace(SCPI_in[SCPI_in_len - 1]))
 		SCPI_in[SCPI_in_len - 1] = 0;
+
+        if (!_SCPI_CMD_IS_QUEST()) {
+                params_min = pgm_read_byte(&SCPI_cmd->set_params_min_P);
+                params_opt = pgm_read_byte(&SCPI_cmd->set_params_opt_P);
+                if (SCPI_params_count < params_min)
+                        return SCPI_err_set_(&SCPI_err_109);
+                if (SCPI_params_count > (params_min+params_opt))
+                        return SCPI_err_set_(&SCPI_err_108);
+        }
+
 	_SCPI_parser = (SCPI_parse_t (*)(void))
 		pgm_read_word(&SCPI_cmd->parser_P);
+
 	return _SCPI_parser();
 }
 

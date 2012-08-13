@@ -13,7 +13,6 @@
  * get_has_params - if 1 get (questionalble form) may have parameters
  * 	0 - questionable form does not accept parameters
  * set - command has set form
- * set_params_atonce - call function when all parameters parsing is finished
  * set_params_min - minimal amount of parameters required for function
  * set_params_opt - number of optional parameters, total maximal amout of
  * 	parameter allowed if set_params_min + set_params_opt
@@ -25,7 +24,6 @@ typedef struct SCPI_cmd_struct {
 	const uint8_t get_P;
 	const uint8_t get_has_params_P;
 	const uint8_t set_P;
-	const uint8_t set_params_atonce_P;
 	const uint8_t set_params_min_P;
 	const uint8_t set_params_opt_P;
 	uint8_t num_suffix_max_P;

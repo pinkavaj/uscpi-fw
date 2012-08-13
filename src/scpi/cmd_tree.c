@@ -14,10 +14,7 @@
 #define PARAMS_N 0
 #define PARAMS_Y 1
 #define SET(s, par) .set_P = s, par
-#define PARAMS(min, opt, once) .set_params_min_P = min, \
-		.set_params_opt_P = opt, .set_params_atonce_P = once
-#define ATONCE_N 0
-#define ATONCE_Y 1
+#define PARAMS(min, opt) .set_params_min_P = min, .set_params_opt_P = opt
 #define OPT_0 0
 #define OPT_1 1
 #define OPT_2 2
@@ -31,16 +28,16 @@
 #define _SCPI_CMD_(c, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## c ## _P PROGMEM = \
 	{ .parser_P = SCPI_CC_ ## c, g, s }
-_SCPI_CMD_(cls, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(ese, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(cls, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0)));
+_SCPI_CMD_(ese, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0)));
 _SCPI_CMD_(esr, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(idn, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(opc, GET(YES, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(opc, GET(YES, PARAMS_N), SET(YES, PARAMS(0, OPT_0)));
 _SCPI_CMD_(rst, GET(NO_, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(sre, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(sre, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0)));
 _SCPI_CMD_(stb, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(tst, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0)));
 
 #define _SCPI_BRANCH_(k, c, b) { .key_P = &k, .cmd_P = c, .branch_P = b, }
 /* Table of SCPI Common Commands */
@@ -66,18 +63,18 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 /* SCPI Instrument Commands */
 _SCPI_CMD_(stat_oper_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_oper_enab, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
+			PARAMS(1, OPT_0)));
 _SCPI_CMD_(stat_oper_even, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_pres, 0,      GET(NO_, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y))); 
+			PARAMS(1, OPT_0))); 
 _SCPI_CMD_(stat_ques_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_ques_enab, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
+			PARAMS(1, OPT_0)));
 _SCPI_CMD_(stat_ques_even, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_err_next, 0,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_vers, 0,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
-_SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0)));
 _SCPI_CMD_(test_func_dec, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_int, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));

@@ -163,7 +163,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_dwel_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_lcon_gain_P PROGMEM = {
@@ -171,7 +170,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_lcon_gain_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_lcon_int_P PROGMEM = {
@@ -179,7 +177,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_lcon_int_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_mode_P PROGMEM = {
@@ -187,7 +184,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_mode_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_slop_P PROGMEM = {
@@ -195,7 +191,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_slop_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_spo_P PROGMEM = {
@@ -203,7 +198,6 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_spo_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 };
 
 const SCPI_cmd_t SCPI_cmd_sour_temp_P PROGMEM = {
@@ -211,7 +205,6 @@ const SCPI_cmd_t SCPI_cmd_sour_temp_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
-        .set_params_atonce_P = 1,
 	.num_suffix_max_P = TEMP_CHANNELS - 1,
 };
 
