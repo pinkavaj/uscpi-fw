@@ -10,7 +10,7 @@
  * real channels used. */
 #define TEMP_CHANNELS_INTERNAL 8
 /* Minimal (bottom) DA output value (even is shortcut or so!) */
-#define TEMP_OUTP_DA_MIN 4096
+#define TEMP_OUTP_DA_MIN 3072
 
 /* temperature DAQ device to measure I and U */
 typedef struct {
