@@ -13,6 +13,10 @@ typedef struct SCPI_key_struct {
 	const prog_char keyword_P[];
 } SCPI_key_t;
 
+typedef const SCPI_key_t* prog_SCPI_key_t PROGMEM;
+
+uint8_t keycmp_P(const char *s, prog_SCPI_key_t key);
+
 extern const SCPI_key_t key_cls_P PROGMEM;
 extern const SCPI_key_t key_ese_P PROGMEM;
 extern const SCPI_key_t key_esr_P PROGMEM;
@@ -29,15 +33,18 @@ extern const SCPI_key_t key_dwel_P PROGMEM;
 extern const SCPI_key_t key_enab_P PROGMEM;
 extern const SCPI_key_t key_err_P PROGMEM;
 extern const SCPI_key_t key_even_P PROGMEM;
+extern const SCPI_key_t key_fix_P PROGMEM;
 extern const SCPI_key_t key_func_P PROGMEM;
 extern const SCPI_key_t key_gain_P PROGMEM;
 extern const SCPI_key_t key_int_P PROGMEM;
 extern const SCPI_key_t key_lcon_P PROGMEM;
+extern const SCPI_key_t key_list_P PROGMEM;
 extern const SCPI_key_t key_meas_P PROGMEM;
 extern const SCPI_key_t key_mode_P PROGMEM;
 extern const SCPI_key_t key_next_P PROGMEM;
 extern const SCPI_key_t key_oper_P PROGMEM;
 extern const SCPI_key_t key_pres_P PROGMEM;
+extern const SCPI_key_t key_prog_P PROGMEM;
 extern const SCPI_key_t key_ques_P PROGMEM;
 extern const SCPI_key_t key_res_P PROGMEM;
 extern const SCPI_key_t key_rtim_P PROGMEM;

@@ -73,12 +73,38 @@ SCPI_parse_t SCPI_IC_sour_temp_lcon_int(void)
 SCPI_parse_t SCPI_IC_sour_temp_mode(void)
 {
         uint8_t channel;
+        temp_mode_t mode;
 
         channel = get_temp_channel();
-        SCPI_err_set(&SCPI_err_1);
 
-        /* TODO: ... */
-        return SCPI_parse_err;
+        if (_SCPI_CMD_IS_QUEST()) {
+                switch(temp_mode_get(channel)) {
+                        default:
+                        case temp_mode_fix:
+                                print_P(key_fix_P.keyword_P);
+                                break;
+                        case temp_mode_list:
+                                print_P(key_list_P.keyword_P);
+                                break;
+                        case temp_mode_prog:
+                                print_P(key_prog_P.keyword_P);
+                                break;
+                }
+                return SCPI_parse_end;
+        }
+        
+        if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_fix_P))
+                mode = temp_mode_fix;
+        /*else if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_list_P))
+                mode = temp_mode_list;
+        else if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_prog_P))
+                mode = temp_mode_prog;*/
+        else
+                return SCPI_err_set_(&SCPI_err_224);
+        
+        temp_mode_set(channel, mode);
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_sour_temp_rtim(void)

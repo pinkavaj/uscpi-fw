@@ -25,15 +25,18 @@ _key_(dwel, "DWELL",        SHORT4B);
 _key_(enab, "ENABLE",       SHORT4B);
 _key_(err,  "ERROR",        SHORT3B);
 _key_(even, "EVENT",        SHORT4B);
+_key_(fix,  "FIXED",        SHORT3B);
 _key_(func, "FUNCTION",     SHORT4B);
 _key_(gain, "GAIN",         SHORT4B);
 _key_(int,  "INTEGRAL",     SHORT3B);
 _key_(lcon, "LCONSTANTS",   SHORT4B);
+_key_(list, "LIST",         SHORT4B);
 _key_(meas, "MEASURE",      SHORT4B);
 _key_(mode, "MODE",         SHORT4B);
 _key_(next, "NEXT",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);
 _key_(pres, "PRESET",       SHORT4B);
+_key_(prog, "PROGRAM",      SHORT4B);
 _key_(ques, "QUESTIONABLE", SHORT4B);
 _key_(res,  "RESISTANCE",   SHORT3B);
 _key_(rtim, "RTIME",        SHORT4B);
@@ -51,4 +54,17 @@ _key_(div, "DIV",  SHORT3B);
 _key_(heat,"HEAT", SHORT4B);
 _key_(mul, "MUL",  SHORT3B);
 _key_(time,"TIME", SHORT4B);
+
+uint8_t keycmp_P(const char *s, prog_SCPI_key_t key)
+{
+        uint8_t len;
+        
+        len = pgm_read_byte(&key->len_short_P);
+        if (!strncmp_P(s, key->keyword_P, len)) {
+                if (s[len] == '\0')
+                        return 0;
+        }
+
+        return strcmp_P(s, key->keyword_P);
+}
 

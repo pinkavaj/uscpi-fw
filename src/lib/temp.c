@@ -43,6 +43,7 @@ typedef struct {
         pic16_data_t pic;
         FP_2_14_t R;
         FP_2_14_t R_want;
+        temp_mode_t mode;
 } temp_data_t;
 
 /* Temperature channel constants */
@@ -176,6 +177,16 @@ static temp_data_IU_t temp_correct_IU(uint8_t channel, temp_data_IU_t data_IU)
 	data_IU.U -= offs;
 
 	return data_IU;
+}
+
+temp_mode_t temp_mode_get(uint8_t channel)
+{
+        return temp_data[channel].mode;
+}
+
+void temp_mode_set(uint8_t channel, temp_mode_t mode)
+{
+        temp_data[channel].mode = mode;
 }
 
 static void temp_output_DA(uint8_t channel, uint16_t output)
