@@ -10,7 +10,7 @@
 static uint8_t get_valv_channel(void)
 {
 #if VALVE_CHANNELS != 1
-        if (SCPI_num_suffixes_idx != 1)
+        if (SCPI_num_suffixes_idx != 1 && SCPI_num_suffixes_idx != 2)
                 SCPI_err_set(&SCPI_err_2);
 #endif
 
@@ -47,13 +47,14 @@ static SCPI_parse_t SCPI_IC_cont_valv_open(void)
 
 static const SCPI_cmd_t SCPI_cmd_cont_valv_clos_P PROGMEM = {
         .parser_P = SCPI_IC_cont_valv_clos,
-        .get_P = 1,
+        .set_P = 1,
 	.num_suffix_max_P = VALVE_CHANNELS - 1,
 };
 
 static const SCPI_cmd_t SCPI_cmd_cont_valv_open_P PROGMEM = {
         .parser_P = SCPI_IC_cont_valv_open,
         .get_P = 1,
+		.set_P = 1,
 	.num_suffix_max_P = VALVE_CHANNELS - 1,
 };
 
