@@ -1,9 +1,20 @@
-#include <inttypes.h>
 #include <avr/pgmspace.h>
+#include "lib/pt_RT_table.h"
 
-typedef uint16_t FP_2_14;
+/* header: 
+#include <inttypes.h>
 
-const FP_2_14 PROGMEM temp_to_R[] = {
+typedef uint16_t fix_2_14;
+typedef uint16_t fix_10_6;
+
+fix_2_14 pt_R(fix_10_6 T);
+fix_10_6 pt_T(fix_2_14 R);
+
+*/
+
+#define TEMP_STEP 10.000000
+
+static const fix_2_14 PROGMEM temp_to_R[] = {
 
         0x4000, /* 0.000000 */
         0x427f, /* 10.000000 */
@@ -87,5 +98,40 @@ const FP_2_14 PROGMEM temp_to_R[] = {
         0xee69, /* 790.000000 */
         0xf053, /* 800.000000 */
 };
+
+fix_2_14 pt_R(fix_10_6 T)
+{
+    uint16_t idx = 0;
+    fix_2_14 R;
+
+    idx = T / (uint16_t)((1<<6) * TEMP_STEP);
+    R = pgm_read_word(&temp_to_R[idx]);
+
+    /* TODO: linearni interpolace */
+    return R;
+}
+
+fix_10_6 pt_T(fix_2_14 R)
+{
+    fix_10_6 T;
+    fix_2_14 R_1;
+    uint16_t idx = sizeof(temp_to_R) / 2;
+    uint16_t step = sizeof(temp_to_R) / 4;
+    
+    while (step) {
+        R_1 = pgm_read_word(idx);
+        if (R_1 > R)
+            idx -= step;
+        else
+            idx += step;
+        step /= 2;
+    };
+    /* TODO: tohle je jen prvni krok vyhledavani!!! nutno dohledat podle
+     * posledni polozky*/
+    /* TODO: linearni interpolace */
+    T = idx << 6;
+
+    return T;
+}
 
 
