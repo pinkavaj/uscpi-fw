@@ -14,5 +14,6 @@
 void SPI_dev_init(void);
 void SPI_dev_select(uint8_t dev_num);
 uint16_t SPI_dev_AD_get_sample(uint8_t channel);
+void SPI_dev_DA_set_output(uint8_t channel, uint16_t output);
 
 #endif

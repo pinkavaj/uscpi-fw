@@ -68,7 +68,6 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 }
 
 #include "drivers/spi_dev.h"
-#include "drivers/mcp4922.h"
 static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
@@ -92,10 +91,10 @@ static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 		SPI_dev_select(SPI_DEV_MCP4922_0);
 
 		SCPI_in_uint16(&val);
-		mcp4922_write_channel(0, val);
+		SPI_dev_DA_set_output(0, val);
 
 		SCPI_in_uint16(&val);
-		mcp4922_write_channel(1, val);
+		SPI_dev_DA_set_output(1, val);
 	} 
 	return SCPI_parse_end;
 }
