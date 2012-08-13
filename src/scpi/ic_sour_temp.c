@@ -44,14 +44,13 @@ static SCPI_parse_t temp_lcon(uint8_t gain)
                         print_FP_16_16(pic_param.gain_int);
                 return SCPI_parse_end;
         }
-       
-        /* FIXME: should be FP in range <0, 1) */
+
         ret = SCPI_in_FP_16_16(&val);
         if (ret == SCPI_parse_err)
                 return ret;
         if (val >= 0x10000)
                 return SCPI_err_set_(&SCPI_err_222);
-        
+
         if (gain)
                 pic_param.gain_lin = val;
         else
