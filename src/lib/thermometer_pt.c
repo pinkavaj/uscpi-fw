@@ -1,4 +1,5 @@
 #include <avr/pgmspace.h>
+#include "lib/extlib.h"
 #include "lib/thermometer_pt.h"
 
 /* ====== header ======
@@ -16,8 +17,6 @@ temp_1_20_t Pt_RtoT(FP_2_14_t R);
 
 #endif
 ====== end of header ====== */
-
-#define ARRAY_LEN(array) ((sizeof(array) / sizeof(array[0])))
 
 #define PT_TABLE_OFFSET (((uint8_t)30))
 #define PT_TABLE_STEP (((uint8_t)1))
@@ -808,7 +807,7 @@ FP_2_14_t Pt_TtoR(temp_1_20_t T)
     T -= PT_TABLE_OFFSET * PT_CENTIGRADE;
 
     idx = T / PT_TABLE_CTGS_PER_STEP;
-    if (idx >= ARRAY_LEN(Pt_TtoR_table))
+    if (idx >= ARRAY_SIZE(Pt_TtoR_table))
         return -1;
     fract = T % PT_TABLE_CTGS_PER_STEP;
 
@@ -830,8 +829,8 @@ temp_1_20_t Pt_RtoT(FP_2_14_t R)
     if (R >= PT_TTOR_TABLE_MAX)
         return 0xffff;
 
-    idx = ARRAY_LEN(Pt_TtoR_table) / 2 - 1;
-    step = ARRAY_LEN(Pt_TtoR_table) / 4;
+    idx = ARRAY_SIZE(Pt_TtoR_table) / 2 - 1;
+    step = ARRAY_SIZE(Pt_TtoR_table) / 4;
     
     while (step) {
         Rlo = pgm_read_word(&Pt_TtoR_table[idx]);
