@@ -48,38 +48,36 @@ SCPI_parse_t SCPI_IC_test_adc(void)
 
 SCPI_parse_t SCPI_IC_test_func_div(void)
 {
-	static uint64_t nom;
-	static uint32_t num;
+	uint64_t nom;
+	uint32_t num;
+	uint32_t *p = (void *)&nom;
+        uint32_t val;
 
-	if (_SCPI_CMD_IS_QUEST()) {
-		uint32_t val = math_div_64_32_r32(nom, num);
-		print_uint32(val);
-	} else {
-		uint32_t *p = (void *)&nom;
+	SCPI_in_uint32(p+1);
+	SCPI_in_uint32(p);
+	SCPI_in_uint32(&num);
 
-		SCPI_in_uint32(p+1);
-		SCPI_in_uint32(p);
-		SCPI_in_uint32(&num);
-	}
+	val = math_div_64_32_r32(nom, num);
+	print_uint32(val);
+
 	return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_func_mul(void)
 {
-	static uint32_t val1, val2;
+	uint32_t val1, val2;
+	volatile uint64_t val;
+        uint32_t *p;
 
-	if (_SCPI_CMD_IS_QUEST()) {
-		volatile uint64_t val;
+	SCPI_in_uint32(&val1);
+	SCPI_in_uint32(&val2);
 
-		val = math_mul_32_32_r64(val1, val2);
-		uint32_t *p = (void*)&val;
-		print_uint32(*(p+1));
-		putc(',');
-		print_uint32(val);
-	} else {
-		SCPI_in_uint32(&val1);
-		SCPI_in_uint32(&val2);
-	}
+	val = math_mul_32_32_r64(val1, val2);
+	p = (void*)&val;
+	print_uint32(*(p+1));
+	putc(',');
+	print_uint32(val);
+
 	return SCPI_parse_end;
 }
 

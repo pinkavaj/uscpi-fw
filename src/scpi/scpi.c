@@ -9,6 +9,8 @@
 #include "scpi_parser.h"
 #include "scpi/error.c"
 
+const char SCPI_version_P[] PROGMEM = "1999.0";
+
 /* If c is command separator returns c, 0 othervise */
 #define SCPI_iscmdend(c) (c == '\n' || c == ';')
 static SCPI_parse_t SCPI_parse_keyword(void);

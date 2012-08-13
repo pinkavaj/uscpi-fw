@@ -5,7 +5,7 @@
 #include "scpi.h"
 
 iobuf255_t stdout_buf;
-/* FIXME: zoptimalizovat čas strávený se zakázaným přerušením */
+/* TODO: zoptimalizovat čas strávený se zakázaným přerušením */
 
 /*****************************************************************************/
 void stdout_buf_reset(void)

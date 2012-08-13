@@ -79,9 +79,9 @@ _SCPI_CMD_(syst_vers, 0,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 _SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_func_dec, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_int, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_func_mul, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_func_mul, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_temp, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
@@ -89,7 +89,6 @@ _SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
 static const SCPI_branch_item_t SCPI_bt_sour_P[] PROGMEM = {
-        /* TODO: přenést položku do temperature */
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_sour_temp_P, SCPI_bt_sour_temp_P),
 	_SCPI_branch_END_,
 };

@@ -267,7 +267,6 @@ static void temp_loop_(uint8_t channel)
         data_IU = temp_meas_IU(channel);
         status = temp_status_IU(data_IU);
         if (status == temp_status_IU_disconnected) {
-                /* FIXME: value */
                 temp_output_DA(channel, 0);
                 return;
         }

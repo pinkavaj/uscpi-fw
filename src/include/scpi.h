@@ -37,7 +37,7 @@ typedef enum SCPI_parse_enum {
 SCPI_parse_t SCPI_parse(char c);
 void SCPI_parser_reset(void);
 
-static const char SCPI_version_P[] PROGMEM = "1999.0";
+extern const char SCPI_version_P[] PROGMEM;
 
 #endif
 

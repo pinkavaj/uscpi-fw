@@ -1,7 +1,6 @@
 #include "config.h"
 #include "drivers/usart.h"
 
-// FIXME: remove
 #include "scpi.h"
 #include "lib/iobuf.h"
 
