@@ -114,7 +114,7 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
         /* conversion from FP_16_16_t to temp_1_20_t
          * T = (T + (1/2*1/20 - eps)) * 20 / 0x10000 */
         T = (T + (0x10000 / 40 - 1)) / (0x10000 / 20);
-        temp_want_set(T, channel);
+        temp_want_set(channel, T);
         return SCPI_parse_end;
 }
 

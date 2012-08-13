@@ -18,7 +18,7 @@ pic16_param_t temp_pic_params_get(uint8_t channel);
 void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param);
 void temp_loop(void);
 temp_1_20_t temp_want_get(uint8_t channel);
-void temp_want_set(temp_1_20_t T, uint8_t channel);
+void temp_want_set(uint8_t channel, temp_1_20_t T);
 
 #endif
 

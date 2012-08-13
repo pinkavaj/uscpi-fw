@@ -164,7 +164,7 @@ temp_data_IU_t temp_meas_IU(uint8_t channel)
 }
 
 /* Make correction above I nad U from acqusition */
-static temp_data_IU_t temp_correct_IU(temp_data_IU_t data_IU, uint8_t channel)
+static temp_data_IU_t temp_correct_IU(uint8_t channel, temp_data_IU_t data_IU)
 {
 	int8_t offs;
         const temp_correct_IU_t *correct_IU_E;
@@ -238,7 +238,7 @@ static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
 }
 
 #include "lib/iobuf.h"
-static FP_2_14_t temp_get_R(temp_data_IU_t data_IU, uint8_t channel)
+static FP_2_14_t temp_get_R(uint8_t channel, temp_data_IU_t data_IU)
 {
         uint64_t tmp64;
         uint32_t R, R_0, R_slope;
@@ -278,8 +278,8 @@ static void temp_loop_(uint8_t channel)
                 temp_output_DA(channel, 0);
                 return;
         }
-        data_IU = temp_correct_IU(data_IU, channel);
-        R = temp_get_R(data_IU, channel);
+        data_IU = temp_correct_IU(channel, data_IU);
+        R = temp_get_R(channel, data_IU);
         temp_data[channel].R = R;
         
         e = (int32_t)temp_data[channel].R_want - R;
@@ -319,7 +319,7 @@ temp_1_20_t temp_want_get(uint8_t channel)
         return Pt_RtoT(temp_data[channel].R_want);
 }
 
-void temp_want_set(temp_1_20_t T, uint8_t channel)
+void temp_want_set(uint8_t channel, temp_1_20_t T)
 {
         temp_data[channel].R_want = Pt_TtoR(T);
 }
@@ -329,6 +329,6 @@ void temp_init(void)
         for(uint8_t channel = TEMP_CHANNELS; channel;)
         {
                 channel--;
-                temp_output_DA(0, channel);
+                temp_output_DA(channel, 0);
         }
 }
