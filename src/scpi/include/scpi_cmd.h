@@ -21,6 +21,7 @@ SCPI_parse_t SCPI_IC_test_adc(char c);
 SCPI_parse_t SCPI_IC_test_div(char c);
 SCPI_parse_t SCPI_IC_test_mul(char c);
 SCPI_parse_t SCPI_IC_test_num(char c);
+SCPI_parse_t SCPI_IC_test_temp(char c);
 SCPI_parse_t SCPI_IC_test_time(char c);
 SCPI_parse_t SCPI_IC_test_heat(char c);
 #endif

@@ -10,6 +10,7 @@
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
 #include "lib/math_cust.h"
+#include "lib/thermometer_pt.h"
 #include "lib/temp.h"
 
 SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
@@ -88,6 +89,20 @@ SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 	else
 		return SCPI_in_uint32(&val);
 	return SCPI_parse_end;
+}
+
+SCPI_parse_t SCPI_IC_test_temp(char UNUSED(c))
+{
+        uint16_t val;
+
+        if (SCPI_params_count != 1)
+                return SCPI_parse_err;
+
+        SCPI_in_uint16(&val);
+        val = Pt_RtoT(val);
+
+        print_uint32(val);
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))

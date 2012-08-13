@@ -1,5 +1,5 @@
 
-all: daq input math scpi timer1
+all: daq input math scpi sour timer1
 
 daq:
 	./test_dev_ad974_mcp4922.py
@@ -13,6 +13,9 @@ math:
 
 scpi:
 	./test_scpi_CC.py
+
+sour:
+	./test_sour_temp.py
 
 timer1:
 	./test_timer1.py

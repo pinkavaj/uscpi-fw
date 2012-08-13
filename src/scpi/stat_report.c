@@ -39,14 +39,14 @@ uint8_t SCPI_STB_get(void)
 
 /* Set selected bits in status byte */
 void SCPI_STB_set(uint8_t x)
-{ 
+{
 	SCPI_status_byte.status |= x & ~SCPI_STB_RQS;
 }
 
 /* Clear selected bits in status byte */
 void SCPI_STB_reset(uint8_t x)
-{ 
-	SCPI_status_byte.status &= ~x; 
+{
+	SCPI_status_byte.status &= ~x;
 }
 
 /* Returns status register enabled, enabled bits in STB */
