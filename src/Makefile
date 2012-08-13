@@ -28,9 +28,9 @@ SRC+=scpi/scpi.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
      scpi/cc.c \
-     scpi/ic_list.c \
      scpi/ic_meas.c \
      scpi/ic_test.c \
+     scpi/ic_sens_list.c \
      scpi/ic_sour_temp.c \
      scpi/ic_stat.c \
      scpi/ic_syst.c \

@@ -85,6 +85,11 @@ _SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
+static const SCPI_branch_item_t SCPI_bt_sens_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_list_P, &SCPI_cmd_sens_list_P, SCPI_bt_sens_list_P),
+	_SCPI_branch_END_,
+};
+
 static const SCPI_branch_item_t SCPI_bt_sour_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_sour_temp_P, SCPI_bt_sour_temp_P),
 	_SCPI_branch_END_,
@@ -147,8 +152,8 @@ static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 };
 
 const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
-	_SCPI_BRANCH_(key_list_P, &SCPI_cmd_list_P, SCPI_bt_list_P),
 	_SCPI_BRANCH_(key_meas_P, NULL, SCPI_bt_meas_P),
+	_SCPI_BRANCH_(key_sens_P, NULL, SCPI_bt_sens_P),
 	_SCPI_BRANCH_(key_sour_P, NULL, SCPI_bt_sour_P),
 	_SCPI_BRANCH_(key_stat_P, NULL, SCPI_bt_stat_P),
 	_SCPI_BRANCH_(key_syst_P, NULL, SCPI_bt_syst_P),
