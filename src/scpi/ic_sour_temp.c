@@ -9,20 +9,36 @@
 
 #include "lib/temp.h"
 
+static uint8_t get_channel(void)
+{
+        if (SCPI_num_suffixes_idx != 1) {
+                SCPI_err_set(&SCPI_err_2);
+                return SCPI_parse_err;
+        }
+
+        return SCPI_num_suffixes[0];
+}
+
+SCPI_parse_t SCPI_IC_sour_temp_dwel(char UNUSED(c))
+{
+        uint8_t channel;
+
+        channel = get_channel();
+        SCPI_err_set(&SCPI_err_1);
+
+        /* TODO: ... */
+        return SCPI_parse_err;
+}
+
 /* Common function to get/set PI regulator constants */
-SCPI_parse_t temp_lcon(uint8_t gain)
+static SCPI_parse_t temp_lcon(uint8_t gain)
 {
         uint16_t val;
         pic16_param_t pic_param;
         SCPI_parse_t ret;
         int8_t channel;
 
-        if (SCPI_num_suffixes_idx != 1) {
-                SCPI_err_set(&SCPI_err_2);
-                return SCPI_parse_err;
-        }
-
-        channel = SCPI_num_suffixes[0];
+        channel = get_channel();
         pic_param = temp_pic_params_get(channel);
         if (_SCPI_CMD_IS_QUEST()) {
                 if (gain)
@@ -54,6 +70,39 @@ SCPI_parse_t SCPI_IC_sour_temp_lcon_gain(char UNUSED(c))
 SCPI_parse_t SCPI_IC_sour_temp_lcon_int(char UNUSED(c))
 {
         return temp_lcon(0);
+}
+
+SCPI_parse_t SCPI_IC_sour_temp_mode(char UNUSED(c))
+{
+        uint8_t channel;
+
+        channel = get_channel();
+        SCPI_err_set(&SCPI_err_1);
+
+        /* TODO: ... */
+        return SCPI_parse_err;
+}
+
+SCPI_parse_t SCPI_IC_sour_temp_rtim(char UNUSED(c))
+{
+        uint8_t channel;
+
+        channel = get_channel();
+        SCPI_err_set(&SCPI_err_1);
+
+        /* TODO: ... */
+        return SCPI_parse_err;
+}
+
+SCPI_parse_t SCPI_IC_sour_temp_spo(char UNUSED(c))
+{
+        uint8_t channel;
+
+        channel = get_channel();
+        SCPI_err_set(&SCPI_err_1);
+
+        /* TODO: ... */
+        return SCPI_parse_err;
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
