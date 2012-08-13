@@ -5,7 +5,7 @@
 #include "scpi_parser.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
-#include "lib/temp.h"
+#include "temp.h"
 
 /* Return channel <N> defined in CMD ( :TEMPerature<N> ) */
 static uint8_t get_temp_channel(void)

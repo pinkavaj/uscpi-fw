@@ -11,7 +11,7 @@
 #include "drivers/timer.h"
 #include "lib/math_cust.h"
 #include "lib/thermometer_pt.h"
-#include "lib/temp.h"
+#include "temp.h"
 
 /* TODO: přemístit sem definici klíče */
 

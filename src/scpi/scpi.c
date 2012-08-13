@@ -5,7 +5,9 @@
 #include "config.h"
 #include "cmd_tools.h"
 #include "lib/iobuf.h"
+#include "list.h"
 #include "scpi.h"
+#include "temp.h"
 #include "scpi_parser.h"
 #include "scpi/error.c"
 
@@ -323,6 +325,9 @@ void SCPI_loop(void)
 	char c;
 	SCPI_parse_t ret;
 
+        /* handle all time critical routines first */
+        temp_loop();
+
 	while (USART0_in_len < USART0_in_len_) {
 		c = USART0_in[USART0_in_len++];
 		if (c == CHAR_ERR_ESC) {
@@ -408,6 +413,12 @@ static void SCPI_parser_reset_(void)
 	SCPI_params_count = 0;
 	SCPI_param_in_buf_idx = 0;
 	_SCPI_parser = NULL;
+}
+
+void SCPI_init(void)
+{
+        list_init();
+        temp_init();
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

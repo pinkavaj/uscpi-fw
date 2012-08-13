@@ -34,6 +34,7 @@ typedef enum SCPI_parse_enum {
 #include "scpi/error.h"
 
 #define SCPI_isstart(c) ( c == ':' || c == '*' || isalpha(c))
+void SCPI_init(void);
 void SCPI_loop(void);
 void SCPI_parser_reset(void);
 

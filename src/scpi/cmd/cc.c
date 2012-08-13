@@ -7,7 +7,7 @@
 #include "stat_report.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
-#include "lib/temp.h"
+#include "temp.h"
 
 /* TODO: přesunout sem strom */
 

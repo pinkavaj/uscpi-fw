@@ -3,8 +3,6 @@
 #include "drivers/timer.h"
 #include "drivers/usart.h"
 #include "lib/iobuf.h"
-#include "lib/list.h"
-#include "lib/temp.h"
 #include "scpi.h"
 
 #include <avr/interrupt.h>
@@ -33,15 +31,13 @@ void main(void)
 	SPI_dev_init();
 	TIMER1_init();
 	USART0_init();
-        temp_init();
-        list_init();
+        SCPI_init();
 	stdout_buf_reset();
 
 	TIMER1_start();
 	
 	sei();
 	do {	
-                temp_loop();
 	        SCPI_loop();
 	} while(1);
 }

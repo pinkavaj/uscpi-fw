@@ -3,9 +3,9 @@
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
 #include "lib/math_cust.h"
-#include "lib/temp.h"
 #include "lib/thermometer_pt.h"
 #include "stat_report.h"
+#include "temp.h"
 
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */

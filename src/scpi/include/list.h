@@ -1,7 +1,7 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
-#include "lib/temp.h"
+#include "temp.h"
 
 #define LIST_COUN_INF 0
 #define LIST_MAX 4

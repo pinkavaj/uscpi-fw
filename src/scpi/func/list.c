@@ -1,4 +1,4 @@
-#include "lib/list.h"
+#include "list.h"
 
 list_t list[TEMP_CHANNELS][LIST_MAX];
 uint8_t list_coun[TEMP_CHANNELS];
