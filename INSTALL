@@ -1,0 +1,25 @@
+Instalace potřebných nástrojů
+
+cross-AVR enviroment
+
+== Gentoo
+
+Install Gentoo cross development tools and build AVR cross-compile utilities.
+GCC 4.4 seems be broken for AVR.
+
+emerge sys-devel/crossdev
+crossdev -t avr --g 4.2
+
+== OpenSuSE
+
+Add new repository with cross platform develoment tools from OpenSuse build 
+service.
+
+http://download.opensuse.org/repositories/CrossToolchain:/avr/openSUSE_11.3/
+
+Install packages:
+
+
+
+== Ubuntu
+
