@@ -249,8 +249,8 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 	return SCPI_parse_err;
 }
 
-/* Normalize parameters recieved on input, convert tehm to zero ended string
- * each and fill parameter types into SCPI_param_types list */
+/* Normalize parameters recieved on input, convert tehm to zero terminated 
+ * string, and fill parameter types into SCPI_param_types list */
 static SCPI_parse_t SCPI_parse_params(char c)
 {
 	SCPI_param_type_t pt;
@@ -280,14 +280,21 @@ static SCPI_parse_t SCPI_parse_params(char c)
 			return SCPI_parse_flush_last;
 		}
 		/* Start of new parameter or end of command found */
-		SCPI_params_count++;
-		if (SCPI_iscmdend(c))
+		if (SCPI_iscmdend(c)) {
 			goto SCPI_parse_params_eof;
+			SCPI_params_count++;
+		}
+		if (!(SCPI_param_types[SCPI_params_count] & SCPI_PAR_END)) {
+			SCPI_err_set(&SCPI_err_103);
+			return SCPI_parse_err;
+		}
+		SCPI_params_count++;
 		/* new parameter starts, is there a room to store type? */
 		if (SCPI_params_count >= SCPI_PARAMS_MAX) {
 			SCPI_err_set(&SCPI_err_223);
 			return SCPI_parse_err;
 		}
+		_SCPI_PARSE_PARAM_SEP_reset();
 		pt = 0;
 	}
 	/* Try detect type of parameter */
