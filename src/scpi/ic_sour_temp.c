@@ -9,6 +9,7 @@
 
 #include "lib/temp.h"
 
+/* Common function to get/set PI regulator constants */
 SCPI_parse_t temp_lcon(uint8_t gain)
 {
         uint16_t val;
