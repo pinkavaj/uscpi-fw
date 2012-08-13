@@ -4,6 +4,7 @@
 #include "drivers/usart.h"
 #include "lib/iobuf.h"
 #include "lib/temp.h"
+#include "scpi.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -39,8 +40,7 @@ void main(void)
 	sei();
 	do {	
                 temp_loop();
-                /* FIXME: přejmenovat, přesunout pod SCPI -> SCPI_loop */
-	        USART0_in_process();
+	        SCPI_loop();
 	} while(1);
 }
 

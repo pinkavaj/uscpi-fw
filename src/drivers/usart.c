@@ -11,25 +11,6 @@
 #define CHAR_RESET '\x03'
 
 #define USART0_OUT_LEN 128
-/* Input state, used to handle input events when error occurs,
- * drop all input until newline found, reset SCPI parser
- * - USART errors
- * CHAR_ERR_LINE - SCPI parser error accured*/
-#define CHAR_ERR_ESC '\x00'
-#define CHAR_ERR_FRAMING ((char)_BV(4))
-#define CHAR_ERR_OVERFLOW ((char)_BV(3))
-#define CHAR_ERR_PARITY ((char)_BV(2))
-#define CHAR_ERR_LINE ((char)_BV(1))
-
-#if FE0 != 4
-#warning "FE0 != CHAR_ERR_FRAMING, this might lead to a bit larger code."
-#endif
-#if DOR0 != 3
-#warning "DOR0 != CHAR_ERR_OVERFLOW, this might lead to a bit larger code."
-#endif
-#if UPE0 != 2
-#warning "UPE0 != CHAR_ERR_PARITY, this might lead to a bit larger code."
-#endif
 
 /* Input buffer for asynchronous data recieving */
 char USART0_in[USART0_IN_LEN];
@@ -39,7 +20,7 @@ char USART0_in[USART0_IN_LEN];
  * modify all data in range <0, USART0_in_len -1>, but no touch others */
 volatile USART0_in_len_t USART0_in_len = 0;
 /* index to first free position to store newly recieved char */
-static volatile USART0_in_len_t USART0_in_len_ = 0;
+volatile USART0_in_len_t USART0_in_len_ = 0;
 
 ISR(USART0_RXC_vect)
 {
@@ -126,78 +107,6 @@ void USART0_init(void)
 	PORTD &= ~(1<<PD0);
 	/* enable Rx and Recieve Complete Interrupt */
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
-}
-
-/* Start processing bytes in input buffer,
- * suppose tath interrupts are disabled, but can be enabled. */
-void USART0_in_process(void)
-{
-	static uint8_t char_err = 0;
-	char c;
-	SCPI_parse_t ret;
-
-	while (USART0_in_len < USART0_in_len_) {
-		c = USART0_in[USART0_in_len++];
-		if (c == CHAR_ERR_ESC) {
-			c = USART0_in[USART0_in_len++];
-			if (c != CHAR_ERR_ESC) {
-				char_err = c;
-				if (char_err & CHAR_ERR_PARITY)
-					SCPI_err_set(&SCPI_err_361);
-				if (char_err & CHAR_ERR_FRAMING)
-					SCPI_err_set(&SCPI_err_362);
-				if (char_err & CHAR_ERR_OVERFLOW)
-					SCPI_err_set(&SCPI_err_363);
-			}
-		}
-
-		ret = char_err ? SCPI_parse_err : SCPI_parse(c);
-		cli();
-		switch (ret)
-		{
-			default:
-			case SCPI_parse_err:
-				char_err = CHAR_ERR_LINE;
-			case SCPI_parse_end:
-			case SCPI_parse_drop_all:
-				USART0_in_len_ -= USART0_in_len;
-				memmove(USART0_in, USART0_in + USART0_in_len, USART0_in_len_);
-				USART0_in_len = 0;
-				break;
-			case SCPI_parse_drop_last:
-				memmove(USART0_in + USART0_in_len - 1, 
-						USART0_in + USART0_in_len, 
-						USART0_in_len_ - USART0_in_len);
-				USART0_in_len--;
-				USART0_in_len_--;
-				break;
-			case SCPI_parse_drop_str:
-				{
-					uint8_t idx = 0;
-					while (USART0_in[idx]) {
-						if (idx == USART0_in_len)
-							break;
-						idx++;
-						USART0_in_len_--;
-					};
-					
-					if (USART0_in[idx] == 0 && idx < USART0_in_len) {
-						idx++;
-						USART0_in_len_--;
-					}
-					memmove(USART0_in, USART0_in + idx, USART0_in_len_);
-				}
-
-				break;
-			case SCPI_parse_more:
-				break;
-		}
-		sei();
-		if (c == '\n') {
-			SCPI_parser_reset();
-			char_err = 0;
-		}
-	}
 }
 
 /* Allow interrup to start sending */

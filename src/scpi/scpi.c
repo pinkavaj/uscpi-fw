@@ -264,7 +264,7 @@ static SCPI_parse_t SCPI_parse_end_(SCPI_parse_t ret)
 }
 
 /* Detect type of SCPI message or call proper parsing function */
-SCPI_parse_t SCPI_parse(char c)
+static SCPI_parse_t SCPI_parse(char c)
 {
 	if (_SCPI_parser == NULL) {
 		if (c == '\n')
@@ -300,6 +300,78 @@ SCPI_parse_t SCPI_parse(char c)
 		return SCPI_parse_end_(SCPI_parse_end);
 	}
 	return ret;
+}
+
+/* Start processing bytes in input buffer,
+ * suppose tath interrupts are disabled, but can be enabled. */
+void SCPI_loop(void)
+{
+	static uint8_t char_err = 0;
+	char c;
+	SCPI_parse_t ret;
+
+	while (USART0_in_len < USART0_in_len_) {
+		c = USART0_in[USART0_in_len++];
+		if (c == CHAR_ERR_ESC) {
+			c = USART0_in[USART0_in_len++];
+			if (c != CHAR_ERR_ESC) {
+				char_err = c;
+				if (char_err & CHAR_ERR_PARITY)
+					SCPI_err_set(&SCPI_err_361);
+				if (char_err & CHAR_ERR_FRAMING)
+					SCPI_err_set(&SCPI_err_362);
+				if (char_err & CHAR_ERR_OVERFLOW)
+					SCPI_err_set(&SCPI_err_363);
+			}
+		}
+
+		ret = char_err ? SCPI_parse_err : SCPI_parse(c);
+		cli();
+		switch (ret)
+		{
+			default:
+			case SCPI_parse_err:
+				char_err = CHAR_ERR_LINE;
+			case SCPI_parse_end:
+			case SCPI_parse_drop_all:
+				USART0_in_len_ -= USART0_in_len;
+				memmove(USART0_in, USART0_in + USART0_in_len, USART0_in_len_);
+				USART0_in_len = 0;
+				break;
+			case SCPI_parse_drop_last:
+				memmove(USART0_in + USART0_in_len - 1, 
+						USART0_in + USART0_in_len, 
+						USART0_in_len_ - USART0_in_len);
+				USART0_in_len--;
+				USART0_in_len_--;
+				break;
+			case SCPI_parse_drop_str:
+				{
+					uint8_t idx = 0;
+					while (USART0_in[idx]) {
+						if (idx == USART0_in_len)
+							break;
+						idx++;
+						USART0_in_len_--;
+					};
+					
+					if (USART0_in[idx] == 0 && idx < USART0_in_len) {
+						idx++;
+						USART0_in_len_--;
+					}
+					memmove(USART0_in, USART0_in + idx, USART0_in_len_);
+				}
+
+				break;
+			case SCPI_parse_more:
+				break;
+		}
+		sei();
+		if (c == '\n') {
+			SCPI_parser_reset();
+			char_err = 0;
+		}
+	}
 }
 
 /* Reset parser before new command sequence begins */
