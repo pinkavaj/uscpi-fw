@@ -19,21 +19,21 @@ INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 
 SRC=-c main.c
 SRC+=lib/iobuf.c \
-     lib/list.c \
      lib/math_cust.S \
      lib/pic16.c \
-     lib/temp.c \
      lib/thermometer_pt.c
 SRC+=scpi/scpi.c \
+     scpi/func/temp.c \
+     scpi/func/list.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
-     scpi/cc.c \
-     scpi/ic_meas.c \
-     scpi/ic_test.c \
-     scpi/ic_sens_list.c \
-     scpi/ic_sour_temp.c \
-     scpi/ic_stat.c \
-     scpi/ic_syst.c \
+     scpi/cmd/cc.c \
+     scpi/cmd/ic_meas.c \
+     scpi/cmd/ic_test.c \
+     scpi/cmd/ic_sens_list.c \
+     scpi/cmd/ic_sour_temp.c \
+     scpi/cmd/ic_stat.c \
+     scpi/cmd/ic_syst.c \
      scpi/key.c \
      scpi/stat_report.c
 SRC+=drivers/usart.c drivers/timer.c
