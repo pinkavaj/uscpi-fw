@@ -19,15 +19,11 @@ elif [ "${1}" == "-h" ] || [ "${1}" == "--help" ]; then
 	help
 	exit 0
 fi
-DEV_PORT=${DEV_PORT:=${1}}
 
-BAUDRATE=${BAUDRATE:=115200}
+export DEV_PORT=${DEV_PORT:=${1}}
+export BAUDRATE=${BAUDRATE:=115200}
 
 stty -F ${DEV_PORT} ${BAUDRATE}
 
-./test_input_version.py ${DEV_PORT} ${BAUDRATE}
-./test_input_num.py ${DEV_PORT} ${BAUDRATE}
-
-./test_math_div.py ${DEV_PORT} ${BAUDRATE}
-./test_math_mul.py ${DEV_PORT} ${BAUDRATE}
+make -f Makefile.test
 
