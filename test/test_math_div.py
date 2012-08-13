@@ -18,7 +18,7 @@ def test(nomHi, nomLo, num):
     try:
         port.write(cmd.encode('ascii'))
         # FIXME: proč je potřeba tahle pauza?
-        time.sleep(0.01)
+        time.sleep(0.005)
         port.write('test:div?\n'.encode('ascii'))
         res = port.readline()
         res = int(res)

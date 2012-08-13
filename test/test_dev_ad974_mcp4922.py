@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import serial
 import sys
@@ -27,32 +27,31 @@ def test(count):
         ch1b = int(ch1b)
         ch2b = int(ch2b)
         ch3b = int(ch3b)
-	d0 = ch0a - ch0b
-	d1 = ch1a - ch1b
-	d2 = ch2a - ch2b
-	d3 = ch3a - ch3b
+        d0 = ch0a - ch0b
+        d1 = ch1a - ch1b
+        d2 = ch2a - ch2b
+        d3 = ch3a - ch3b
         if abs(d0) > d_max or \
                         abs(d1) > d_max or \
                         abs(d2) > d_max or \
                         abs(d3) > d_max:
             raise Exception()
         if count % 200 == 0:
-		sys.stdout.write('.')
-		sys.stdout.flush()
+                sys.stdout.write('.')
+                sys.stdout.flush()
     except:
         print ("Failed cmd: \n%s \nres: %s dif: %i %i %i %i\n" % 
-		(cmd, repr(res), d0, d1, d2, d3, ))
-	print ("count: %i" % count)
+                (cmd, repr(res), d0, d1, d2, d3, ))
+        print ("count: %i" % count)
         raise
 
 port.write('test:adc 400,400\n'.encode('ascii'))
 time.sleep(0.01)
 
 # cmd burst
-count = 0
-while True:
+while count > 0:
     test(count)
-    count = count + 1
+    count = count - 1
 
 print("OK")
 

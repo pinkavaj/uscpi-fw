@@ -1,18 +1,8 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "scpi_cmd.h"
-
-
-#define SCPI_atoi_SIGNED	(1<<0)
-#define SCPI_atoi_UNSIGNED	(1<<1)
-#define SCPI_atoi_1B	(1<<2)
-#define SCPI_atoi_2B	(2<<2)
-#define SCPI_atoi_4B	(4<<2)
-#define SCPI_atoi_NB	(7<<2)
-
-static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags);
-
 
 /* Set bit(s) in Operation Status Register */
 static void SCPI_OPER_cond_set(uint16_t val)
@@ -124,8 +114,16 @@ static SCPI_parse_t SCPI_cmd_err_108(void)
 }
 
 /* Drop parameter from input, move to next one */
-static SCPI_parse_t SCPI_in_drop_param(char *end)
+static void SCPI_in_drop_param(void)
 {
+	char *end = SCPI_in;
+	
+	do {
+		end++;
+	} while (*end);
+
+	/* FIXME: manipulace nad vstupem by měla být jedna, je potřeba cli sei? */
+	cli();
 	if (--SCPI_params_count) {
 		/* skip \0 at end of parameter */
 		end++;
@@ -133,83 +131,45 @@ static SCPI_parse_t SCPI_in_drop_param(char *end)
 		memmove(SCPI_param_types, SCPI_param_types + 1, 
 				SCPI_params_count*sizeof(SCPI_param_type_t));
 	}
-	return SCPI_parse_end;
+	sei();
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
 static SCPI_parse_t SCPI_in_uint8(uint8_t *x)
 {
-	return SCPI_atoi(x, SCPI_atoi_UNSIGNED | SCPI_atoi_1B);
+	uint32_t val;
+	SCPI_parse_t ret;
+
+	ret = SCPI_in_uint32(&val);
+	if (val > 0xff)
+		return SCPI_parse_err;
+	*x = val;
+	return ret;
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
 static SCPI_parse_t SCPI_in_uint16(uint16_t *x)
 {
-	return SCPI_atoi(x, SCPI_atoi_UNSIGNED | SCPI_atoi_2B);
+	uint32_t val;
+	SCPI_parse_t ret;
+
+	ret = SCPI_in_uint32(&val);
+	if (val > 0xffff)
+		return SCPI_parse_err;
+	*x = val;
+	return ret;
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
 static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 {
-	return SCPI_atoi(x, SCPI_atoi_UNSIGNED | SCPI_atoi_4B);
-}
+	char *ret;
 
-/* Parse integer value, if parsed sucessfully, set value of *x, othervise
- * set error code and exit with SCPI_parse_err, flags specify data type 
- * and lenght, see top of this file */
-static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
-{
-	char *c = SCPI_in;
-	int8_t sig_neg;
- 	uint32_t y = 0;
-	uint32_t y_ = 0;
-	SCPI_param_type_t pt = SCPI_param_types[0];
-
-	sig_neg = pt & (SCPI_PAR_NUM_SIG & ~SCPI_PAR_TYPE);
-	/* Check parameter type */
-	if ((pt & SCPI_PAR_NUM_TYPE) != SCPI_PAR_NUM_INT ||
-			(sig_neg && (flags & SCPI_atoi_UNSIGNED)))
-	{
-		SCPI_err_set(&SCPI_err_104);
+	*x = strtoul(SCPI_in, &ret, 0);
+	SCPI_in_drop_param();
+	if (*ret != 0)
 		return SCPI_parse_err;
-	}
-	if ((pt & SCPI_PAR_NUM_INT_TYPE) == SCPI_PAR_NUM_INT_DEC) {
-		do {
-			if (y < y_)
-				break;
-			y_ = y;
-			y = y * 10 + (uint8_t)(*c - '0');
-		} while(*++c);
-	} else {
-		SCPI_err_set(&SCPI_err_1);
-		return SCPI_parse_err;
-	}
-	uint32_t k = 0xffffffff;
-
-	if (flags & SCPI_atoi_SIGNED)
-		k = k >> 1;
-	if (flags & SCPI_atoi_1B)
-		k = k >> 24;
-	else if (flags & SCPI_atoi_2B)
-		k = k >> 16;
-	if (*c || (y & k) != y || y < y_) {
-		if (sig_neg)
-			k++;
-		if (*c || k != y) {
-			SCPI_err_set(&SCPI_err_222);
-			return SCPI_parse_err;
-		}
-	}
-	if (sig_neg)
-		y = (~y) & 0x7fffffff;
-	if (flags & SCPI_atoi_1B)
-		*(uint8_t*)x = y;
-	else if (flags & SCPI_atoi_2B)
-		*(uint16_t*)x = y;
-	else if (flags & SCPI_atoi_4B)
-		*(uint32_t*)x = y;
-
-	return SCPI_in_drop_param(c);
+	return SCPI_parse_end;
 }
 
 /* Print unisgned int to output */
