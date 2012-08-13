@@ -157,19 +157,23 @@ void USART0_out_wait(USART0_out_len_t size)
 	sei();
 }
 
-/* Print len bytes into output buffer */
-void USART0_printn(const char *c, USART0_out_len_t len)
+void USART0_print_common(USART0_out_len_t len)
 {
-	if (!len)
-		return;
 	/* make space in bufffer, if posible */
 	USART0_out_wait(0);
 	cli();
-	/* Start sending when sei() */
-	UCSR0B |= _BV(UDRIE0);
-	if (USART0_OUT_LEN - USART0_out_len < len ) {
-	/* TODO: chack len > aktualni volny prostor v bufferu */
+	if ((size_t)(USART0_OUT_LEN - USART0_out_len) < len) {
+		SCPI_err_set(&SCPI_err_223);
+		return;
 	}
+	/* Allow interrup to start sending */
+	UCSR0B |= _BV(UDRIE0);
+}
+
+/* Print len bytes into output buffer */
+void USART0_printn(const char *c, USART0_out_len_t len)
+{
+	USART0_print_common(len);
 	memcpy(USART0_out + USART0_out_len, c, len);
 	USART0_out_len += len;
 }
@@ -178,15 +182,8 @@ void USART0_printn(const char *c, USART0_out_len_t len)
  * interrupts will be enabled by this rutine! */
 void USART0_print_P(PGM_P c)
 {
-	/* make space in bufffer, if posible */
-	USART0_out_wait(0);
-	cli();
-	/* Allow interrup to start sending */
-	UCSR0B |= _BV(UDRIE0);
-	size_t len = strlen_P(c);
-	if ((size_t)(USART0_OUT_LEN - USART0_out_len) < len) {
-	/* TODO: chack len > aktualni volny prostor v bufferu */
-	}
+	USART0_out_len_t len = strlen_P(c);
+	USART0_print_common(len);
 	memcpy_P(USART0_out + USART0_out_len, c, len);
 	USART0_out_len += len;
 }
@@ -195,7 +192,7 @@ void USART0_print_P(PGM_P c)
 void USART0_putc(char c)
 {
 	/* make space in bufffer, if posible */
-	USART0_out_wait(0);
+	USART0_out_wait(1);
 	cli();
 	USART0_out[USART0_out_len++] = c;
 	UCSR0B |= _BV(UDRIE0);
