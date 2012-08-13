@@ -19,9 +19,6 @@ typedef struct {
         uint8_t spi_dev_num;
         uint8_t Ichannel;
         uint8_t Uchannel;
-        /* FIXME: tohle může přijít i jinam */
-        uint16_t Icode_offs;
-        uint16_t Ucode_offs;
 } daq_param_t;
 
 /* FIXME: */
@@ -30,14 +27,16 @@ typedef struct {
         uint16_t Imax;
         uint16_t Umin;
         uint16_t Umax;
+        /* FIXME: tohle může přijít i jinam */
+        uint16_t Icode_offs;
+        uint16_t Ucode_offs;
 } daq_limits_t;
-
-/* TODO: stavy vstupu (ok, zkrat, .. ?) */
-/* TODO: uint32_t R_slope */
 
 typedef struct {
         daq_param_t daq;
         pic16_param_t pic;
+/* TODO: stavy vstupu (ok, zkrat, .. ?) */
+        uint32_t R_slope;
 } heating_channel_param_t;
 
 heating_channel_t channels[2];
