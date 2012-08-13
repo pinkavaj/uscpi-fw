@@ -36,10 +36,9 @@ class NumTest(FwTest):
 
     def test_math_div(self):
         for nomHi, nomLo, num in self.data:
-            cmd = 'test:div %i,%i,%i' % (nomHi, nomLo, num, )
+            cmd = 'test:func:div? %i,%i,%i' % (nomHi, nomLo, num, )
             exp = int(((2**32*nomHi) + nomLo)/num)
             self.writeline(cmd)
-            self.writeline('test:div?')
             res = self.readline()
             res = int(res)
             self.assertEqual(res, exp, "cmd: \n%s" % (cmd, ))

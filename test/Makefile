@@ -1,18 +1,14 @@
 
-all: daq input math scpi sour timer1
+all: daq func scpi sour timer1
 
 daq:
 	./test_dev_ad974_mcp4922.py
 
 func:
 	./test_func_dec.py
-
-input:
-	./test_input.py
-
-math:
-	./test_math_div.py
-	./test_math_mul.py
+	./test_func_div.py
+	./test_func_int.py
+	./test_func_mul.py
 
 scpi:
 	./test_scpi_CC.py

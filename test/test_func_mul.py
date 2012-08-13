@@ -32,11 +32,10 @@ class NumTest(FwTest):
     def test_math_mull(self):
 
         for mul1, mul2 in self.data:
-            cmd = 'test:mul %i,%i' % (mul1, mul2 )
+            cmd = 'test:func:mul? %i,%i' % (mul1, mul2 )
             exp = mul1*mul2
             exp = (int(exp / (2**32)), int(exp % (2**32)))
             self.writeline(cmd)
-            self.writeline('test:mul?')
             res = self.readline()
             res = res.split(',')
             res = (int(res[0]), int(res[1]))

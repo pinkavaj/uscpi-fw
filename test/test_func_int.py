@@ -25,9 +25,8 @@ class NumTest(FwTest):
 
         for num in self.numbers:
             exp = num
-            cmd = 'test:num %i' % num
+            cmd = 'test:func:int? %i' % num
             self.writeline(cmd)
-            self.writeline('test:num?')
             res = self.readline()
             res = int(res)
             self.assertEqual(res, exp)
