@@ -33,7 +33,7 @@ SCPI_parse_t SCPI_IC_test_adc(void)
 			putc(',');
 		}
 	} else {
-		uint16_t val;
+                uint16_t val;
 
 		SPI_dev_select(SPI_DEV_MCP4922_0);
 
@@ -56,6 +56,7 @@ SCPI_parse_t SCPI_IC_test_div(void)
 		print_uint32(val);
 	} else {
 		uint32_t *p = (void *)&nom;
+
 		SCPI_in_uint32(p+1);
 		SCPI_in_uint32(p);
 		SCPI_in_uint32(&num);
@@ -89,7 +90,7 @@ SCPI_parse_t SCPI_IC_test_num(void)
 	if (_SCPI_CMD_IS_QUEST())
 		print_uint32(val);
 	else
-		return SCPI_in_uint32(&val);
+	        return SCPI_in_uint32(&val);
 	return SCPI_parse_end;
 }
 
@@ -102,8 +103,8 @@ SCPI_parse_t SCPI_IC_test_temp(void)
 
         SCPI_in_uint16(&val);
         val = Pt_RtoT(val);
-
         print_uint32(val);
+
         return SCPI_parse_end;
 }
 
@@ -116,8 +117,8 @@ SCPI_parse_t SCPI_IC_test_temp_res(void)
 
         SCPI_in_uint16(&val);
         val = Pt_TtoR(val);
-
         print_uint32(val);
+
         return SCPI_parse_end;
 }
 

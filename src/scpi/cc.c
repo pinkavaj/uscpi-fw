@@ -29,14 +29,16 @@ SCPI_parse_t SCPI_CC_cls(void)
 /* Standard Event Status Enable Query  */
 SCPI_parse_t SCPI_CC_ese(void)
 {
+        SCPI_parse_t ret;
+        uint8_t val;
+
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_SESR_enab_get());
 		return SCPI_parse_end;
 	} 
 	if (SCPI_params_count != 1)
 		return SCPI_cmd_err_108();
-	uint8_t val = 0;
-	SCPI_parse_t ret = SCPI_in_uint8(&val);
+	ret = SCPI_in_uint8(&val);
 	if (ret == SCPI_parse_err)
 		return ret;
 	SCPI_SESR_enab_set(val);
@@ -86,12 +88,14 @@ SCPI_parse_t SCPI_CC_rst(void)
 /* Service Request Enable Query  */
 SCPI_parse_t SCPI_CC_sre(void)
 {
+        SCPI_parse_t ret;
+        uint8_t val;
+
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_SRE_get());
 		return SCPI_parse_end;
 	}
-	uint8_t val = 0;
-	SCPI_parse_t ret = SCPI_in_uint8(&val);
+	ret = SCPI_in_uint8(&val);
 	if (ret == SCPI_parse_err)
 		return ret;
 	SCPI_SRE_set(val);

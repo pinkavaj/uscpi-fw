@@ -33,10 +33,10 @@ SCPI_parse_t SCPI_IC_sour_temp_dwel(void)
 /* Common function to get/set PI regulator constants */
 static SCPI_parse_t temp_lcon(uint8_t gain)
 {
-        uint16_t val;
         pic16_param_t pic_param;
         SCPI_parse_t ret;
         int8_t channel;
+        uint16_t val;
 
         channel = get_temp_channel();
         pic_param = temp_pic_params_get(channel);
@@ -51,7 +51,7 @@ static SCPI_parse_t temp_lcon(uint8_t gain)
         /* FIXME: should be FP in range <0, 1) */
         ret = SCPI_in_uint16(&val);
         if (ret == SCPI_parse_err)
-                return SCPI_parse_err;
+                return ret;
         
         if (gain)
                 pic_param.gain_lin = val;

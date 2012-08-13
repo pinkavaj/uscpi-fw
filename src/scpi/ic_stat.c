@@ -20,15 +20,20 @@ SCPI_parse_t SCPI_IC_stat_oper_cond(void)
 /* Value of SCPI OPERation ENABled register */
 SCPI_parse_t SCPI_IC_stat_oper_enab(void)
 {
+        SCPI_parse_t ret;
+        uint16_t val;
+
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_OPER_enab_get());
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_cmd_err_108();
-	uint16_t val;
-	SCPI_parse_t ret = SCPI_in_uint16(&val);
+	ret = SCPI_in_uint16(&val);
+        if (ret == SCPI_parse_err)
+                return ret;
 	SCPI_OPER_enab_set(val);
+
 	return ret;
 }
 
@@ -55,14 +60,18 @@ SCPI_parse_t SCPI_IC_stat_ques_cond(void)
 
 SCPI_parse_t SCPI_IC_stat_ques_enab(void)
 {
+        SCPI_parse_t ret;
+        uint16_t val;
+
 	if (_SCPI_CMD_IS_QUEST()) {
 		print_uint32(SCPI_QUES_enab_get());
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_cmd_err_108();
-	uint16_t val;
-	SCPI_parse_t ret = SCPI_in_uint16(&val);
+	ret = SCPI_in_uint16(&val);
+        if (ret == SCPI_parse_err)
+                return SCPI_parse_err;
 	SCPI_QUES_enab_set(val);
 	return ret;
 }
