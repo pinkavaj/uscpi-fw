@@ -269,10 +269,6 @@ static void USART0_in_process(void)
 					memmove(USART0_in, USART0_in + idx, USART0_in_len_);
 				}
 
-				/* FIXME: if (--SCPI_params_count) { 
-					memmove(SCPI_param_types, SCPI_param_types + 1, 
-					SCPI_params_count*sizeof(SCPI_param_type_t));
-				 * */
 				break;
 			case SCPI_parse_more:
 				break;

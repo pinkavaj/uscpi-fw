@@ -144,10 +144,11 @@ static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 {
 	char *ret;
 
-	*x = strtoul(SCPI_in, &ret, 0);
+	*x = strtoul(SCPI_in + SCPI_param_in_buf_idx, &ret, 0);
+	SCPI_param_in_buf_idx += strlen(SCPI_in + SCPI_param_in_buf_idx) + 1;
 	if (*ret != 0)
 		return SCPI_parse_err;
-	return SCPI_parse_drop_str;
+	return SCPI_parse_end;
 }
 
 /* Print unisgned int to output */

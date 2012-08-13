@@ -16,7 +16,11 @@ static SCPI_parse_t SCPI_parse_keyword(char c);
 static SCPI_parse_t SCPI_parse_keyword_num(char c);
 static SCPI_parse_t SCPI_parse_keyword_question(char c);
 static SCPI_parse_t SCPI_parse_keyword_sep(char c);
-static SCPI_parse_t SCPI_parse_params(char c);
+static SCPI_parse_t SCPI_parse_param_start(char c);
+static SCPI_parse_t SCPI_parse_param_str(char c);
+static SCPI_parse_t SCPI_parse_param_str_end(char c);
+static SCPI_parse_t SCPI_parse_param_nostr(char c);
+static SCPI_parse_t SCPI_parse_param_end(char c);
 static void SCPI_parser_reset_(void) ;
 
 uint8_t SCPI_opts;
@@ -34,13 +38,8 @@ uint8_t SCPI_opts;
 #define _SCPI_PREV_RESULT() (SCPI_opts & (1<<2))
 #define _SCPI_PREV_RESULT_set() (SCPI_opts |= (1<<2))
 #define _SCPI_PREV_RESULT_reset() (SCPI_opts &= ~(1<<2))
-/* Parsing parameter is finished, looking for parameter separator and/or 
- * command end */
-#define _SCPI_PARSE_PARAM_SEP() (SCPI_opts & (1<<3))
-#define _SCPI_PARSE_PARAM_SEP_set() (SCPI_opts |= (1<<3))
-#define _SCPI_PARSE_PARAM_SEP_reset() (SCPI_opts &= ~(1<<3))
-/* parse_pref - set to 1 when parsing prefix (#X) in integers or chracter
- * 		after escape ('\') in string, 0 othervise */
+/* parse_pref - 1 when parsing character after escape ('\') in string, 
+ * 	0 othervise */
 #define _SCPI_PARSE_PARAM_PREF() (SCPI_opts & (1<<4))
 #define _SCPI_PARSE_PARAM_PREF_set() (SCPI_opts |= (1<<4))
 #define _SCPI_PARSE_PARAM_PREF_reset() (SCPI_opts &= ~(1<<4))
@@ -62,45 +61,8 @@ static const SCPI_branch_item_t *SCPI_branch;
 
 /* used to identify type of parameter */
 #define SCPI_PARAMS_MAX 16
-typedef uint8_t SCPI_param_type_t;
 static uint8_t SCPI_params_count;
-static SCPI_param_type_t SCPI_param_types[SCPI_PARAMS_MAX];
-/* Identify type of parameter:
- * 2B, Identify basic data type, Character, numeric and expression */
-#define SCPI_PAR_TYPE	(3<<0)
-#define SCPI_PAR_NONE	(0<<0)
-#define SCPI_PAR_CHAR	(1<<0)
-#define SCPI_PAR_NUM	(2<<0)
-#define SCPI_PAR_EXPR	(3<<0)
-/* 1B, Parameter separator type: 0 = ' ', 1 = ',' */
-#define SCPI_PAR_END		(1<<7)
-/* 1B, Flags for character data, it might be alpha [a-zA-Z] or string ("...") */
-#define SCPI_PAR_CHAR_TYPE	(SCPI_PAR_TYPE | (1<<2))
-#define SCPI_PAR_CHAR_ALPHA	(SCPI_PAR_CHAR | (0<<2))
-#define SCPI_PAR_CHAR_STR	(SCPI_PAR_CHAR | (1<<2))
-/* 1B, Sign for number, no mather whatever float or integer */
-#define SCPI_PAR_NUM_SIG	(SCPI_PAR_TYPE | (1<<2))
-#define SCPI_PAR_NUM_SIG_NO	(SCPI_PAR_NUM | (0<<2))
-#define SCPI_PAR_NUM_SIG_MINUS	(SCPI_PAR_NUM | (1<<2))
-/* 1B, Basic number type, floating point number or integer */
-#define SCPI_PAR_NUM_TYPE	(SCPI_PAR_TYPE | (1<<3))
-#define SCPI_PAR_NUM_INT	(SCPI_PAR_NUM | (0<<3))
-#define SCPI_PAR_NUM_FLOAT	(SCPI_PAR_NUM | (1<<3))
-/* 2B, Integer type, decimal, octal, hexadecimal or binary */
-#define SCPI_PAR_NUM_INT_TYPE	(SCPI_PAR_NUM_TYPE | (3<<4))
-#define SCPI_PAR_NUM_INT_DEC	(SCPI_PAR_NUM_INT | (0<<4))
-#define SCPI_PAR_NUM_INT_HEX	(SCPI_PAR_NUM_INT | (1<<4))
-#define SCPI_PAR_NUM_INT_OCT	(SCPI_PAR_NUM_INT | (2<<4))
-#define SCPI_PAR_NUM_INT_BIN	(SCPI_PAR_NUM_INT | (3<<4))
-/* 1B, Floating point, 0 = no decimal separator present ('.'), 1 = present */
-//#define SCPI_PAR_NUM_FLOAT_NOPT	(0<<4)
-#define SCPI_PAR_NUM_FLOAT_PT		(1<<4)
-/* 1B, Floating point, 0 = no exponent present, 1 = exponent present */
-//#define SCPI_PAR_NUM_FLOAT_NOEXP	(0<<5)
-#define SCPI_PAR_NUM_FLOAT_EXP	(1<<5)
-/* 1B, Floating point exponent, 0 = positive, 1= negative */
-//#define SCPI_PAR_NUM_FLOAT_EXP_NOSIG	(0<<6)
-#define SCPI_PAR_NUM_FLOAT_EXP_MINUS	(1<<6)
+static uint8_t SCPI_param_in_buf_idx;
 
 /* Current parser, changes during different stages of parsing input */
 static SCPI_parse_t (*_SCPI_parser)(char);
@@ -241,7 +203,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 			pgm_read_word(&SCPI_cmd->parser_P);
 		return _SCPI_parser(c);
 	}
-	_SCPI_parser = SCPI_parse_params;
+	_SCPI_parser = SCPI_parse_param_start;
 	if (isspace(c))
 		return SCPI_parse_drop_all;
 
@@ -251,181 +213,84 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 
 /* Normalize parameters recieved on input, convert tehm to zero terminated 
  * string, and fill parameter types into SCPI_param_types list */
-static SCPI_parse_t SCPI_parse_params(char c)
+static SCPI_parse_t SCPI_parse_param_start(char c)
 {
-	SCPI_param_type_t pt;
+	if (SCPI_iscmdend(c))
+		return SCPI_parse_param_end(c);
 
-	if (SCPI_in_len == 1) {
-		if (SCPI_iscmdend(c))
-			goto SCPI_parse_params_eof;
-		/* Drop whitespaces at start of parameter list */
-		if(isspace(c))
-			return SCPI_parse_drop_all;
-	}
+	if(isspace(c))
+		return SCPI_parse_drop_last;
 
-	pt = SCPI_param_types[SCPI_params_count];
+	if (c == '"')
+		_SCPI_parser = SCPI_parse_param_str;
+	else
+		_SCPI_parser = SCPI_parse_param_nostr;
+	return _SCPI_parser(c);
+}
 
-	/* End of parameter reached, normalize param. separator (' ', ',') */
-	if (_SCPI_PARSE_PARAM_SEP()) {
-		if (isspace(c) && !SCPI_iscmdend(c))
-			return SCPI_parse_drop_last;
-		if (c == ',') {
-			/* Parameter separator already present */
-			if (pt & SCPI_PAR_END) {
-				SCPI_err_set(&SCPI_err_220);
-				return SCPI_parse_err;
-			}
-			SCPI_param_types[SCPI_params_count] |= 
-					SCPI_PAR_END;
-			return SCPI_parse_drop_last;
+static SCPI_parse_t SCPI_parse_param_str(char c)
+{
+	/* TODO */
+	if (!_SCPI_PARSE_PARAM_PREF()) {
+		if (c == '"') {
+			_SCPI_parser = SCPI_parse_param_str_end;
+			return SCPI_parse_more;
 		}
-		/* Start of new parameter or end of command found */
-		if (SCPI_iscmdend(c)) {
-			goto SCPI_parse_params_eof;
-			SCPI_params_count++;
-		}
-		if (!(SCPI_param_types[SCPI_params_count] & SCPI_PAR_END)) {
-			SCPI_err_set(&SCPI_err_103);
-			return SCPI_parse_err;
-		}
-		SCPI_params_count++;
-		/* new parameter starts, is there a room to store type? */
-		if (SCPI_params_count >= SCPI_PARAMS_MAX) {
-			SCPI_err_set(&SCPI_err_223);
-			return SCPI_parse_err;
-		}
-		_SCPI_PARSE_PARAM_SEP_reset();
-		pt = 0;
-	}
-	/* Try detect type of parameter */
-	if (!pt) {
-		if (isdigit(c))
-			pt = SCPI_PAR_NUM_INT;
-		else if (c == '#') {
+		if (c == '\\')
 			_SCPI_PARSE_PARAM_PREF_set();
-			pt = SCPI_PAR_NUM_INT;
-		} else if (c == '+') {
-			SCPI_param_types[SCPI_params_count] = SCPI_PAR_NUM_INT;
-			return SCPI_parse_drop_last;
-		} else if (c == '-') 
-			pt = SCPI_PAR_NUM_INT | SCPI_PAR_NUM_SIG_MINUS;
-		else if (c == '.')
-			pt = SCPI_PAR_NUM_FLOAT | SCPI_PAR_NUM_FLOAT_PT;
-		else if (c == '"')
-			pt = SCPI_PAR_CHAR_STR;
-		else if (isalpha(c))
-			pt = SCPI_PAR_CHAR_ALPHA;
-		else if (SCPI_iscmdend(c))
-			goto SCPI_parse_params_eof;
-		else {
-			SCPI_err_set(&SCPI_err_220);
-			return SCPI_parse_err;
-		}
+	} else
+		_SCPI_PARSE_PARAM_PREF_reset();
 
-		SCPI_param_types[SCPI_params_count] = pt;
-		return SCPI_parse_more;
-	}
+	return SCPI_parse_more;
+}
 
-	if ((pt & SCPI_PAR_NUM_TYPE) == SCPI_PAR_NUM_INT) {
-		/* Parsing char after '#', prefix before number */
-		if (_SCPI_PARSE_PARAM_PREF()) {
-			if (c == 'B')
-				pt |= SCPI_PAR_NUM_INT_BIN;
-			else if (c == 'H')
-				pt |= SCPI_PAR_NUM_INT_HEX;
-			else if (c == 'Q')
-				pt |= SCPI_PAR_NUM_INT_OCT;
-			else {
-				SCPI_err_set(&SCPI_err_102);
-				return SCPI_parse_err;
-			}
-			_SCPI_PARSE_PARAM_PREF_reset();
-			SCPI_param_types[SCPI_params_count] = pt;
-			return SCPI_parse_more;
-		}
-		switch(pt & SCPI_PAR_NUM_INT_TYPE) {
-			case SCPI_PAR_NUM_INT_HEX:
-				if (c >= 'A' && c <= 'F')
-					return SCPI_parse_more;
-			default:
-			case SCPI_PAR_NUM_INT_DEC:
-				if (isdigit(c))
-					return SCPI_parse_more;
-				break;
-			case SCPI_PAR_NUM_INT_OCT:
-				if (c >= '0' && c <= '7')
-					return SCPI_parse_more;
-				break;
-			case SCPI_PAR_NUM_INT_BIN:
-				if (c == '0' || c == '1')
-					return SCPI_parse_more;
-				break;
-		}
-		/* Is floating point number ? */
-		if ((c == '.' || c == 'E') && 
-				(pt & SCPI_PAR_NUM_INT_TYPE) == 
-				SCPI_PAR_NUM_INT_DEC) {
-			pt = (pt & ~SCPI_PAR_NUM_TYPE) | SCPI_PAR_NUM_FLOAT;
-			SCPI_param_types[SCPI_params_count] = pt;
-		} else 
-			/* TODO: kontrola osamoceného +- */
-			goto SCPI_parse_params_end;
-	}
-	if ((pt & SCPI_PAR_NUM_TYPE) == SCPI_PAR_NUM_FLOAT) {
-			return SCPI_parse_err;
-	}
-	if ((pt & SCPI_PAR_CHAR_TYPE) == SCPI_PAR_CHAR_STR) {
-		if (_SCPI_PARSE_PARAM_PREF()) {
-			_SCPI_PARSE_PARAM_PREF_reset();
-			/* TODO: check for nonprintable characters */
-			return SCPI_parse_more;
-		}
-		if (c == '\\') {
-			_SCPI_PARSE_PARAM_PREF_set();
-			return SCPI_parse_drop_last;
-		}
-		if (c == '"')
-			goto SCPI_parse_params_end2;
-		return SCPI_parse_more;
-	}
-	if ((pt & SCPI_PAR_CHAR_TYPE) == SCPI_PAR_CHAR_ALPHA) {
-		if (isalpha(c))
-			return SCPI_parse_more;
-		goto SCPI_parse_params_end;
-	}
-	/* This will never happend */
-	return SCPI_parse_err;
-
-SCPI_parse_params_end:
-	/* Check for parameter separator, otherwise some parameter 
-	 * parsing failed */
-	SCPI_in[SCPI_in_len - 1] = '\0';
+static SCPI_parse_t SCPI_parse_param_str_end(char c)
+{
 	if (SCPI_iscmdend(c)) {
 		SCPI_params_count++;
-		goto SCPI_parse_params_eof;
+		return SCPI_parse_param_end(c);
 	}
-	if (c == ',' || isspace(c)) {
-		if (c == ',') {
-			pt |= SCPI_PAR_END;
-			SCPI_param_types[SCPI_params_count] = pt;
-		}
-SCPI_parse_params_end2:
-		_SCPI_PARSE_PARAM_SEP_set();
-		return SCPI_parse_more;
-	}
-	SCPI_err_set(&SCPI_err_220);
-	return SCPI_parse_err;
 
-	/* Jumped when end of command found */
-SCPI_parse_params_eof:
-	/* TODO: check parameters, its count ant type */
-//			SCPI_err_set(&SCPI_err_109); // Missing parameter
-	/* After parameter separator must follow parameter */
-	if (SCPI_params_count) 
-		if (SCPI_param_types[SCPI_params_count - 1] & SCPI_PAR_END) {
-			SCPI_err_set(&SCPI_err_220);
-			return SCPI_parse_err;
-		}
+	if (isspace(c))
+		return SCPI_parse_drop_last;
+
+	if (c == ',') {
+		SCPI_in[SCPI_in_len - 1] = 0;
+		SCPI_params_count++;
+		_SCPI_parser = SCPI_parse_param_start;
+	}
+	return SCPI_parse_err;
+}
+
+static SCPI_parse_t SCPI_parse_param_nostr(char c)
+{
+	if (SCPI_iscmdend(c)) {
+		if (isspace(SCPI_in[SCPI_in_len - 2]))
+			SCPI_in[SCPI_in_len - 2] = 0;
+		SCPI_params_count++;
+		return SCPI_parse_param_end(c);
+	}
+
+	if (isspace(c)) {
+		if (isspace(SCPI_in[SCPI_in_len - 2])) {
+			SCPI_in[SCPI_in_len - 2] = ' ';
+			return SCPI_parse_drop_last;
+		} else
+			SCPI_in[SCPI_in_len - 1] = ' ';
+	} else
+	if (c == ',') {
+		SCPI_in[SCPI_in_len - 1] = 0;
+		SCPI_params_count++;
+		_SCPI_parser = SCPI_parse_param_start;
+	}
+
+	return SCPI_parse_more;
+}
+
+static SCPI_parse_t SCPI_parse_param_end(char c)
+{
+	if (isspace(SCPI_in[SCPI_in_len - 1]))
+		SCPI_in[SCPI_in_len - 1] = 0;
 	_SCPI_parser = (SCPI_parse_t (*)(char))
 		pgm_read_word(&SCPI_cmd->parser_P);
 	return _SCPI_parser(c);
@@ -492,14 +357,12 @@ void SCPI_parser_reset(void)
 /* Reset parser after end of command (when new command start */
 static void SCPI_parser_reset_(void) 
 {
-	num_suffix.current = 0;
 	SCPI_cmd = NULL;
 	_SCPI_CMD_IS_QUEST_reset();
 	_SCPI_CMD_IS_CC_reset();
-	_SCPI_PARSE_PARAM_SEP_reset();
 	_SCPI_PARSE_PARAM_PREF_reset();
 	SCPI_params_count = 0;
-	SCPI_param_types[0] = 0;
+	SCPI_param_in_buf_idx = 0;
 	_SCPI_parser = NULL;
 }
 
