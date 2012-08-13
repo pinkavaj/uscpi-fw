@@ -50,15 +50,23 @@ static uint16_t ad974_get_sample_(void)
 	BIT_CLR(AD974_PORT, AD974_CS);
 	/* start conversion, 10ns CS->RC */
 	BIT_CLR(AD974_PORT, AD974_RC);
-	/* wait until conversion complete 4us + few ns to set-up signals */
-	_delay_us(5);
+	/* Dummy clock cycle, enable generation of synchronization pulse.
+	 * This is necesary because sync. pulse is unpredictable spontaneously
+	 * generated when SPI is used to comunicate to other device(s). */
+	SPI_dummy_clk();
+	/* Wait until conversion complete 4us + few x0 ns to set-up signals. */
+	_delay_us(4.2);
 //	loop_until_bit_is_set(AD974_PORT, AD974_BUSY);
+
 	/* data acquisition 1us + few ns to set up signals */
 	BIT_SET(AD974_PORT, AD974_RC);
-	_delay_us(1.5);
-	// read result
+	_delay_us(1.2);
+	/* dummy clock, starts synchronization pulse */
+	SPI_dummy_clk();
+	_delay_loop_1(1);
 	val = SPI_transfer8b(0) << 8;
 	val |= SPI_transfer8b(0);
+
 	BIT_SET(AD974_PORT, AD974_CS);
 
 	return val;
