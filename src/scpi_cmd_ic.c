@@ -81,18 +81,37 @@ static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 #include "math.h"
 static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 {
-	static uint32_t val1, val2;
-	static uint64_t val;
+	static uint64_t nom;
+	static uint32_t num;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-//		val_ = math_mul_32_32_r64(val1, val2);
-		val1 = math_div_64_32_r32(val, val2);
-		SCPI_out_uint32(val1);
+		uint32_t val = math_div_64_32_r32(nom, num);
+		SCPI_out_uint32(val);
+	} else {
+		uint32_t val1, val2;
+		SCPI_in_uint32(&val1);
+		SCPI_in_uint32(&val2);
+		SCPI_in_uint32(&num);
+
+		nom = (((uint64_t)val1)<<32) + val2;
+	}
+	return SCPI_parse_end;
+}
+
+static SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
+{
+	static uint32_t val1, val2;
+
+	if (_SCPI_CMD_IS_QUEST()) {
+		uint64_t val;
+
+		val = math_mul_32_32_r64(val1, val2);
+		SCPI_out_uint32(val>>32);
+		SCPI_printn(",", 1);
+		SCPI_out_uint32(val);
 	} else {
 		SCPI_in_uint32(&val1);
 		SCPI_in_uint32(&val2);
-
-		val = (uint64_t)val1 * val2;
 	}
 	return SCPI_parse_end;
 }

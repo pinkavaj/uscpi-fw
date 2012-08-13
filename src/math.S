@@ -200,15 +200,15 @@ math_mul_32_32_r64:
 	push	YL
 	push	YL
 
-	mov	R25, temp0
-	mov	R24, temp1
-	mov	R23, temp2
-	mov	R22, temp3
+	mov	temp0, R22
+	mov	temp1, R23
+	mov	temp2, R24
+	mov	temp3, R25
 
-	mov	R21, reg0
-	mov	R20, reg1
-	mov	R19, reg2
-	mov	R18, reg3
+	mov	reg0, R18
+	mov	reg1, R19
+	mov	reg2, R20
+	mov	reg3, R21
 
 /*****************************************************************************/
 

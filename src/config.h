@@ -9,7 +9,7 @@
 #define VER_MAJ 0
 #define VER_MINOR 0
 #define VER_REV 0
-#define VER_BUILD 543M
+#define VER_BUILD 545M
 #define INFO_AUTHOR Lukas-Kucera_Jiri-Pinkava
 #define INFO_COMPANY VSCHT
 #ifndef INFO_MODEL
