@@ -124,13 +124,14 @@ static SCPI_parse_t SCPI_cmd_err_108(void)
 }
 
 /* Drop parameter from input, move to next one */
-static SCPI_parse_t SCPI_in_drop_param(char *c)
+static SCPI_parse_t SCPI_in_drop_param(char *end)
 {
 	if (--SCPI_params_count) {
-		c++;
-		memmove(SCPI_in, c, SCPI_in_len - (SCPI_in - c));
+		/* skip \0 at end of parameter */
+		end++;
+		memmove(SCPI_in, end, (SCPI_in_len - (SCPI_in - end) + 1)*sizeof(char));
 		memmove(SCPI_param_types, SCPI_param_types + 1, 
-				SCPI_params_count);
+				SCPI_params_count*sizeof(SCPI_param_type_t));
 	}
 	return SCPI_parse_end;
 }
