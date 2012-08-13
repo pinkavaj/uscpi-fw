@@ -111,7 +111,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 	}
 	/* find keywork in keyword table */
 	do {
-		uint8_t len, len_short;
+		uint8_t len;
 		SCPI_key_t *key;
 		key = (SCPI_key_t*)pgm_read_word(&branch->key_P);
 		if (key == NULL) {
@@ -120,14 +120,11 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 		}
 		/* if lenght of current keyword is equal to lenght of long or 
 		 * short form of keyword */
-		len = pgm_read_byte(&key->len_P);
-		len_short = pgm_read_byte(&key->len_short_P);
-		if (len == kw_len || len_short == kw_len) {
-			PGM_P keyword_P = (const char *)pgm_read_word(
-					&key->keyword_P);
-			if(!memcmp_P(SCPI_in, keyword_P, kw_len))
-				break;
-		}
+		len = pgm_read_byte(&key->len_short_P);
+                if (len != kw_len)
+                        len = kw_len + 1;
+		if(!strncmp_P(SCPI_in, key->keyword_P, len))
+			break;
 		branch++;
 	} while(1);
 	SCPI_cmd = (SCPI_cmd_t*)pgm_read_word(&branch->cmd_P);

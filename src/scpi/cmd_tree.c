@@ -43,95 +43,60 @@ _SCPI_CMD_(stb, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(tst, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
 
-/* SCPI Common Commands, need be filled to 4B with \0 */
-static const char kw_cls_P[] PROGMEM = "CLS";
-static const char kw_ese_P[] PROGMEM = "ESE";
-static const char kw_esr_P[] PROGMEM = "ESR";
-static const char kw_idn_P[] PROGMEM = "IDN";
-static const char kw_opc_P[] PROGMEM = "OPC";
-static const char kw_rst_P[] PROGMEM = "RST";
-static const char kw_sre_P[] PROGMEM = "SRE";
-static const char kw_stb_P[] PROGMEM = "STB";
-static const char kw_tst_P[] PROGMEM = "TST";
-static const char kw_wai_P[] PROGMEM = "WAI";
-       
-#define _SCPI_key_(kw, s) static const SCPI_key_t SCPI_key_ ## kw ## _P \
-	PROGMEM = { .keyword_P = kw_ ## kw ## _P, .len_short_P = s, \
-	.len_P = sizeof(kw_ ## kw ## _P) - 1 }
+#define _key_(kw, key, slen) \
+        __extension__ static const SCPI_key_t key_ ## kw ## _P PROGMEM = \
+        { .len_short_P = slen, .keyword_P = key, }
 
-_SCPI_key_(cls, SHORT3B);
-_SCPI_key_(ese, SHORT3B);
-_SCPI_key_(esr, SHORT3B);
-_SCPI_key_(idn, SHORT3B);
-_SCPI_key_(opc, SHORT3B);
-_SCPI_key_(rst, SHORT3B);
-_SCPI_key_(sre, SHORT3B);
-_SCPI_key_(stb, SHORT3B);
-_SCPI_key_(tst, SHORT3B);
-_SCPI_key_(wai, SHORT3B);
+_key_(cls, "CLS", SHORT3B);
+_key_(ese, "ESE", SHORT3B);
+_key_(esr, "ESR", SHORT3B);
+_key_(idn, "IDN", SHORT3B);
+_key_(opc, "OPC", SHORT3B);
+_key_(rst, "RST", SHORT3B);
+_key_(sre, "SRE", SHORT3B);
+_key_(stb, "STB", SHORT3B);
+_key_(tst, "TST", SHORT3B);
+_key_(wai, "WAI", SHORT3B);
 
 #define _SCPI_BRANCH_(k, c, b) { .key_P = &k, .cmd_P = c, .branch_P = b, }
 /* Table of SCPI Common Commands */
 const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_cls_P, &SCPI_cmd_cls_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_ese_P, &SCPI_cmd_ese_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_esr_P, &SCPI_cmd_esr_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_idn_P, &SCPI_cmd_idn_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_opc_P, &SCPI_cmd_opc_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_rst_P, &SCPI_cmd_rst_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_sre_P, &SCPI_cmd_sre_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_stb_P, &SCPI_cmd_stb_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_tst_P, &SCPI_cmd_tst_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_wai_P, &SCPI_cmd_wai_P, NULL),
+	_SCPI_BRANCH_(key_cls_P, &SCPI_cmd_cls_P, NULL),
+	_SCPI_BRANCH_(key_ese_P, &SCPI_cmd_ese_P, NULL),
+	_SCPI_BRANCH_(key_esr_P, &SCPI_cmd_esr_P, NULL),
+	_SCPI_BRANCH_(key_idn_P, &SCPI_cmd_idn_P, NULL),
+	_SCPI_BRANCH_(key_opc_P, &SCPI_cmd_opc_P, NULL),
+	_SCPI_BRANCH_(key_rst_P, &SCPI_cmd_rst_P, NULL),
+	_SCPI_BRANCH_(key_sre_P, &SCPI_cmd_sre_P, NULL),
+	_SCPI_BRANCH_(key_stb_P, &SCPI_cmd_stb_P, NULL),
+	_SCPI_BRANCH_(key_tst_P, &SCPI_cmd_tst_P, NULL),
+	_SCPI_BRANCH_(key_wai_P, &SCPI_cmd_wai_P, NULL),
 	_SCPI_branch_END_,
 };
 
 /* SCPI Instrument Commands, list of keywords */
-static const char kw_cond_P[] PROGMEM = "CONDITION";
-static const char kw_enab_P[] PROGMEM = "ENABLE";
-static const char kw_err_P[]  PROGMEM = "ERROR";
-static const char kw_even_P[] PROGMEM = "EVENT";
-static const char kw_next_P[] PROGMEM = "NEXT";
-static const char kw_oper_P[] PROGMEM = "OPERATION";
-static const char kw_pres_P[] PROGMEM = "PRESET";
-static const char kw_ques_P[] PROGMEM = "QUESTIONABLE";
-static const char kw_res_P[]  PROGMEM = "RESISTANCE";
-static const char kw_sour_P[] PROGMEM = "SOURCE";
-static const char kw_stat_P[] PROGMEM = "STATUS";
-static const char kw_syst_P[] PROGMEM = "SYSTEM";
-static const char kw_temp_P[] PROGMEM = "TEMPERATURE";
-static const char kw_test_P[] PROGMEM = "TEST";
-static const char kw_vers_P[] PROGMEM = "VERSION";
+_key_(cond, "CONDITION",    SHORT4B);
+_key_(enab, "ENABLE",       SHORT4B);
+_key_(err,  "ERROR",        SHORT3B);
+_key_(even, "EVENT",        SHORT4B);
+_key_(next, "NEXT",         SHORT4B);
+_key_(oper, "OPERATION",    SHORT4B);
+_key_(pres, "PRESET",       SHORT4B);
+_key_(ques, "QUESTIONABLE", SHORT4B);
+_key_(res,  "RESISTANCE",   SHORT3B);
+_key_(sour, "SOURCE",       SHORT4B);
+_key_(stat, "STATUS",       SHORT4B);
+_key_(syst, "SYSTEM",       SHORT4B);
+_key_(temp, "TEMPERATURE",  SHORT4B);
+_key_(test, "TEST",         SHORT4B);
+_key_(vers, "VERSION",      SHORT4B);
 
-static const char kw_adc_P[] PROGMEM = "ADC";
-static const char kw_div_P[] PROGMEM = "DIV";
-static const char kw_heat_P[] PROGMEM = "HEAT";
-static const char kw_mul_P[] PROGMEM = "MUL";
-static const char kw_num_P[] PROGMEM = "NUM";
-static const char kw_time_P[] PROGMEM = "TIME";
-       
-_SCPI_key_(cond, SHORT4B);
-_SCPI_key_(enab, SHORT4B);
-_SCPI_key_(err, SHORT3B);
-_SCPI_key_(even, SHORT4B);
-_SCPI_key_(next, SHORT4B);
-_SCPI_key_(oper, SHORT4B);
-_SCPI_key_(pres, SHORT4B);
-_SCPI_key_(ques, SHORT4B);
-_SCPI_key_(res, SHORT3B);
-_SCPI_key_(sour, SHORT4B);
-_SCPI_key_(stat, SHORT4B);
-_SCPI_key_(syst, SHORT4B);
-_SCPI_key_(temp, SHORT4B);
-_SCPI_key_(vers, SHORT4B);
-
-_SCPI_key_(adc, SHORT3B);
-_SCPI_key_(div, SHORT3B);
-_SCPI_key_(heat, SHORT4B);
-_SCPI_key_(mul, SHORT3B);
-_SCPI_key_(num, SHORT3B);
-_SCPI_key_(test, SHORT4B);
-_SCPI_key_(time, SHORT4B);
+_key_(adc, "ADC",  SHORT3B);
+_key_(div, "DIV",  SHORT3B);
+_key_(heat,"HEAT", SHORT4B);
+_key_(mul, "MUL",  SHORT3B);
+_key_(num, "NUM",  SHORT3B);
+_key_(time,"TIME", SHORT4B);
 
 #undef _SCPI_CMD_
 #define _SCPI_CMD_(p, g, s) \
@@ -163,61 +128,61 @@ _SCPI_CMD_(test_time, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
 static const SCPI_branch_item_t SCPI_bt_syst_err_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_next_P, &SCPI_cmd_syst_err_next_P, NULL),
+	_SCPI_BRANCH_(key_next_P, &SCPI_cmd_syst_err_next_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_stat_oper_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_cond_P, &SCPI_cmd_stat_oper_cond_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_enab_P, &SCPI_cmd_stat_oper_enab_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_even_P, &SCPI_cmd_stat_oper_even_P, NULL),
+	_SCPI_BRANCH_(key_cond_P, &SCPI_cmd_stat_oper_cond_P, NULL),
+	_SCPI_BRANCH_(key_enab_P, &SCPI_cmd_stat_oper_enab_P, NULL),
+	_SCPI_BRANCH_(key_even_P, &SCPI_cmd_stat_oper_even_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_stat_ques_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_cond_P, &SCPI_cmd_stat_ques_cond_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_enab_P, &SCPI_cmd_stat_ques_enab_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_even_P, &SCPI_cmd_stat_ques_even_P, NULL),
+	_SCPI_BRANCH_(key_cond_P, &SCPI_cmd_stat_ques_cond_P, NULL),
+	_SCPI_BRANCH_(key_enab_P, &SCPI_cmd_stat_ques_enab_P, NULL),
+	_SCPI_BRANCH_(key_even_P, &SCPI_cmd_stat_ques_even_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_stat_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_ques_P, &SCPI_cmd_stat_ques_even_P, 
+	_SCPI_BRANCH_(key_ques_P, &SCPI_cmd_stat_ques_even_P, 
 			SCPI_bt_stat_ques_P),
-	_SCPI_BRANCH_(SCPI_key_oper_P, &SCPI_cmd_stat_oper_even_P, 
+	_SCPI_BRANCH_(key_oper_P, &SCPI_cmd_stat_oper_even_P, 
 			SCPI_bt_stat_oper_P),
-	_SCPI_BRANCH_(SCPI_key_pres_P, &SCPI_cmd_stat_pres_P, NULL),
+	_SCPI_BRANCH_(key_pres_P, &SCPI_cmd_stat_pres_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_err_P,  &SCPI_cmd_syst_err_next_P, 
+	_SCPI_BRANCH_(key_err_P,  &SCPI_cmd_syst_err_next_P, 
 			SCPI_bt_syst_err_P),
-	_SCPI_BRANCH_(SCPI_key_vers_P, &SCPI_cmd_syst_vers_P, NULL),
+	_SCPI_BRANCH_(key_vers_P, &SCPI_cmd_syst_vers_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_test_temp_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_res_P, &SCPI_cmd_test_temp_res_P, NULL),
+	_SCPI_BRANCH_(key_res_P, &SCPI_cmd_test_temp_res_P, NULL),
 	_SCPI_branch_END_,
 };
 
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_div_P, &SCPI_cmd_test_div_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_heat_P, &SCPI_cmd_test_heat_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_mul_P, &SCPI_cmd_test_mul_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_num_P, &SCPI_cmd_test_num_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
-	_SCPI_BRANCH_(SCPI_key_time_P, &SCPI_cmd_test_time_P, NULL),
+	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
+	_SCPI_BRANCH_(key_div_P, &SCPI_cmd_test_div_P, NULL),
+	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
+	_SCPI_BRANCH_(key_mul_P, &SCPI_cmd_test_mul_P, NULL),
+	_SCPI_BRANCH_(key_num_P, &SCPI_cmd_test_num_P, NULL),
+	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
+	_SCPI_BRANCH_(key_time_P, &SCPI_cmd_test_time_P, NULL),
 	_SCPI_branch_END_,
 };
 
 const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
-	_SCPI_BRANCH_(SCPI_key_stat_P, NULL, SCPI_bt_stat_P),
-	_SCPI_BRANCH_(SCPI_key_syst_P, NULL, SCPI_bt_syst_P),
+	_SCPI_BRANCH_(key_stat_P, NULL, SCPI_bt_stat_P),
+	_SCPI_BRANCH_(key_syst_P, NULL, SCPI_bt_syst_P),
 
-	_SCPI_BRANCH_(SCPI_key_test_P, NULL, SCPI_bt_test_P),
+	_SCPI_BRANCH_(key_test_P, NULL, SCPI_bt_test_P),
 	_SCPI_branch_END_,
 };
 

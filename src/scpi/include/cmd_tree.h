@@ -36,9 +36,9 @@ typedef struct SCPI_cmd_struct {
  * keyword - SCPI keyword, UPPERCASE long form of keyword
  * */
 typedef struct SCPI_key_struct {
-	const uint8_t len_P;
 	const uint8_t len_short_P;
-	const char const *keyword_P;
+//	const char const keyword_P[];
+	const prog_char keyword_P[];
 } SCPI_key_t;
 
 /*
