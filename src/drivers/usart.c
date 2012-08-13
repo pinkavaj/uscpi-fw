@@ -41,8 +41,6 @@ volatile USART0_in_len_t USART0_in_len = 0;
 /* index to first free position to store newly recieved char */
 static volatile USART0_in_len_t USART0_in_len_ = 0;
 
-static void USART0_in_process(void);
-
 ISR(USART0_RXC_vect)
 {
 	uint8_t c;
@@ -88,9 +86,6 @@ ISR(USART0_RXC_vect)
 			USART0_in[USART0_in_len_++] = c;
 		}
 	} while(0);
-	/* Anounce there is new data to proceed */
-	/* FIXME: bug, not called when error during buffer filling */
-	USART0_in_process();
 }
 
 /* USART0_TXC_vect */
@@ -135,18 +130,12 @@ void USART0_init(void)
 
 /* Start processing bytes in input buffer,
  * suppose tath interrupts are disabled, but can be enabled. */
-static void USART0_in_process(void)
+void USART0_in_process(void)
 {
-	static volatile uint8_t USART0_in_process_lock = 0;
 	static uint8_t char_err = 0;
 	char c;
 	SCPI_parse_t ret;
 
-	/* parsing already in progress or no data to parse */
-	if (USART0_in_process_lock)
-		return;
-
-	USART0_in_process_lock++;
 	while (USART0_in_len < USART0_in_len_) {
 		c = USART0_in[USART0_in_len++];
 		if (c == CHAR_ERR_ESC) {
@@ -162,7 +151,6 @@ static void USART0_in_process(void)
 			}
 		}
 
-		sei();
 		ret = char_err ? SCPI_parse_err : SCPI_parse(c);
 		cli();
 		switch (ret)
@@ -204,12 +192,12 @@ static void USART0_in_process(void)
 			case SCPI_parse_more:
 				break;
 		}
+		sei();
 		if (c == '\n') {
 			SCPI_parser_reset();
 			char_err = 0;
 		}
 	}
-	USART0_in_process_lock--;
 }
 
 /* Allow interrup to start sending */

@@ -16,6 +16,7 @@ extern char USART0_in[USART0_IN_LEN];
 extern volatile USART0_in_len_t USART0_in_len;
 
 void USART0_init(void);
+void USART0_in_process(void);
 void USART0_start_sending(void);
 
 #endif

@@ -38,9 +38,9 @@ void main(void)
 	
 	sei();
 	do {	
-		set_sleep_mode(SLEEP_MODE_IDLE);
-		sleep_mode();
                 temp_loop();
+                /* FIXME: přejmenovat, přesunout pod SCPI -> SCPI_loop */
+	        USART0_in_process();
 	} while(1);
 }
 
