@@ -3,13 +3,13 @@
 #include <string.h>
 
 #include "config.h"
+#include "cmd_tree.h"
+#include "cmd_tools.h"
 #include "lib/iobuf.h"
 #include "scpi.h"
 #include "scpi_parser.h"
 #include "scpi_cmd.h"
-#include "cmd_tools.h"
 #include "scpi_err.c"
-#include "scpi_tree.h"
 
 
 /* If c is command separator returns c, 0 othervise */
@@ -38,9 +38,6 @@ static const SCPI_branch_item_t *SCPI_branch;
 
 /* Current parser, changes during different stages of parsing input */
 static SCPI_parse_t (*_SCPI_parser)(char);
-
-#include "scpi_tree.c"
-//#include "scpi_cmd_tools.c"
 
 /* Get SCPI keyword [a-zA-Z] or skip to next parser */
 static SCPI_parse_t SCPI_parse_keyword(char c)
