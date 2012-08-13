@@ -36,7 +36,7 @@ void SPI_dev_select(uint8_t dev_num)
 	}
 }
 
-int16_t SPI_dev_AD_get_sample(uint8_t channel)
+uint16_t SPI_dev_AD_get_sample(uint8_t channel)
 {
 	switch(SPI_dev_current)
 	{

@@ -68,10 +68,15 @@ static void ad974_set_channel(uint8_t channel)
 }
 
 /*****************************************************************************/
-int16_t ad974_get_sample(uint8_t channel)
+uint16_t ad974_get_sample(uint8_t channel)
 {
+	uint16_t val;
+
 	ad974_set_channel(channel);
-	return ad974_get_sample_() - 0x8000;
+	val = ad974_get_sample_();
+	if (val < 0x8000)
+		return 0;
+	return val - 0x8000;
 }
 
 /*****************************************************************************/

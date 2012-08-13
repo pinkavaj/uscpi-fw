@@ -101,7 +101,7 @@ SCPI_parse_t SCPI_IC_test_heat(char UNUSED(c))
 
         for(uint8_t channel = 0; channel < 1; channel++)
         {
-                heating_daq_test(channel, &Icode, &Ucode);
+                temp_meas_IU_test(channel, &Icode, &Ucode);
                 print_uint32(Icode);
                 putc(',');
                 print_uint32(Ucode);
