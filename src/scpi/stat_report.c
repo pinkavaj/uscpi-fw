@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "status_reporting.h"
+#include "stat_report.h"
 
 typedef struct {
 	/* TODO: add transition filter support */

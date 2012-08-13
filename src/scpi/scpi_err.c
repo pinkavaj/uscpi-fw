@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "status_reporting.h"
+#include "stat_report.h"
 
 /* SCPI errors */
 /* SCPI_SES_QERR

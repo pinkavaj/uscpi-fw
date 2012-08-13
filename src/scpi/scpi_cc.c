@@ -6,7 +6,7 @@
 #include "scpi_cmd.h"
 #include "scpi_cmd_tools.h"
 #include "scpi_parser.h"
-#include "status_reporting.h"
+#include "stat_report.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
 
