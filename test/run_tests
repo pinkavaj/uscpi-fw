@@ -25,6 +25,7 @@ BAUDRATE=${BAUDRATE:=115200}
 
 stty -F ${DEV_PORT} ${BAUDRATE}
 
+./test_input_version.py ${DEV_PORT} ${BAUDRATE}
 ./test_input_num.py ${DEV_PORT} ${BAUDRATE}
 
 ./test_math_div.py ${DEV_PORT} ${BAUDRATE}
