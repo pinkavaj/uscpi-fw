@@ -1,7 +1,7 @@
 #ifndef __SCPI_ERR_H__
 #define __SCPI_ERR_H__
 
-typedef struct SCPI_err_struct {
+typedef struct {
 	const char *str_P;
 	uint8_t SES_P;
 } SCPI_err_t;

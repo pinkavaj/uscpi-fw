@@ -3,6 +3,8 @@
 
 #include "config.h"
 #include "stat_report.h"
+#include "lib/extlib.h"
+#include "scpi/error.h"
 
 #define _SCPI_ERR_(n, esr, t) \
 	static const char SCPI_err ## n ## s_P[] PROGMEM = t; \
@@ -134,19 +136,18 @@ _SCPI_ERR_(700, SCPI_SESR_QERR, "-700,\"Request control\"");
 _SCPI_ERR_(800, SCPI_SESR_QERR, "-800,\"Operation complete\"");
 
 /* buffer for SCPI errors */
-#define SCPI_ERR_MAX 4
-static const SCPI_err_t *SCPI_err[SCPI_ERR_MAX];
+static const SCPI_err_t *SCPI_err[4];
 static uint8_t SCPI_err_count = 0;
 
 void SCPI_err_set(const SCPI_err_t *e)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
-		if (SCPI_err_count < SCPI_ERR_MAX) {
+		if (SCPI_err_count < ARRAY_SIZE(SCPI_err)) {
 			SCPI_err[SCPI_err_count++] = e;
 			SCPI_SESR_set(pgm_read_byte(&e->SES_P));
 			SCPI_STB_set(SCPI_STB_EEQ);
-		} else if (SCPI_err_count == SCPI_ERR_MAX) {
+		} else if (SCPI_err_count == ARRAY_SIZE(SCPI_err)) {
 			SCPI_err_count++;
 			SCPI_SESR_set(pgm_read_byte(&SCPI_err_350.SES_P));
 		}
@@ -163,11 +164,11 @@ const SCPI_err_t* SCPI_err_pop(void)
 		else {
 			e = SCPI_err[0];
 			memmove(SCPI_err, SCPI_err + 1,
-					(SCPI_ERR_MAX - 1) * sizeof(void *));
+					(ARRAY_SIZE(SCPI_err) - 1) * sizeof(void *));
 			/* Error queue overflow indicated by 
-			 * SCPI_err_count > SCPI_ERR_MAX */
-			if (--SCPI_err_count == SCPI_ERR_MAX) 
-				SCPI_err[SCPI_ERR_MAX - 1] = &SCPI_err_350;
+			 * SCPI_err_count > ARRAY_SIZE(SCPI_err) */
+			if (--SCPI_err_count == ARRAY_SIZE(SCPI_err)) 
+				SCPI_err[ARRAY_SIZE(SCPI_err) - 1] = &SCPI_err_350;
 			if (!SCPI_err_count)
 				SCPI_STB_reset(SCPI_STB_EEQ);
 		}

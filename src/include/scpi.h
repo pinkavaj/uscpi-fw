@@ -13,7 +13,7 @@
 #define SCPI_in_len USART0_in_len
 #define SCPI_in_len_ USART0_in_len_
 
-#include "scpi_err.h"
+#include "scpi/error.h"
 
 /*
  * SCPI_parse_more - continue recieving, need more data

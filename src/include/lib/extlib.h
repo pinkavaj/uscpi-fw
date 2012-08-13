@@ -1,6 +1,8 @@
 #ifndef __EXTLIB_H__
 #define __EXTLIB_H__
 
+#define ARRAY_SIZE(array) ((sizeof(array) / sizeof(array[0])))
+
 #ifndef NULL
 #define NULL 0
 #endif

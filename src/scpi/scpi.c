@@ -9,7 +9,7 @@
 #include "scpi.h"
 #include "scpi_parser.h"
 #include "scpi_cmd.h"
-#include "scpi_err.c"
+#include "scpi/error.c"
 
 /* If c is command separator returns c, 0 othervise */
 #define SCPI_iscmdend(c) (c == '\n' || c == ';')

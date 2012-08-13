@@ -4,7 +4,7 @@
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
 #include "scpi_cmd.h"
-#include "scpi_err.h"
+#include "scpi/error.h"
 
 SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 {
