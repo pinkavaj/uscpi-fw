@@ -60,11 +60,11 @@ OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
 
 # optimize for size:
-CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
+CFLAGS=--std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 	-Wall -Wstrict-prototypes -Wstrict-aliasing=1 -Wextra -pedantic \
 	-ffreestanding -fshort-enums -fstrict-aliasing -funsigned-char \
 	-funsigned-bitfields ${INC} \
-	-flto
+	-flto -fwhole-program
 #debug
 #CFLAGS=-g --std=gnu99 -O1 -mmcu=$(MCU) -mrelax ${INC} -DF_CPU=${F_CPU} -flto
 
