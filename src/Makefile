@@ -18,8 +18,7 @@ PROJECT=uSCPIfw
 INC=-I. -Iinclude -I/usr/lib/avr/include/
 
 SRC=-c main.c scpi_io.c
-SRC+=lib/math_cust.S
-SRC+=lib/iobuf.c
+SRC+= lib/iobuf.c lib/math_cust.S lib/pic16.c
 SRC+=scpi/scpi.c
 SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
