@@ -18,7 +18,7 @@ PROJECT=uSCPIfw
 INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 
 SRC=-c main.c
-SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/pt_RT_table.c
+SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/thermometer_pt.c
 SRC+=scpi/scpi.c \
      scpi/scpi_cc.c \
      scpi/ic_test.c \
@@ -93,5 +93,5 @@ test:
 	cd ../test && make
 
 pttable:
-	python ../../dhcu_2.0/tools/pt_table.py >lib/pt_temp_res.c
+	python3 ../../dhcu_2.0/tools/pt_table.py >lib/thermometer_pt.c
 
