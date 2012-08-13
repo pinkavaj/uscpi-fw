@@ -49,6 +49,7 @@ extern const SCPI_key_t key_next_P PROGMEM;
 extern const SCPI_key_t key_open_P PROGMEM;
 extern const SCPI_key_t key_oper_P PROGMEM;
 extern const SCPI_key_t key_poin_P PROGMEM;
+extern const SCPI_key_t key_port_P PROGMEM;
 extern const SCPI_key_t key_pres_P PROGMEM;
 extern const SCPI_key_t key_prog_P PROGMEM;
 extern const SCPI_key_t key_ques_P PROGMEM;

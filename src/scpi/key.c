@@ -42,6 +42,7 @@ _key_(next, "NEXT",         SHORT4B);
 _key_(open, "OPEN",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);
 _key_(poin, "POINTS",       SHORT4B);
+_key_(port, "PORT",         SHORT4B);
 _key_(pres, "PRESET",       SHORT4B);
 _key_(prog, "PROGRAM",      SHORT4B);
 _key_(ques, "QUESTIONABLE", SHORT4B);

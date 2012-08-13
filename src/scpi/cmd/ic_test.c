@@ -118,6 +118,33 @@ static SCPI_parse_t SCPI_IC_test_func_int(void)
         return SCPI_parse_end;
 }
 
+static SCPI_parse_t SCPI_IC_test_port(void)
+{
+        uint8_t x;
+        SCPI_parse_t ret;
+
+	ret = SCPI_in_uint8(&x);
+        if (ret == SCPI_parse_err)
+                return ret;
+
+		uint16_t val;
+		if (x == 0) {
+			val = PORTA;
+		} else if (x == 1) {
+			val = PORTB;
+		} else if (x == 2) {
+			val = PORTC;
+		} else if (x == 3) {
+			val = PORTD;
+		} else {
+			val = 0xffff;
+		}
+
+	SCPI_print_uint16(val);
+
+        return SCPI_parse_end;
+}
+
 static SCPI_parse_t SCPI_IC_test_temp(void)
 {
         uint16_t val;
@@ -202,6 +229,12 @@ static const SCPI_cmd_t SCPI_cmd_test_func_mul_P PROGMEM = {
         .parser_P = SCPI_IC_test_heat,
 };*/
 
+static const SCPI_cmd_t SCPI_cmd_test_port_P PROGMEM = {
+        .get_P = 1,
+        .get_has_params_P = 1,
+        .parser_P = SCPI_IC_test_port,
+};
+
 static const SCPI_cmd_t SCPI_cmd_test_temp_P PROGMEM = {
         .get_P = 1,
         .get_has_params_P = 1,
@@ -236,6 +269,7 @@ const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 //	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(key_func_P, NULL, SCPI_bt_test_func_P),
 //	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
+	_SCPI_BRANCH_(key_port_P, &SCPI_cmd_test_port_P, NULL),
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
 	_SCPI_BRANCH_(key_time_P, &SCPI_cmd_test_time_P, NULL),
 	_SCPI_branch_END_,
