@@ -2,7 +2,7 @@
 #####     Customize these for your project     #####
 
 # port where JTAG programmer is connected
-PROG_PORT=/dev/ttyUSB0
+PROG_PORT=/dev/ttyS0
 
 # Name of target controller
 # (see the available avr-gcc mmcu options for possible values)
@@ -20,7 +20,7 @@ PROJECT=uSCPIfw
 INC="-I. -I/usr/lib/avr/include/"
 SRC=-c main.c -c scpi.c -c usart.c -c timer.c -c spi.c -c math.S
 #OBJ=main.o scpi.o
-OBJ=main.o
+OBJ=main.o math.o
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
@@ -31,6 +31,9 @@ CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 	-ffreestanding -fshort-enums -fstrict-aliasing -funsigned-char \
 	-funsigned-bitfields ${INC} -DF_CPU=${F_CPU} \
 	--combine -fwhole-program 
+#debug
+#CFLAGS=-g --std=gnu99 -O1 -mmcu=$(MCU) -mrelax ${INC} -DF_CPU=${F_CPU} --combine
+
 # 
 # experimental stuff
 # 
