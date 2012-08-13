@@ -109,8 +109,6 @@ ISR(USART0_UDRE_vect)
 	/* No more data to send, stop sending, reset buffer */
 	if (USART0_out_len == USART0_out_len_) {
 		UCSR0B &= ~_BV(UDRIE0);
-		USART0_out_len = 0;
-		USART0_out_len_ = 0;
 	}
 }
 
@@ -142,60 +140,65 @@ void USART0_init(void)
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
 }
 
-void USART0_out_wait(USART0_out_len_t size)
+void USART0_out_flush(void)
 {
-	/* requested size > all available space in output buffer */
-	/* TODO: chack size > USART0_OUT_LEN ??? */
-	while (size > USART0_OUT_LEN - (USART0_out_len - USART0_out_len_)) {
+	while (USART0_out_len != USART0_out_len_) {
+		sei();
 		sleep_mode();
+		cli();
 	}
-	cli();
-	memmove((char *)USART0_out, (char *)USART0_out + USART0_out_len_,
-			USART0_OUT_LEN - USART0_out_len_);
-	USART0_out_len -= USART0_out_len_;
-	USART0_out_len_ = 0;
-	sei();
 }
 
-void USART0_print_common(USART0_out_len_t len)
+void USART0_out_wipe(void)
 {
-	/* make space in bufffer, if posible */
-	USART0_out_wait(0);
-	cli();
-	if ((size_t)(USART0_OUT_LEN - USART0_out_len) < len) {
+	USART0_out_len -= USART0_out_len_;
+	memmove((char *)USART0_out, (char *)USART0_out + USART0_out_len_,
+			USART0_out_len);
+	USART0_out_len_ = 0;
+}
+
+USART0_out_len_t USART0_print_common(USART0_out_len_t len)
+{
+	USART0_out_wipe();
+	if ((USART0_out_len_t)(USART0_OUT_LEN - USART0_out_len) < len) {
 		SCPI_err_set(&SCPI_err_223);
-		return;
+		len = USART0_OUT_LEN - USART0_out_len;
 	}
 	/* Allow interrup to start sending */
 	UCSR0B |= _BV(UDRIE0);
+	return len;
 }
 
 /* Print len bytes into output buffer */
-void USART0_printn(const char *c, USART0_out_len_t len)
+void USART0_printn(const char *str, USART0_out_len_t len)
 {
-	USART0_print_common(len);
-	memcpy(USART0_out + USART0_out_len, c, len);
+	cli();
+	len = USART0_print_common(len);
+	memcpy(USART0_out + USART0_out_len, str, len);
 	USART0_out_len += len;
+	sei();
 }
 
 /* Print string from Program memory into output buffer,
  * interrupts will be enabled by this rutine! */
-void USART0_print_P(PGM_P c)
+void USART0_print_P(PGM_P str_P)
 {
-	USART0_out_len_t len = strlen_P(c);
-	USART0_print_common(len);
-	memcpy_P(USART0_out + USART0_out_len, c, len);
+	cli();
+	USART0_out_len_t len = strlen_P(str_P);
+	len = USART0_print_common(len);
+	memcpy_P(USART0_out + USART0_out_len, str_P, len);
 	USART0_out_len += len;
+	sei();
 }
 
 /* Put character into output buffer */
 void USART0_putc(char c)
 {
-	/* make space in bufffer, if posible */
-	USART0_out_wait(1);
+	uint8_t len = 1;
+
 	cli();
-	USART0_out[USART0_out_len++] = c;
-	UCSR0B |= _BV(UDRIE0);
+	if (USART0_print_common(len))
+		USART0_out[USART0_out_len++] = c;
 	sei(); 
 }
 
