@@ -97,14 +97,14 @@ SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
 
 SCPI_parse_t SCPI_IC_test_heat(char UNUSED(c))
 {
-        uint16_t Icode, Ucode;
-
         for(uint8_t channel = 0; channel < 1; channel++)
         {
-                temp_meas_IU_test(channel, &Icode, &Ucode);
-                print_uint32(Icode);
+		temp_daq_data_t temp_daq_data;
+
+                temp_daq_data = temp_meas_IU_raw(channel);
+                print_uint32(temp_daq_data.I);
                 putc(',');
-                print_uint32(Ucode);
+                print_uint32(temp_daq_data.U);
         }
         return SCPI_parse_end;
 }
