@@ -6,6 +6,7 @@
 #include "scpi_cmd.h"
 #include "cmd_tree.h"
 
+/* SCPI command tree item parameters */
 #define YES 1
 #define NO_ 0
 #define GET(g, p) .get_P = g, .get_has_params_P = p
@@ -21,6 +22,7 @@
 #define OPT_2 2
 #define OPT_INF 0xff
 
+/* SCPI command short form lenght */
 #define SHORT3B (3)
 #define SHORT4B (4)
 
@@ -42,20 +44,20 @@ _SCPI_CMD_(tst, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
 
 /* SCPI Common Commands, need be filled to 4B with \0 */
-static const char SCPI_kw_cls_P[] PROGMEM = "CLS";
-static const char SCPI_kw_ese_P[] PROGMEM = "ESE";
-static const char SCPI_kw_esr_P[] PROGMEM = "ESR";
-static const char SCPI_kw_idn_P[] PROGMEM = "IDN";
-static const char SCPI_kw_opc_P[] PROGMEM = "OPC";
-static const char SCPI_kw_rst_P[] PROGMEM = "RST";
-static const char SCPI_kw_sre_P[] PROGMEM = "SRE";
-static const char SCPI_kw_stb_P[] PROGMEM = "STB";
-static const char SCPI_kw_tst_P[] PROGMEM = "TST";
-static const char SCPI_kw_wai_P[] PROGMEM = "WAI";
+static const char kw_cls_P[] PROGMEM = "CLS";
+static const char kw_ese_P[] PROGMEM = "ESE";
+static const char kw_esr_P[] PROGMEM = "ESR";
+static const char kw_idn_P[] PROGMEM = "IDN";
+static const char kw_opc_P[] PROGMEM = "OPC";
+static const char kw_rst_P[] PROGMEM = "RST";
+static const char kw_sre_P[] PROGMEM = "SRE";
+static const char kw_stb_P[] PROGMEM = "STB";
+static const char kw_tst_P[] PROGMEM = "TST";
+static const char kw_wai_P[] PROGMEM = "WAI";
        
 #define _SCPI_key_(kw, s) static const SCPI_key_t SCPI_key_ ## kw ## _P \
-	PROGMEM = { .keyword_P = SCPI_kw_ ## kw ## _P, .len_short_P = s, \
-	.len_P = sizeof(SCPI_kw_ ## kw ## _P) - 1 }
+	PROGMEM = { .keyword_P = kw_ ## kw ## _P, .len_short_P = s, \
+	.len_P = sizeof(kw_ ## kw ## _P) - 1 }
 
 _SCPI_key_(cls, SHORT3B);
 _SCPI_key_(ese, SHORT3B);
@@ -85,27 +87,28 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 };
 
 /* SCPI Instrument Commands, list of keywords */
-static const char SCPI_kw_cond_P[] PROGMEM = "CONDITION";
-static const char SCPI_kw_enab_P[] PROGMEM = "ENABLE";
-static const char SCPI_kw_err_P[]  PROGMEM = "ERROR";
-static const char SCPI_kw_even_P[] PROGMEM = "EVENT";
-static const char SCPI_kw_next_P[] PROGMEM = "NEXT";
-static const char SCPI_kw_oper_P[] PROGMEM = "OPERATION";
-static const char SCPI_kw_pres_P[] PROGMEM = "PRESET";
-static const char SCPI_kw_ques_P[] PROGMEM = "QUESTIONABLE";
-static const char SCPI_kw_res_P[]  PROGMEM = "RESISTANCE";
-static const char SCPI_kw_stat_P[] PROGMEM = "STATUS";
-static const char SCPI_kw_syst_P[] PROGMEM = "SYSTEM";
-static const char SCPI_kw_temp_P[] PROGMEM = "TEMPERATURE";
-static const char SCPI_kw_vers_P[] PROGMEM = "VERSION";
+static const char kw_cond_P[] PROGMEM = "CONDITION";
+static const char kw_enab_P[] PROGMEM = "ENABLE";
+static const char kw_err_P[]  PROGMEM = "ERROR";
+static const char kw_even_P[] PROGMEM = "EVENT";
+static const char kw_next_P[] PROGMEM = "NEXT";
+static const char kw_oper_P[] PROGMEM = "OPERATION";
+static const char kw_pres_P[] PROGMEM = "PRESET";
+static const char kw_ques_P[] PROGMEM = "QUESTIONABLE";
+static const char kw_res_P[]  PROGMEM = "RESISTANCE";
+static const char kw_sour_P[] PROGMEM = "SOURCE";
+static const char kw_stat_P[] PROGMEM = "STATUS";
+static const char kw_syst_P[] PROGMEM = "SYSTEM";
+static const char kw_temp_P[] PROGMEM = "TEMPERATURE";
+static const char kw_test_P[] PROGMEM = "TEST";
+static const char kw_vers_P[] PROGMEM = "VERSION";
 
-static const char SCPI_kw_adc_P[] PROGMEM = "ADC";
-static const char SCPI_kw_div_P[] PROGMEM = "DIV";
-static const char SCPI_kw_heat_P[] PROGMEM = "HEAT";
-static const char SCPI_kw_mul_P[] PROGMEM = "MUL";
-static const char SCPI_kw_num_P[] PROGMEM = "NUM";
-static const char SCPI_kw_test_P[] PROGMEM = "TEST";
-static const char SCPI_kw_time_P[] PROGMEM = "TIME";
+static const char kw_adc_P[] PROGMEM = "ADC";
+static const char kw_div_P[] PROGMEM = "DIV";
+static const char kw_heat_P[] PROGMEM = "HEAT";
+static const char kw_mul_P[] PROGMEM = "MUL";
+static const char kw_num_P[] PROGMEM = "NUM";
+static const char kw_time_P[] PROGMEM = "TIME";
        
 _SCPI_key_(cond, SHORT4B);
 _SCPI_key_(enab, SHORT4B);
@@ -116,6 +119,7 @@ _SCPI_key_(oper, SHORT4B);
 _SCPI_key_(pres, SHORT4B);
 _SCPI_key_(ques, SHORT4B);
 _SCPI_key_(res, SHORT3B);
+_SCPI_key_(sour, SHORT4B);
 _SCPI_key_(stat, SHORT4B);
 _SCPI_key_(syst, SHORT4B);
 _SCPI_key_(temp, SHORT4B);
