@@ -9,7 +9,7 @@
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */
 #define TEMP_CHANNELS_INTERNAL 8
-/* Minimal (bottom) DA output value (even is shortcut or so!) */
+/* Minimal (bottom) DA output value (even in shortcut or so!) */
 #define TEMP_OUTP_DA_MIN 3072
 
 /* temperature DAQ device to measure I and U */
@@ -222,28 +222,35 @@ static void temp_output_DA(uint8_t channel, uint16_t output)
 /* TODO: DAQ data status */
 static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
 {
-#define IMAX 2**15-128
-#define DAQ_STAT_I_OVER (1<<0)
-#define DAQ_STAT_I_UNDER (2<<0)
-#define DAQ_STAT_U_OVER (1<<3)
-#define DAQ_STAT_U_UNDER (2<<3)
+#define IMAX ((0x7fff - 0x7f))
+#define IMIN 2048
+#define UMAX ((0x7fff - 0x7f))
+#define UMIN 4096
+
+#define I_OVER 1
+#define I_UNDER 2
+#define U_OVER 4
+#define U_UNDER 8
         temp_status_IU_t status;
-/*        uint16_t Imin, Imax, Umax, Umin;
-
-//        Imin = pgm_r
-
-        if (data_IU.I > Imax) {
-                if (data_IU.U < Umin) {
-                        status = daq_status_shortcut;
-                }
-                else
-                        status = daq_status_invalid;
-
-        } else if (data_IU.I < Imin) {
-        }*/
-        data_IU = data_IU;
-        //status = temp_status_IU_invalid;
         status = temp_status_IU_valid;
+        uint8_t status_ = 0;
+
+        if (data_IU.I > IMAX)
+                status_ = I_OVER;
+        else if (data_IU.I < IMIN)
+                status_ = I_UNDER;
+
+        if (data_IU.U > UMAX)
+                status_ = U_OVER;
+        else if (data_IU.U < UMIN)
+                status_ = U_UNDER;
+       
+        if (status_ == (I_UNDER))
+                status = temp_status_IU_disconnected;
+        else if (status_ == (I_UNDER | U_UNDER))
+                status = temp_status_IU_shortcut;
+        else if (status_)
+                status = temp_status_IU_invalid;
 
         return status;
 }
