@@ -23,13 +23,13 @@ typedef struct {
 
 /* FIXME: */
 typedef struct {
-        uint16_t Imin;
-        uint16_t Imax;
-        uint16_t Umin;
-        uint16_t Umax;
+        int16_t Imin;
+        int16_t Imax;
+        int16_t Umin;
+        int16_t Umax;
         /* FIXME: tohle může přijít i jinam */
-        uint16_t Icode_offs;
-        uint16_t Ucode_offs;
+        int8_t Icode_offs;
+        int8_t Ucode_offs;
 } daq_limits_t;
 
 typedef enum {
@@ -75,8 +75,8 @@ static daq_data_t heating_daq(uint8_t channel)
 {
 	daq_data_t daq_data;
 
-	uint32_t Icode = 0;
-	uint32_t Ucode = 0;
+	int32_t Icode = 0;
+	int32_t Ucode = 0;
 
         const heating_channel_param_t *params_E = &channel_params_E[channel];
 	uint8_t Ichannel = eeprom_read_byte(&params_E->daq.Ichannel);
@@ -86,7 +86,7 @@ static daq_data_t heating_daq(uint8_t channel)
         SPI_dev_select(spi_dev_num);
 #define SAMPLES 8
 #define DAQ_READS 16
-	uint16_t i =  DAQ_READS;
+	uint8_t i = DAQ_READS;
 	TIMER1_delay_rel_reset();
 	do {
 		Icode += SPI_dev_AD_get_sample(Ichannel);
