@@ -1,8 +1,8 @@
 #include "config.h"
-#include "usart.h"
+#include "drivers/usart.h"
 
 // FIXME: remove
-#include "../scpi/scpi.h"
+#include "scpi.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -96,7 +96,7 @@ ISR(USART0_RXC_vect)
 		}
 	} while(0);
 	/* Anounce there is new data to proceed */
-	/* FIXME: bug, not called when eror during buffer filling */
+	/* FIXME: bug, not called when error during buffer filling */
 	USART0_in_process();
 }
 

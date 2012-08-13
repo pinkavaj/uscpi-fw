@@ -6,9 +6,9 @@
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
-#include "iodef.h"
-#include "spi.h"
-#include "ad974.h"
+#include "drivers/iodef.h"
+#include "drivers/spi.h"
+#include "drivers/ad974.h"
 
 void ad974_io_init(void)
 {

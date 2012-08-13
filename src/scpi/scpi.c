@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "config.h"
-#include "scpi_config.h"
 #include "scpi.h"
+#include "scpi_io.h"
 #include "scpi_cmd.h"
 #include "scpi_err.c"
 #include "scpi_tree.h"

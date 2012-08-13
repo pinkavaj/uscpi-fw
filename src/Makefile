@@ -8,8 +8,6 @@ DEV_PORT=/dev/ttyUSB0
 # Name of target controller
 # (see the available avr-gcc mmcu options for possible values)
 MCU=atmega162
-# CPU Frequency, more at avrprog boot library README
-F_CPU = 11059200
 PROJECT=uSCPIfw
 
 # Source files
@@ -17,9 +15,9 @@ PROJECT=uSCPIfw
 # (list all files to compile, e.g. 'a.c b.cpp as.S')
 # Use .cc, .cpp or .C suffix for C++ files, use .S
 # (NOT .s !!!) for assembly source code files.
-INC=-I. -I/usr/lib/avr/include/
+INC=-I. -Iinclude -I/usr/lib/avr/include/
 
-SRC=-c main.c
+SRC=-c main.c scpi_io.c
 SRC+=lib/math.S
 SRC+=scpi/scpi.c 
 SRC+=drivers/usart.c drivers/timer.c
@@ -34,7 +32,7 @@ OBJDUMP=avr-objdump
 CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 	-Wall -Wstrict-prototypes -Wstrict-aliasing=1 -Wextra -pedantic \
 	-ffreestanding -fshort-enums -fstrict-aliasing -funsigned-char \
-	-funsigned-bitfields ${INC} -DF_CPU=${F_CPU} \
+	-funsigned-bitfields ${INC} \
 	--combine -fwhole-program 
 #debug
 #CFLAGS=-g --std=gnu99 -O1 -mmcu=$(MCU) -mrelax ${INC} -DF_CPU=${F_CPU} --combine

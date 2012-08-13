@@ -1,26 +1,16 @@
+#include "config.h"
+
 #include <string.h>
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
-#include "config.h"
-#include "spi.h"
-#include "ad974.h"
-#include "mcp4922.h"
-#include "spi_dev.h"
-
-
-#define SPI_PORT PORTB
-#define SPI_DDR DDRB
-#define SPI_SS _BV(PB4)
-#define SPI_MOSI _BV(PB5)
-#define SPI_MISO _BV(PB6)
-#define SPI_SCK _BV(PB7)
-#define SPI_MASK (SPI_MISO | SPI_SCK | SPI_MOSI | SPI_SS)
-
+#include "drivers/spi.h"
+#include "drivers/ad974.h"
+#include "drivers/mcp4922.h"
+#include "drivers/spi_dev.h"
 
 /* number of currently selected SPI device, see spi.h */
 static uint8_t SPI_dev_current;
-
 
 void SPI_dev_select(uint8_t dev_num)
 {

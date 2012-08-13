@@ -6,15 +6,18 @@
 /* for debuging only */
 #include <avr/io.h>
 
+#define F_CPU 11059200
+
 #define VER_MAJ 0
 #define VER_MINOR 0
 #define VER_REV 0
-#define VER_BUILD 612M
+#define VER_BUILD 613M
 #define INFO_AUTHOR Lukas-Kucera_Jiri-Pinkava
 #define INFO_COMPANY VSCHT
 #ifndef INFO_MODEL
 #define INFO_MODEL M162board-dev00
 #endif
+
 
 #endif
 

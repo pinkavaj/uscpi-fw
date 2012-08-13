@@ -67,9 +67,9 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-#include "../drivers/spi_dev.h"
-#include "../drivers/ad974.h"
-#include "../drivers/mcp4922.h"
+#include "drivers/spi_dev.h"
+#include "drivers/ad974.h"
+#include "drivers/mcp4922.h"
 static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {

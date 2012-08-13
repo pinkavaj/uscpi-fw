@@ -11,9 +11,9 @@
 
 #include <util/delay_basic.h>
 
-#include "iodef.h"
-#include "spi.h"
-#include "mcp4922.h"
+#include "drivers/iodef.h"
+#include "drivers/spi.h"
+#include "drivers/mcp4922.h"
 
 #define MCP4922_OUTPUT 12
 #define MCP4922_OUTPUT_ON (1<<MCP4922_OUTPUT)
