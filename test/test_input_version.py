@@ -1,36 +1,26 @@
 #!/usr/bin/env python3
 
-import serial
-import sys
+from fwtest import FwTest
+
+import unittest
 
 
-count=100
+class InputTest(FwTest):
+    def setUp(self):
+        FwTest.setUp(self)
 
-port=serial.Serial(port=sys.argv[1], baudrate=sys.argv[2], timeout=1)
-port.open()
+    def test_input_version(self):
+        # cmd burst
+        for mult in (1, 2, 3, 4, 16, 30, 60 ):
+            cmd = 'syst:vers?\n' * mult
+            exp = '1999.0'
+            self.writeline(cmd)
+            while mult:
+                res = self.readline()
+                self.assertEqual(res, exp)
+                mult = mult - 1
 
-def test(mult):
-    """Test input for specified number"""
-    cmd = 'syst:vers?\n' * mult
-    exp = '1999.0'
-    try:
-        port.write(cmd.encode('ascii'))
-        while mult:
-            res = port.readline()
-            res = res.decode('ascii').strip()
-            if res != exp:
-                raise Exception()
-            print('.',end='')
-            sys.stdout.flush()
-            mult = mult - 1
-    except:
-        print ("Failed cmd: \n%s \nres: %s exp: %s\n" % 
-                (cmd, repr(res), repr(exp), ))
-        raise
 
-# cmd burst
-for n in (1, 2, 3, 4, 16, 30, 60 ):
-    test(n)
-
-print("OK")
+if __name__ == '__main__':
+    unittest.main()
 

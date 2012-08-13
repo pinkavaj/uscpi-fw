@@ -24,5 +24,5 @@ class FwTest(unittest.TestCase):
         line = self.port.readline()
         if not line:
             return None
-        return line.strip()
+        return line.strip().decode('ascii')
 

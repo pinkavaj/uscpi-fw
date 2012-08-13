@@ -1,55 +1,39 @@
 #!/usr/bin/env python3
 
-import serial
-import sys
+from fwtest import FwTest
+
+import unittest
 
 
-count=100
+class DevAD974Test(FwTest):
+    def setUp(self):
+        FwTest.setUp(self)
+        #port.write('test:adc 400,400\n'.encode('ascii'))
 
-port=serial.Serial(port=sys.argv[1], baudrate=sys.argv[2], timeout=1)
-port.open()
+    def test_ad974(self):
+        cmd = 'test:adc?'
+        d_max = 300
+        
+        count=100
+        while count:
+            count = count - 1
+            self.writeline(cmd)
+            res = self.readline()
+            ch0a, ch0b, ch1a, ch1b, ch2a, ch2b, ch3a, ch3b = res.split(',')
+            ch0a, ch1a, ch2a, ch3a, ch0b, ch1b, ch2b, ch3b = \
+                    int(ch0a), int(ch1a), int(ch2a), int(ch3a), \
+                    int(ch0b), int(ch1b), int(ch2b), int(ch3b)
+# TODO: udělat test chXY != 0 -> aby se ověřilo že je AD připojeno
+            d0 = abs(ch0a - ch0b)
+            d1 = abs(ch1a - ch1b)
+            d2 = abs(ch2a - ch2b)
+            d3 = abs(ch3a - ch3b)
+            self.assertLess(d0, d_max)
+            self.assertLess(d1, d_max)
+            self.assertLess(d2, d_max)
+            self.assertLess(d3, d_max)
 
-def test(count):
-    """Test input for specified number"""
-    cmd = 'test:adc?\n'
-    d_max = 300
-    try:
-        port.write(cmd.encode('ascii'))
-        res = port.readline()
-        res = res.decode('ascii').strip()
-        ch0a, ch0b, ch1a, ch1b, ch2a, ch2b, ch3a, ch3b = res.split(',')
-        ch0a = int(ch0a)
-        ch1a = int(ch1a)
-        ch2a = int(ch2a)
-        ch3a = int(ch3a)
-        ch0b = int(ch0b)
-        ch1b = int(ch1b)
-        ch2b = int(ch2b)
-        ch3b = int(ch3b)
-        d0 = ch0a - ch0b
-        d1 = ch1a - ch1b
-        d2 = ch2a - ch2b
-        d3 = ch3a - ch3b
-        if abs(d0) > d_max or \
-                        abs(d1) > d_max or \
-                        abs(d2) > d_max or \
-                        abs(d3) > d_max:
-            raise Exception()
-        if count % 200 == 0:
-                sys.stdout.write('.')
-                sys.stdout.flush()
-    except:
-        print ("Failed cmd: \n%s \nres: %s dif: %i %i %i %i\n" % 
-                (cmd, repr(res), d0, d1, d2, d3, ))
-        print ("count: %i" % count)
-        raise
 
-port.write('test:adc 400,400\n'.encode('ascii'))
-
-# cmd burst
-while count > 0:
-    test(count)
-    count = count - 1
-
-print("OK")
+if __name__ == '__main__':
+    unittest.main()
 
