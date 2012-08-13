@@ -6,6 +6,9 @@
 extern uint8_t SCPI_params_count;
 
 /* SCPI Instrument Commands */
+SCPI_parse_t SCPI_IC_sour_temp_lcon_gain(char c);
+SCPI_parse_t SCPI_IC_sour_temp_lcon_int(char c);
+#define SCPI_IC_sour_temp NULL
 SCPI_parse_t SCPI_IC_stat_oper_cond(char c);
 SCPI_parse_t SCPI_IC_stat_oper_enab(char c);
 SCPI_parse_t SCPI_IC_stat_oper_even(char c);

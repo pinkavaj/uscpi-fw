@@ -1,6 +1,14 @@
 #ifndef __SCPI_PARSER_H__
 #define __SCPI_PARSER_H__
 
+#include "cmd_tree.h"
+
+/* numeric suffix after keyword, internaly numbered from 0,
+ * stored only for branches which supports more channels + one
+ * used to process current branch */
+extern uint8_t SCPI_num_suffixes[2];
+extern uint8_t SCPI_num_suffixes_idx;
+
 /* FIXME: přejmenovat na SCPI_bits */
 uint8_t SCPI_opts;
 /* command is question (ends with '?') */

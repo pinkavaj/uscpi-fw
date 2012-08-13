@@ -31,7 +31,7 @@
 /* SCPI Common Commands */
 #define _SCPI_CMD_(c, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## c ## _P PROGMEM = \
-	{ .parser_P = SCPI_CC_ ## c, g, s}
+	{ .parser_P = SCPI_CC_ ## c, g, s }
 _SCPI_CMD_(cls, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(ese, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(esr, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
@@ -76,9 +76,13 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 
 /* SCPI Instrument Commands, list of keywords */
 _key_(cond, "CONDITION",    SHORT4B);
+/*_key_(der,  "DERIVATIVE",   SHORT3B);*/
 _key_(enab, "ENABLE",       SHORT4B);
 _key_(err,  "ERROR",        SHORT3B);
 _key_(even, "EVENT",        SHORT4B);
+_key_(gain, "GAIN",         SHORT4B);
+_key_(int,  "INTEGRAL",     SHORT3B);
+_key_(lcon, "LCONSTANTS",   SHORT4B);
 _key_(next, "NEXT",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);
 _key_(pres, "PRESET",       SHORT4B);
@@ -99,36 +103,56 @@ _key_(num, "NUM",  SHORT3B);
 _key_(time,"TIME", SHORT4B);
 
 #undef _SCPI_CMD_
-#define _SCPI_CMD_(p, g, s) \
+#define _SCPI_CMD_(p, n, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## p ## _P PROGMEM = \
-	{.parser_P = SCPI_IC_ ## p, g, s}
+	{.parser_P = SCPI_IC_ ## p, g, s, .num_suffix_max_P = n}
 
 /* SCPI Instrument Commands */
-_SCPI_CMD_(stat_oper_cond, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(stat_oper_enab, GET(YES, PARAMS_N), SET(YES, 
+/*_SCPI_CMD_(sour_temp_lcon_der, GET(YES, PARAMS_N), SET(YES, 
+			PARAMS(1, OPT_0, ATONCE_Y)));*/
+_SCPI_CMD_(sour_temp_lcon_gain, 0, GET(YES, PARAMS_N), SET(YES, 
 			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(stat_oper_even, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(stat_pres,      GET(NO_, PARAMS_N), SET(YES, 
+_SCPI_CMD_(sour_temp_lcon_int, 0, GET(YES, PARAMS_N), SET(YES, 
+			PARAMS(1, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(sour_temp, 1, GET(NO_, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(stat_oper_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(stat_oper_enab, 0, GET(YES, PARAMS_N), SET(YES, 
+			PARAMS(1, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(stat_oper_even, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(stat_pres, 0,      GET(NO_, PARAMS_N), SET(YES, 
 			PARAMS(1, OPT_0, ATONCE_Y))); 
-_SCPI_CMD_(stat_ques_cond, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(stat_ques_enab, GET(YES, PARAMS_N), SET(YES, 
+_SCPI_CMD_(stat_ques_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(stat_ques_enab, 0, GET(YES, PARAMS_N), SET(YES, 
 			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(stat_ques_even, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(syst_err_next,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(syst_vers,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(stat_ques_even, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(syst_err_next, 0,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(syst_vers, 0,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
-_SCPI_CMD_(test_adc,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_div,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_heat, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_mul,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_num,  GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_temp, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_temp_res, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_time, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_div, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_mul, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_num, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_temp, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
-static const SCPI_branch_item_t SCPI_bt_syst_err_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_next_P, &SCPI_cmd_syst_err_next_P, NULL),
+static const SCPI_branch_item_t SCPI_bt_sour_temp_lcon_P[] PROGMEM = {
+/*	_SCPI_BRANCH_(key_der_P, &SCPI_cmd_sour_temp_lcon_der_P, NULL),*/
+	_SCPI_BRANCH_(key_gain_P, &SCPI_cmd_sour_temp_lcon_gain_P, NULL),
+	_SCPI_BRANCH_(key_int_P, &SCPI_cmd_sour_temp_lcon_int_P, NULL),
+	_SCPI_branch_END_,
+};
+
+static const SCPI_branch_item_t SCPI_bt_sour_temp_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_lcon_P, &SCPI_cmd_sour_temp_lcon_gain_P, 
+                        SCPI_bt_sour_temp_lcon_P),
+	_SCPI_branch_END_,
+};
+
+static const SCPI_branch_item_t SCPI_bt_sour_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_sour_temp_P, SCPI_bt_sour_temp_P),
 	_SCPI_branch_END_,
 };
 
@@ -152,6 +176,11 @@ static const SCPI_branch_item_t SCPI_bt_stat_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_oper_P, &SCPI_cmd_stat_oper_even_P, 
 			SCPI_bt_stat_oper_P),
 	_SCPI_BRANCH_(key_pres_P, &SCPI_cmd_stat_pres_P, NULL),
+	_SCPI_branch_END_,
+};
+
+static const SCPI_branch_item_t SCPI_bt_syst_err_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_next_P, &SCPI_cmd_syst_err_next_P, NULL),
 	_SCPI_branch_END_,
 };
 
@@ -179,9 +208,9 @@ static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 };
 
 const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
+	_SCPI_BRANCH_(key_sour_P, NULL, SCPI_bt_sour_P),
 	_SCPI_BRANCH_(key_stat_P, NULL, SCPI_bt_stat_P),
 	_SCPI_BRANCH_(key_syst_P, NULL, SCPI_bt_syst_P),
-
 	_SCPI_BRANCH_(key_test_P, NULL, SCPI_bt_test_P),
 	_SCPI_branch_END_,
 };

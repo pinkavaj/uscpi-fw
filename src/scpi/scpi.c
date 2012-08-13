@@ -11,7 +11,6 @@
 #include "scpi_cmd.h"
 #include "scpi_err.c"
 
-
 /* If c is command separator returns c, 0 othervise */
 #define SCPI_iscmdend(c) (c == '\n' || c == ';')
 static SCPI_parse_t SCPI_parse_keyword(char c);
@@ -25,11 +24,8 @@ static SCPI_parse_t SCPI_parse_param_nostr(char c);
 static SCPI_parse_t SCPI_parse_param_end(char c);
 static void SCPI_parser_reset_(void) ;
 
-/* num_suffix - numeric suffix after keyword (-1) internaly numbered from 0 */
-#define NUM_SUFFIX_MAX 15
-static union {
-	uint8_t current;
-} num_suffix ;
+uint8_t SCPI_num_suffixes[2];
+uint8_t SCPI_num_suffixes_idx;
 
 /* Command for currently (last) selected branch item */
 static const SCPI_cmd_t *SCPI_cmd;
@@ -52,6 +48,11 @@ static SCPI_parse_t SCPI_parse_keyword(char c)
 		SCPI_in[SCPI_in_len - 1] = c;
 		return SCPI_parse_more;
 	}
+        if (SCPI_num_suffixes_idx >= sizeof(SCPI_num_suffixes)) {
+                SCPI_err_set(&SCPI_err_130);
+                return SCPI_parse_err;
+        }
+        SCPI_num_suffixes[SCPI_num_suffixes_idx] = 0;
 	if (isdigit(c)) {
 		_SCPI_parser = SCPI_parse_keyword_num;
 		return SCPI_parse_keyword_num(c);
@@ -62,22 +63,25 @@ static SCPI_parse_t SCPI_parse_keyword(char c)
 /* Parse numeric suffix after keyword */
 static SCPI_parse_t SCPI_parse_keyword_num(char c)
 {
+	uint8_t num_suffix;
+        
+        num_suffix= SCPI_num_suffixes[SCPI_num_suffixes_idx];
 	if (isdigit(c)) {
-		uint8_t x = num_suffix.current * 10 + (c - '0');
-		if (x > NUM_SUFFIX_MAX) {
+		if (num_suffix >= (UINT8_MAX / 10)) {
 			SCPI_err_set(&SCPI_err_114);
 			return SCPI_parse_err;
 		}
-		num_suffix.current = x;
+                num_suffix = num_suffix * 10 + (c - '0');
+		SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix;
 		return SCPI_parse_drop_last;
 	}
 	/* Keyword numeric suffix is number in range <1,N> */
-	if (num_suffix.current == 0) {
+	if (num_suffix == 0) {
 		SCPI_err_set(&SCPI_err_114);
 		return SCPI_parse_err;
 	}
 	/* Internal numbering is from 0 */
-	num_suffix.current--;
+	SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix - 1;
 	return SCPI_parse_keyword_question(c);
 }
 
@@ -100,9 +104,13 @@ static SCPI_parse_t SCPI_parse_keyword_question(char c)
  * function or select new keyword table */
 static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 {
-	uint8_t kw_len = SCPI_in_len - 1;
-	SCPI_in[kw_len] = '\0';
+        uint8_t num_suffix;
+	uint8_t num_suffix_max;
+	uint8_t kw_len;
 	const SCPI_branch_item_t *branch;
+
+        kw_len = SCPI_in_len - 1;
+	SCPI_in[kw_len] = '\0';
 	if (_SCPI_CMD_IS_CC()) {
 		branch = SCPI_CC_ROOT;
 	}
@@ -113,6 +121,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 	do {
 		uint8_t len;
 		SCPI_key_t *key;
+
 		key = (SCPI_key_t*)pgm_read_word(&branch->key_P);
 		if (key == NULL) {
 			SCPI_err_set(&SCPI_err_113);
@@ -128,18 +137,23 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 		branch++;
 	} while(1);
 	SCPI_cmd = (SCPI_cmd_t*)pgm_read_word(&branch->cmd_P);
+
+        /* Check numeric suffix */
+        num_suffix = SCPI_num_suffixes[SCPI_num_suffixes_idx];
+        if (SCPI_cmd != NULL) {
+                num_suffix_max = pgm_read_word(&SCPI_cmd->num_suffix_max_P);
+                if (num_suffix_max > 0) {
+                        SCPI_num_suffixes_idx++;
+                }
+        } else
+                num_suffix_max = 0;
+
+        if (num_suffix > num_suffix_max) {
+	        SCPI_err_set(&SCPI_err_114);
+	        return SCPI_parse_err;
+        }
+
 	/* try setup parsing of another keyword, if found in tree */
-	if (num_suffix.current > 0) {
-		/* Keyword numeric suffix is set (greather than 1)
-		 * but not allowed */
-		uint8_t *cmd_num_suffix = 
-			(uint8_t*)pgm_read_word(&SCPI_cmd->num_suffix_P);
-		if (SCPI_cmd == NULL || cmd_num_suffix == NULL) {
-			SCPI_err_set(&SCPI_err_114);
-			return SCPI_parse_err;
-		}
-		*cmd_num_suffix = num_suffix.current;
-	}
 	if (c == ':') {
 		SCPI_branch = 
 			(SCPI_branch_item_t*)pgm_read_word(&branch->branch_P);
@@ -325,6 +339,7 @@ static void SCPI_parser_reset_(void)
 	_SCPI_CMD_IS_QUEST_reset();
 	_SCPI_CMD_IS_CC_reset();
 	_SCPI_PARSE_PARAM_PREF_reset();
+        SCPI_num_suffixes_idx = 0;
 	SCPI_params_count = 0;
 	SCPI_param_in_buf_idx = 0;
 	_SCPI_parser = NULL;

@@ -2,7 +2,6 @@
 #include <inttypes.h>
 #include <avr/eeprom.h>
 #include "lib/temp.h"
-#include "lib/pic16.h"
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
 
@@ -71,8 +70,8 @@ static const temp_conf_t EEMEM temp_conf_E[2] = {
 			.U_offs = 0,
 		},
                 .pic = {
-                        .gain_lin = 1,
-                        .gain_int = 1,
+                        .gain_lin = 123,
+                        .gain_int = 24,
                 },
         },
         {
@@ -86,11 +85,32 @@ static const temp_conf_t EEMEM temp_conf_E[2] = {
 			.U_offs = 0,
 		},
                 .pic = {
-                        .gain_lin = 1,
-                        .gain_int = 1,
+                        .gain_lin = 234,
+                        .gain_int = 34,
                 },
         },
 };
+
+pic16_param_t temp_pic_params_get(uint8_t channel)
+{
+        const pic16_param_t *pic_E;
+        pic16_param_t pic_param;
+
+        pic_E = &temp_conf_E[channel].pic;
+        pic_param.gain_lin = eeprom_read_word(&pic_E->gain_lin);
+        pic_param.gain_int = eeprom_read_word(&pic_E->gain_int);
+
+        return pic_param;
+}
+
+void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
+{
+        const pic16_param_t *pic_E;
+
+        pic_E = &temp_conf_E[channel].pic;
+        eeprom_write_word((uint16_t *)&pic_E->gain_lin, pic_param.gain_lin);
+        eeprom_write_word((uint16_t *)&pic_E->gain_int, pic_param.gain_int);
+}
 
 static temp_daq_data_t temp_meas_IU(uint8_t channel)
 {
