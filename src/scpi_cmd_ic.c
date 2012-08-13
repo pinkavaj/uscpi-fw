@@ -115,6 +115,16 @@ static SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
+static SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
+{
+	static uint32_t val;
+
+	if (_SCPI_CMD_IS_QUEST())
+		SCPI_out_uint32(val);
+	else
+		SCPI_in_uint32(&val);
+	return SCPI_parse_end;
+}
 
 /* Get (next) error from error queue */
 static SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
