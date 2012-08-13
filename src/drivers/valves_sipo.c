@@ -11,10 +11,10 @@ void valves_sipo_init(void)
 	PORT_MODIFY(VALVE_SIPO1x_DDR, VALVE_SIPO1x_MASK,
 			DDR_OUT(VALVE_SIPO1x_MASK));
 
-        /* Close all ports */
-	BIT_SET(VALVE_SIPO1x_PORT, VALVE_SIPO1x_SCL);
-	_delay_loop_1(1);
+    /* Close all ports */
 	BIT_CLR(VALVE_SIPO1x_PORT, VALVE_SIPO1x_SCL);
+	_delay_loop_1(1);
+	BIT_SET(VALVE_SIPO1x_PORT, VALVE_SIPO1x_SCL);
 }
 
 // TODO: volat valves_sipo1_timeout jednou za 0.5 sec
