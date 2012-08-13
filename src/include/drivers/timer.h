@@ -10,9 +10,8 @@
 #define TIMER1_TICKS_PER_PLC ((TIMER1_TICKS_PER_JIFFER * 16)) /* 20ms */
 #define TIMER1_PERIODS_PER_SEC 32 /* timer 1 periods per second */
 
-/* timeline timed by timer 1 */
-#define TIMER1_ALARM_DAC 2
-#define TIMER1_ALARM_SEND 24
+/* Timeline - time offset in jiffers from start of period */
+#define TIMER1_ALARM_SEND 17
 
 extern volatile uint32_t time_sec;	// MCU s counter
 extern volatile uint8_t period_counter;	// 0-31 (4x 8x 31.25 ms = 1000 ms)
