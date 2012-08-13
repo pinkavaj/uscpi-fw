@@ -75,10 +75,11 @@
 			VALVE_RAW02_PIN)
 
 /* Valves connected trought SIPO 74HCT595 */
-#define VALVE_1x_PORT   PORTD
-#define VALVE_1x_SCL    _BV(6)
-#define VALVE_1x_RCK    _BV(7)
-#define VALVE_1x_MASK   (VALVE_1x_SCL | VALVE_1x_RCK)
+#define VALVE_SIPO1x_PORT   PORTD
+#define VALVE_SIPO1x_DDR	DDRD
+#define VALVE_SIPO1x_SCL    _BV(6)
+#define VALVE_SIPO1x_RCK    _BV(7)
+#define VALVE_SIPO1x_MASK   (VALVE_SIPO1x_SCL | VALVE_SIPO1x_RCK)
 
 #else
 #error "Device not defined"

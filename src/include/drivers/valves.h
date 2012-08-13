@@ -4,7 +4,7 @@
 #include <inttypes.h>
 
 /** Number of valves. */
-#define VALVE_CHANNELS (3)
+#define VALVE_CHANNELS (3 + 4)
 
 void valves_init(void);
 

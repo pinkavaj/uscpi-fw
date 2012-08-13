@@ -47,7 +47,8 @@ SRC+=drivers/spi_dev.c \
 	 drivers/spi.c \
 	 drivers/ad974.c \
 	 drivers/valves.c \
-	 drivers/valves_raw.c
+	 drivers/valves_raw.c \
+	 drivers/valves_sipo.c
 
 #	 drivers/mcp4922.c \
 #	 drivers/max1068.c \
