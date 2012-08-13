@@ -22,8 +22,8 @@ temp_1_20_t Pt_RtoT(FP_2_14_t R);
 #define PT_TABLE_STEP (((uint8_t)1))
 #define PT_CENTIGRADE (((uint8_t)20))
 #define PT_TABLE_CTGS_PER_STEP ((PT_CENTIGRADE * PT_TABLE_STEP))
-#define PT_TTOR_TABLE_MIN ((0x4778))
-#define PT_TTOR_TABLE_MAX ((0xefc1))
+#define PT_TABLE_R_MIN ((0x4778))
+#define PT_TABLE_R_MAX ((0xefc1))
 
 static const FP_2_14_t PROGMEM Pt_TtoR_table[] = {
         0x4778, /* 30.000000 */
@@ -824,9 +824,9 @@ temp_1_20_t Pt_RtoT(FP_2_14_t R)
     uint16_t idx;
     uint16_t step;
 
-    if (R < PT_TTOR_TABLE_MIN)
+    if (R < PT_TABLE_R_MIN)
         return 0;
-    if (R >= PT_TTOR_TABLE_MAX)
+    if (R >= PT_TABLE_R_MAX)
         return 0xffff;
 
     idx = ARRAY_SIZE(Pt_TtoR_table) / 2 - 1;
