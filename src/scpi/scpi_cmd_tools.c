@@ -213,7 +213,7 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 }
 
 /* Print unisgned int to output */
-static SCPI_parse_t SCPI_out_uint32(uint32_t x)
+static SCPI_parse_t SCPI_out_uint32f(uint32_t x, uint8_t digits)
 {
 	// maximal amount of digits for uint32 is 10
 	char buf[10];
@@ -221,9 +221,21 @@ static SCPI_parse_t SCPI_out_uint32(uint32_t x)
 	do {
 		*--c = (x % (uint8_t)10) + '0';
 		x /= (uint8_t)10;
+		if (digits)
+			digits--;
 	} while (x);
+	
+	while(digits) {
+		*--c = '0';
+		digits--;
+	}
 	SCPI_printn(c, sizeof(buf) - (c - buf));
 	return SCPI_parse_end;
+}
+
+static SCPI_parse_t SCPI_out_uint32(uint32_t x)
+{
+	return SCPI_out_uint32f(x, 0);
 }
 
 /* Print int to output */

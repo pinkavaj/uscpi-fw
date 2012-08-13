@@ -116,6 +116,7 @@ static SCPI_parse_t SCPI_in_uint16(uint16_t *x);
 static SCPI_parse_t SCPI_in_uint32(uint32_t *x);
 /* static void SCPI_out_int(int i); */
 static SCPI_parse_t SCPI_out_uint32(uint32_t x);
+static SCPI_parse_t SCPI_out_uint32f(uint32_t x, uint8_t digits);
 static SCPI_parse_t SCPI_out_1(void);
 static SCPI_parse_t SCPI_cmd_err_108(void);
 
