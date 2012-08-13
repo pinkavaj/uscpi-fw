@@ -151,10 +151,10 @@ void SCPI_err_set(const SCPI_err_t *e)
 	{
 		if (SCPI_err_count < ARRAY_SIZE(SCPI_err)) {
 			SCPI_err[SCPI_err_count++] = e;
-			SCPI_SESR_set(pgm_read_byte(&e->SES_P));
+			SCPI_SESR.event |= pgm_read_byte(&e->SES_P);
 		} else if (SCPI_err_count == ARRAY_SIZE(SCPI_err)) {
 			SCPI_err_count++;
-			SCPI_SESR_set(pgm_read_byte(&SCPI_err_350.SES_P));
+			SCPI_SESR.event |= pgm_read_byte(&SCPI_err_350.SES_P);
 		}
 	}
 }

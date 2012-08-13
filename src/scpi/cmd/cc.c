@@ -19,9 +19,9 @@ SCPI_parse_t SCPI_CC_cls(void)
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
 		SCPI_err_queue_reset();
-		SCPI_SESR_get();
-		SCPI_OPER_even_get();
-		SCPI_QUES_even_get();
+		SCPI_SESR.event = 0;
+		SCPI_OPER.event = 0;
+		SCPI_QUES.event = 0;
 	}
 	return SCPI_parse_end;
 }
@@ -31,24 +31,21 @@ SCPI_parse_t SCPI_CC_cls(void)
 SCPI_parse_t SCPI_CC_ese(void)
 {
         SCPI_parse_t ret;
-        uint8_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_print_uint16(SCPI_SESR_enab_get());
+		SCPI_print_uint16(SCPI_SESR.enabled);
 
                 return SCPI_parse_end;
 	} 
-	ret = SCPI_in_uint8(&val);
-	if (ret == SCPI_parse_err)
-		return ret;
-	SCPI_SESR_enab_set(val);
+	ret = SCPI_in_uint8(&SCPI_SESR.enabled);
 	return ret;
 }
 
 /* Event Status Register Query */
 SCPI_parse_t SCPI_CC_esr(void)
 {
-	SCPI_print_uint16(SCPI_SESR_get());
+	SCPI_print_uint16(SCPI_SESR.event & SCPI_SESR.enabled);
+        SCPI_SESR.event = 0;
 
         return SCPI_parse_end;
 }
@@ -76,7 +73,7 @@ SCPI_parse_t SCPI_CC_opc(void)
                 SCPI_print_uint16(1);
 		return SCPI_parse_end;
 	}
-	SCPI_SESR_set(SCPI_SESR_OPC);
+	SCPI_SESR.event |= SCPI_SESR_OPC;
 	return SCPI_parse_end;
 }
 

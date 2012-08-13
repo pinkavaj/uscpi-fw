@@ -38,7 +38,8 @@ SCPI_parse_t SCPI_IC_stat_oper_enab(void)
 /* Value of SCPI OPERation Event register */
 SCPI_parse_t SCPI_IC_stat_oper_even(void)
 {
-	SCPI_print_uint16(SCPI_OPER_even_get());
+	SCPI_print_uint16(SCPI_OPER.event & SCPI_OPER.enabled);
+        SCPI_OPER.event = 0;
 
         return SCPI_parse_end;
 }
@@ -79,7 +80,8 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(void)
 
 SCPI_parse_t SCPI_IC_stat_ques_even(void)
 {
-	SCPI_print_uint16(SCPI_QUES_even_get());
+	SCPI_print_uint16(SCPI_QUES.event & SCPI_QUES.enabled);
+        SCPI_QUES.event = 0;
 
         return SCPI_parse_end;
 }

@@ -4,6 +4,11 @@
 #include <inttypes.h>
 
 typedef struct {
+	uint8_t enabled;
+	uint8_t event;
+} SCPI_SESR_t;
+
+typedef struct {
 	/* TODO: add transition filter support */
 	uint16_t condition;
 	uint16_t transition_up;
@@ -31,7 +36,6 @@ typedef struct {
 SCPI_status_reg_t SCPI_OPER; 
 void SCPI_OPER_cond_set(uint16_t val);
 void SCPI_OPER_cond_reset(uint16_t val);
-uint16_t SCPI_OPER_even_get(void);
 /* Questionable Status */
 #define SCPI_QUES_VOLT	(1<<0)
 #define SCPI_QUES_CURR	(1<<1)
@@ -51,7 +55,6 @@ uint16_t SCPI_OPER_even_get(void);
 SCPI_status_reg_t SCPI_QUES;
 void SCPI_QUES_cond_set(uint16_t val);
 void SCPI_QUES_cond_reset(uint16_t val);
-uint16_t SCPI_QUES_even_get(void);
 /* SCPI Standard Event Status Register/Enable */
 #define SCPI_SESR_OPC	(1<<0)
 #define SCPI_SESR_REQC	(1<<1)
@@ -61,10 +64,7 @@ uint16_t SCPI_QUES_even_get(void);
 #define SCPI_SESR_CERR	(1<<5)
 #define SCPI_SESR_UREQ	(1<<6)
 #define SCPI_SESR_POWON	(1<<7)
-uint8_t SCPI_SESR_get(void);
-void SCPI_SESR_set(uint8_t val);
-uint8_t SCPI_SESR_enab_get(void);
-void SCPI_SESR_enab_set(uint8_t);
+extern SCPI_SESR_t SCPI_SESR;
 /* SCPI Status Byte */
 #define SCPI_STB_USER1	(1<<0)
 #define SCPI_STB_USER2	(1<<1)
