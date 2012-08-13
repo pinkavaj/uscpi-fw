@@ -4,7 +4,7 @@
 #include "lib/pic16.h"
 #include "lib/thermometer_pt.h"
 
-#define TEMP_CHANNELS 2
+#define TEMP_CHANNELS 1
 
 typedef struct {
 	uint16_t I;

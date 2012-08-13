@@ -107,7 +107,7 @@ SCPI_parse_t SCPI_IC_sour_temp_mode(void)
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_sour_temp_rtim(void)
+SCPI_parse_t SCPI_IC_sour_temp_slop(void)
 {
         uint8_t channel;
 
@@ -139,7 +139,7 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
        
         /* conversion from FP_16_16_t to temp_1_20_t
          * T = (T + (1/2*1/20 - eps)) * 20 / 0x10000 */
-        T = (T + (0x10000 / 40 - 1)) / (0x10000 / 20);
+        T = (((T + (0x10000 / 40 - 1)) / 0x100) * 20) / 0x100;
         temp_want_set(channel, T);
         return SCPI_parse_end;
 }
@@ -176,8 +176,8 @@ static const SCPI_cmd_t SCPI_cmd_sour_temp_mode_P PROGMEM = {
         .set_params_atonce_P = 1,
 };
 
-static const SCPI_cmd_t SCPI_cmd_sour_temp_rtim_P PROGMEM = {
-        .parser_P = SCPI_IC_sour_temp_rtim, 
+static const SCPI_cmd_t SCPI_cmd_sour_temp_slop_P PROGMEM = {
+        .parser_P = SCPI_IC_sour_temp_slop, 
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
@@ -213,7 +213,7 @@ const SCPI_branch_item_t SCPI_bt_sour_temp_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_lcon_P, &SCPI_cmd_sour_temp_lcon_gain_P, 
                         SCPI_bt_sour_temp_lcon_P),
 	_SCPI_BRANCH_(key_mode_P, &SCPI_cmd_sour_temp_mode_P, NULL),
-	_SCPI_BRANCH_(key_rtim_P, &SCPI_cmd_sour_temp_rtim_P, NULL),
+	_SCPI_BRANCH_(key_rtim_P, &SCPI_cmd_sour_temp_slop_P, NULL),
 	_SCPI_BRANCH_(key_spo_P, &SCPI_cmd_sour_temp_spo_P, NULL),
 	_SCPI_branch_END_,
 };

@@ -16,7 +16,7 @@ typedef struct {
 
 /*****************************************************************************/
 void pic16(pic16_data_t *data, int16_t e, const pic16_param_t *param_E);
-/*void pic_limit16(pic16_data_t *data, int16_t output);*/
+void pic16_reset(pic16_data_t *data, uint16_t output);
 
 #endif
 

@@ -40,6 +40,7 @@ _key_(prog, "PROGRAM",      SHORT4B);
 _key_(ques, "QUESTIONABLE", SHORT4B);
 _key_(res,  "RESISTANCE",   SHORT3B);
 _key_(rtim, "RTIME",        SHORT4B);
+_key_(slop, "SLOPE",        SHORT4B);
 _key_(sour, "SOURCE",       SHORT4B);
 _key_(spo,  "SPOINT",       SHORT3B);
 _key_(stat, "STATUS",       SHORT4B);

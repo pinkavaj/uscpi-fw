@@ -6,6 +6,9 @@
 #include "lib/temp.h"
 #include "lib/thermometer_pt.h"
 
+/* FIXME: debug only */
+#include "lib/iobuf.h"
+
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */
 #define TEMP_CHANNELS_INTERNAL 8
@@ -31,30 +34,41 @@ typedef struct {
 } temp_correct_IU_t;
 
 /* TODO: stavy vstupu (ok, zkrat, .. ?) */
+/* temp_status_IU_stabilizing   - recovering from one of invalid states 
+ * temp_status_IU_setting       - approaching to target temperature usign
+ *      ramp with slope */
+/* FIXME: rozdělit stavy regulačního automatu T a výstupu měření */
 typedef enum {
         temp_status_IU_valid = 0,
-        temp_status_IU_shortcut,
-        temp_status_IU_disconnected,
-        temp_status_IU_invalid,
+        temp_status_IU_shortcut = 1,
+        temp_status_IU_disconnected = 2,
+        temp_status_IU_invalid = 4,
+        temp_status_IU_stabilizing = 8,
+        temp_status_IU_setting = 16,
 } temp_status_IU_t;
 
 /* Temperature channel working data */
+/* R            - R from last measurement
+ * T_want       - requested value of regulation
+ * T_dest       - destination T for slope */
 typedef struct {
         pic16_data_t pic;
-        FP_2_14_t R;
-        FP_2_14_t R_want;
         temp_mode_t mode;
+        FP_2_14_t R;
+        temp_1_20_t T_want;
+        temp_1_20_t T_dest;
+        temp_status_IU_t status;
 } temp_data_t;
 
 /* Temperature channel constants */
+/* R_slope      - R = U_code/I_code*R_slope 
+ * R_0          - R of sensor at 0°C */
 typedef struct {
         pic16_param_t pic;
 	temp_correct_IU_t correct_IU;
         temp_dev_AD_t dev_AD;
         temp_dev_DA_t dev_DA;
-        /* R = U_code/I_code*R_slope */
         FP_16_16_t R_slope;
-        /* R of sensor at 0°C */
         FP_16_16_t R_0;
 } temp_conf_t;
 
@@ -81,7 +95,7 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
                         .gain_int = 2000,
                 },
         },
-        {
+/*        {
                 .R_0 = 0x0a0000,
                 .R_slope = 0x0023A147,
 		.correct_IU = {
@@ -101,7 +115,7 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
                         .gain_lin = 20000,
                         .gain_int = 2000,
                 },
-        },
+        },*/
 };
 
 temp_1_20_t temp_get(uint8_t channel)
@@ -137,9 +151,9 @@ temp_data_IU_t temp_meas_IU(uint8_t channel)
 {
 	temp_data_IU_t data_IU;
 	int32_t I = 0, U = 0;
-	const temp_dev_AD_t *dev_AD_E;
-	uint8_t spi_dev_num;
 	uint8_t Ichannel, Uchannel;
+	uint8_t spi_dev_num;
+	const temp_dev_AD_t *dev_AD_E;
 
 	dev_AD_E = &temp_conf_E[channel].dev_AD;
 	spi_dev_num = eeprom_read_byte(&dev_AD_E->spi_dev_num);
@@ -164,7 +178,7 @@ temp_data_IU_t temp_meas_IU(uint8_t channel)
 	return data_IU;
 }
 
-/* Make correction above I nad U from acqusition */
+/* Make correction for I nad U from acqusition */
 static temp_data_IU_t temp_correct_IU(uint8_t channel, temp_data_IU_t data_IU)
 {
 	int8_t offs;
@@ -195,11 +209,14 @@ static void temp_output_DA(uint8_t channel, uint16_t output)
         uint8_t channel_dev_DA;
         uint8_t DA_width;
 	const temp_dev_DA_t *dev_DA_E;
+        uint16_t round;
 
         /* At AD output must be allways voltage, in order to measure 
          * resistence, detect shortcut or disconnection. */
-        if (output < TEMP_OUTP_DA_MIN)
+        if (output < TEMP_OUTP_DA_MIN) {
                 output = TEMP_OUTP_DA_MIN;
+                pic16_reset(&temp_data[channel].pic, output);
+        }
 
 	dev_DA_E = &temp_conf_E[channel].dev_DA;
 	spi_dev_num = eeprom_read_byte(&dev_DA_E->spi_dev_num);
@@ -207,15 +224,13 @@ static void temp_output_DA(uint8_t channel, uint16_t output)
         
         SPI_dev_select(spi_dev_num);
         DA_width = SPI_dev_DA_width();
-        if (DA_width > 0) {
-                /* Rounding */
-                if (output < 0xffff) {
-                        output >>= 16 - 1 - DA_width;
-                        output++;
-                        output >>= 1;
-                } else
-                        output >>= 16 - DA_width;
-        }
+        round = 0x8000 >> DA_width;
+        /* Rounding */
+        round += output;
+        /* Not overflow */
+        if(round >= output)
+                output = round;
+        output >>= 16 - DA_width;
         SPI_dev_DA_set_output(channel_dev_DA, output);
 }
 
@@ -241,9 +256,9 @@ static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
                 status_ = I_UNDER;
 
         if (data_IU.U > UMAX)
-                status_ = U_OVER;
+                status_ |= U_OVER;
         else if (data_IU.U < UMIN)
-                status_ = U_UNDER;
+                status_ |= U_UNDER;
        
         if (status_ == (I_UNDER))
                 status = temp_status_IU_disconnected;
@@ -255,8 +270,7 @@ static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
         return status;
 }
 
-#include "lib/iobuf.h"
-static FP_2_14_t temp_get_R(uint8_t channel, temp_data_IU_t data_IU)
+static FP_2_14_t temp_calc_R(uint8_t channel, temp_data_IU_t data_IU)
 {
         uint64_t tmp64;
         uint32_t R, R_0, R_slope;
@@ -268,39 +282,76 @@ static FP_2_14_t temp_get_R(uint8_t channel, temp_data_IU_t data_IU)
 
         tmp64 = math_mul_32_32_r64(R_slope, data_IU.U);
         R = math_div_64_32_r32(tmp64, data_IU.I);
-        tmp64 = math_mul_32_32_r64(R, 0x10000);
+        /* conversion to FP_2_14_t is done by >> 2 */
+        tmp64 = math_mul_32_32_r64(R, 0x10000 >> 2);
         R = math_div_64_32_r32(tmp64, R_0);
-        /* FP_2_14_t */
-        return R >> 2;
+        if (R > 0xffff)
+                R = 0xffff;
+        return R;
 }
 
 static void temp_loop_(uint8_t channel)
 {
         int32_t e;
         uint16_t output;
-        FP_2_14_t R;
+        FP_2_14_t R, R_want;
         temp_data_IU_t data_IU;
-        temp_status_IU_t status;
+        temp_status_IU_t status_IU;
 
+        TIMER1_jiff_alarm(TIMER1_ALARM_MEAS);
         data_IU = temp_meas_IU(channel);
-        status = temp_status_IU(data_IU);
-        if (status == temp_status_IU_disconnected) {
+        status_IU = temp_status_IU(data_IU);
+        if (status_IU != temp_status_IU_valid) {
                 temp_output_DA(channel, 0);
+                temp_data[channel].status = status_IU;
                 return;
         }
-        if (status == temp_status_IU_invalid) {
-                temp_output_DA(channel, 0);
-                return;
-        }
-        if (status == temp_status_IU_shortcut) {
-                temp_output_DA(channel, 0);
-                return;
-        }
+
         data_IU = temp_correct_IU(channel, data_IU);
-        R = temp_get_R(channel, data_IU);
+        R = temp_calc_R(channel, data_IU);
+
+        /* TODO: check R - emp_data[channel].R < K */
+        if (temp_data[channel].status == temp_status_IU_disconnected ||
+                        temp_data[channel].status == temp_status_IU_invalid ||
+                        temp_data[channel].status == temp_status_IU_shortcut) {
+                temp_data[channel].status = temp_status_IU_stabilizing;
+                return;
+        } else if (temp_data[channel].status == temp_status_IU_stabilizing) {
+                temp_data[channel].status = temp_status_IU_setting;
+                temp_data[channel].T_want = Pt_RtoT(R);
+        } else if (temp_data[channel].status == temp_status_IU_setting) {
+                temp_1_20_t T_dest, T_want, Tdiff;
+                int16_t slope = 5;
+
+                T_dest = temp_data[channel].T_dest;
+                T_want = temp_data[channel].T_want;
+
+                if (T_dest < T_want)
+                        Tdiff = T_want - T_dest;
+                else
+                        Tdiff = T_dest - T_want;
+
+                if (Tdiff > (uint16_t)slope) {
+                        if (T_dest < T_want)
+                                T_want -= slope;
+                        else
+                                T_want += slope;
+                } else
+                        T_want = T_dest;
+                /* FIXME: kontrolovatl vystup na rozsah, přepracovat */
+
+                temp_data[channel].T_want = T_want;
+
+                if (T_dest == T_want)
+                        temp_data[channel].status = temp_status_IU_valid;
+        } else if (temp_data[channel].status == temp_status_IU_valid) {
+                /* TODO: depends on current selected mode */
+                //return;
+        }
         temp_data[channel].R = R;
         
-        e = (int32_t)temp_data[channel].R_want - R;
+        R_want = Pt_TtoR(temp_data[channel].T_want);
+        e = (int32_t)R_want - R;
         if (e > INT16_MAX)
                 e = INT16_MAX;
         if (e < INT16_MIN)
@@ -334,12 +385,16 @@ void temp_loop(void)
 
 temp_1_20_t temp_want_get(uint8_t channel)
 {
-        return Pt_RtoT(temp_data[channel].R_want);
+        return temp_data[channel].T_dest;
 }
 
 void temp_want_set(uint8_t channel, temp_1_20_t T)
 {
-        temp_data[channel].R_want = Pt_TtoR(T);
+        temp_data[channel].T_dest = T;
+        if (temp_data[channel].status == temp_status_IU_valid) {
+                temp_data[channel].status = temp_status_IU_setting;
+                temp_data[channel].T_want = Pt_RtoT(temp_data[channel].R);
+        }
 }
 
 void temp_init(void)
@@ -350,3 +405,4 @@ void temp_init(void)
                 temp_output_DA(channel, 0);
         }
 }
+

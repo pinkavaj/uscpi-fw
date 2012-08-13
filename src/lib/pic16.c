@@ -82,4 +82,9 @@ void pic16(pic16_data_t *data, int16_t e, const pic16_param_t *param_E)
 	data->output = output32;
 }
 
+void pic16_reset(pic16_data_t *data, uint16_t output)
+{
+        data->gain_lin_e_old = 0;
+        data->output = (FP_16_16_t)output << 16;
+}
 
