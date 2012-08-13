@@ -15,17 +15,19 @@
 #include "drivers/spi.h"
 #include "drivers/mcp4922.h"
 
+#define MCP4922_DATA_MASK 0x0fff
+
 #define MCP4922_OUTPUT 12
 #define MCP4922_OUTPUT_ON (1<<MCP4922_OUTPUT)
 #define MCP4922_OUTPUT_OFF (0<<MCP4922_OUTPUT)
 
-#define MCP4922_BUF 14
-#define MCP4922_BUF_DIS (0<<MCP4922_BUF)
-#define MCP4922_BUF_EN (1<<MCP4922_BUF)
-
 #define MCP4922_GAIN 13
 #define MCP4922_GAIN_1 (1<<MCP4922_GAIN)
 #define MCP4922_GAIN_2 (0<<MCP4922_GAIN)
+
+#define MCP4922_BUF 14
+#define MCP4922_BUF_DIS (0<<MCP4922_BUF)
+#define MCP4922_BUF_EN (1<<MCP4922_BUF)
 
 #define MCP4922_CH 15
 #define MCP4922_CH_A (0<<MCP4922_CH)
@@ -69,9 +71,9 @@ void mcp4922_write_channel(uint8_t ch, uint16_t val)
 {
 #define _MCP4922_CFG_ (MCP4922_GAIN_1 | MCP4922_OUTPUT_ON | MCP4922_BUF_DIS)
 	if (ch == 0)
-		val |= MCP4922_CH_A | _MCP4922_CFG_;
+		val = (val & MCP4922_DATA_MASK) | MCP4922_CH_A | _MCP4922_CFG_;
 	if (ch == 1)
-		val |= MCP4922_CH_B | _MCP4922_CFG_;
+		val = (val & MCP4922_DATA_MASK) | MCP4922_CH_B | _MCP4922_CFG_;
 #undef _MCP4922_CFG_
 
 	mcp4922_write(val);
