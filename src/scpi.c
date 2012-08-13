@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "scpi_config.h"
 #include "scpi.h"
 #include "scpi_cmd.h"
 #include "scpi_err.c"
