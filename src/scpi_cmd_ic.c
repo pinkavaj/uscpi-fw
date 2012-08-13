@@ -88,7 +88,7 @@ static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 		uint32_t val = math_div_64_32_r32(nom, num);
 		SCPI_out_uint32(val);
 	} else {
-		uint32_t *p = (uint32_t*)&nom;
+		uint32_t *p = (void *)&nom;
 		SCPI_in_uint32(p+1);
 		SCPI_in_uint32(p);
 		SCPI_in_uint32(&num);
@@ -104,7 +104,7 @@ static SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
 		volatile uint64_t val;
 
 		val = math_mul_32_32_r64(val1, val2);
-		uint32_t *p = (uint32_t*)&val;
+		uint32_t *p = (void*)&val;
 		SCPI_out_uint32(*(p+1));
 		SCPI_putc(',');
 		SCPI_out_uint32(val);
