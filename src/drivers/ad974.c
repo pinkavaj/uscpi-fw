@@ -1,10 +1,13 @@
+/*****************************************************************************
+ *        ****  Analog-to-Digital Converter AD974  ****
+ */
+
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
 #include "iodef.h"
 #include "spi.h"
 #include "ad974.h"
-
 
 void ad974_io_init(void)
 {
