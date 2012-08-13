@@ -93,7 +93,8 @@ static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 		SCPI_in_uint32(&val2);
 		SCPI_in_uint32(&num);
 
-		nom = (((uint64_t)val1)<<32) + val2;
+		*(((uint32_t *)(&nom))+1) = val1;
+		*(((uint32_t *)(&nom))) = val2;
 	}
 	return SCPI_parse_end;
 }
@@ -106,7 +107,7 @@ static SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
 		uint64_t val;
 
 		val = math_mul_32_32_r64(val1, val2);
-		SCPI_out_uint32(val>>32);
+		SCPI_out_uint32(*(((uint32_t *)(&val))+1));
 		SCPI_printn(",", 1);
 		SCPI_out_uint32(val);
 	} else {
