@@ -20,17 +20,14 @@ void pic16(pic16_data_t *data, int16_t e, const pic16_param_t *param_E)
 	int32_t gain_term32, int_term32, gain_term_old;
 	register uint32_t output32;
 	register int8_t outputHi = 0;
-	pic16_param_t param;
+        FP_0_16_t gain;
 	
 	/* implement equation: 
 	 * output += gain_term32 - data->gain_term_old + int_term32 */
-	param.gain_lin = eeprom_read_word(&param_E->gain_lin);
-	/* FIXME: result is int32_t */
-	gain_term32 = e * param.gain_lin;
+	gain = eeprom_read_word(&param_E->gain_lin);
+	gain_term32 = (int32_t)e * gain;
 	output32 = data->output;
 	asm (
-		"sbrc	%D0, 7	\n"	/* check for sign */
-		"com	%A1	\n" 	/* if negative, extend with 0xff */
 		"mov	__tmp_reg__, __zero_reg__	\n"
 		"sbrc	%D2, 7		\n"	/* check for sign */
 		"com	__tmp_reg__	\n" 	/* if negative extend with 0xff */
@@ -43,9 +40,8 @@ void pic16(pic16_data_t *data, int16_t e, const pic16_param_t *param_E)
 		: "r" (gain_term32)
 	    );
 
-	param.gain_int = eeprom_read_word(&param_E->gain_int);
-	/* FIXME: result is int32_t */
-	int_term32 = e * param.gain_int;
+	gain = eeprom_read_word(&param_E->gain_int);
+	int_term32 = (int32_t)e * gain;
 	asm (
 		"mov	__tmp_reg__, __zero_reg__	\n"
 		"sbrc	%D2, 7		\n"	/* check for sign */

@@ -2,16 +2,16 @@
 #define __PIC16_H__
 
 #include <inttypes.h>
+#include "lib/math_cust.h"
 
 typedef struct {
-	uint16_t output;
-	int16_t gain_lin_e_old;
+	FP_16_16_t output;
+	int32_t gain_lin_e_old;
 } pic16_data_t;
 
 typedef struct {
-	/* FP 0.16 */
-	uint16_t gain_lin;
-	uint16_t gain_int;
+	FP_0_16_t gain_lin;
+	FP_0_16_t gain_int;
 } pic16_param_t;
 
 /*****************************************************************************/
