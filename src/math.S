@@ -85,19 +85,19 @@ math_div_64_32_r32:
 	push	YL
 	push	YL
 
-	mov	R25, acc0
-	mov	R24, acc1
-	mov	R23, acc2
-	mov	R22, acc3
-	mov	R21, acc4
-	mov	R20, acc5
-	mov	R19, acc6
-	mov	R18, acc7
+	mov	acc0, R18
+	mov	acc2, R20
+	mov	acc1, R19
+	mov	acc3, R21
+	mov	acc4, R22
+	mov	acc5, R23
+	mov	acc6, R24
+	mov	acc7, R25
 
-	mov	R17, reg0
-	mov	R16, reg1
-	mov	R15, reg2
-	mov	R14, reg3
+	mov	reg0, R14
+	mov	reg1, R15
+	mov	reg2, R16
+	mov	reg3, R17
 
 /*****************************************************************************/
 	clr	temp0
