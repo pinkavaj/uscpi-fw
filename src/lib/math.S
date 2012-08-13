@@ -50,7 +50,7 @@ R25:R22
 	clr	temp1
 	ldi	counter, 40
 
-udi1:
+udiv1:
 	lsl	acc0
 	rol	acc1
 	rol	acc2
@@ -60,27 +60,25 @@ udi1:
 	rol	acc6
 	rol	acc7
 	rol	temp0
-	rol	temp1
+	brcs	udiv_sub
 
 	cp	acc5, reg0
 	cpc	acc6, reg1
 	cpc	acc7, reg2
 	cpc	temp0, reg3
-	cpc	temp1, zero
 
-	brcs udi2
-
+	brcs udiv2
+udiv_sub:
 	sub	acc5, reg0
 	sbc	acc6, reg1
 	sbc	acc7, reg2
 	sbc	temp0, reg3
-	sbc	temp1, zero
 
 	inc	acc0
 
-udi2:
+udiv2:
 	dec	counter
-	brne udi1
+	brne udiv1
 
 	movw	r22,	acc0
 	movw	r24,	acc2
