@@ -81,7 +81,7 @@ _SCPI_CMD_(test_func_dec, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_int, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_func_mul, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+//_SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_temp, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
@@ -147,7 +147,7 @@ static const SCPI_branch_item_t SCPI_bt_test_func_P[] PROGMEM = {
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(key_func_P, NULL, SCPI_bt_test_func_P),
-	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
+//	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
 	_SCPI_BRANCH_(key_time_P, &SCPI_cmd_test_time_P, NULL),
 	_SCPI_branch_END_,

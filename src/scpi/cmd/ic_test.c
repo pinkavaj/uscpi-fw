@@ -141,7 +141,7 @@ SCPI_parse_t SCPI_IC_test_time(void)
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_heat(void)
+/*SCPI_parse_t SCPI_IC_test_heat(void)
 {
         for(uint8_t channel = 0; channel < TEMP_CHANNELS; channel++)
         {
@@ -152,6 +152,6 @@ SCPI_parse_t SCPI_IC_test_heat(void)
                 SCPI_print_uint16(temp_data_IU.U);
         }
         return SCPI_parse_end;
-}
+}*/
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

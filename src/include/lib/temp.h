@@ -22,7 +22,6 @@ void temp_init(void);
 void temp_loop(void);
 
 temp_1_20_t temp_get(uint8_t channel);
-temp_data_IU_t temp_meas_IU(uint8_t channel);
 uint16_t temp_dwel_get(uint8_t channel);
 void temp_dwel_set(uint8_t channel, uint16_t dwel);
 temp_mode_t temp_mode_get(uint8_t channel);

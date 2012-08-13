@@ -7,9 +7,6 @@
 #include "lib/thermometer_pt.h"
 #include "stat_report.h"
 
-/* FIXME: debug only */
-#include "lib/iobuf.h"
-
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */
 #define TEMP_CHANNELS_INTERNAL 8
@@ -122,52 +119,7 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
         },*/
 };
 
-temp_1_20_t temp_get(uint8_t channel)
-{
-        temp_1_20_t T;
-
-        T = Pt_RtoT(temp_data[channel].R);
-        return T;
-}
-
-pic16_param_t temp_pic_params_get(uint8_t channel)
-{
-        const pic16_param_t *pic_E;
-        pic16_param_t pic_param;
-
-        pic_E = &temp_conf_E[channel].pic;
-        pic_param.gain_lin = eeprom_read_word(&pic_E->gain_lin);
-        pic_param.gain_int = eeprom_read_word(&pic_E->gain_int);
-
-        return pic_param;
-}
-
-void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
-{
-        const pic16_param_t *pic_E;
-
-        pic_E = &temp_conf_E[channel].pic;
-        eeprom_write_word((uint16_t *)&pic_E->gain_lin, pic_param.gain_lin);
-        eeprom_write_word((uint16_t *)&pic_E->gain_int, pic_param.gain_int);
-}
-
-temp_1_20_t temp_slope_get(uint8_t channel)
-{
-        return temp_data[channel].T_slope * 4;
-}
-
-void temp_slope_set(uint8_t channel, temp_1_20_t slope)
-{
-        slope = (slope + 2) / 4;
-        temp_data[channel].T_slope = slope;
-}
-
-void temp_trg(void)
-{
-        //SCPI_OPER_cond_set(SCPI_OPER_SWE);
-}
-
-temp_data_IU_t temp_meas_IU(uint8_t channel)
+static temp_data_IU_t temp_meas_IU(uint8_t channel)
 {
 	temp_data_IU_t data_IU;
 	int32_t I = 0, U = 0;
@@ -211,33 +163,6 @@ static temp_data_IU_t temp_correct_IU(uint8_t channel, temp_data_IU_t data_IU)
 	data_IU.U -= offs;
 
 	return data_IU;
-}
-
-uint16_t temp_dwel_get(uint8_t channel)
-{
-        return temp_data[channel].dwel;
-}
-
-void temp_dwel_set(uint8_t channel, uint16_t dwel)
-{
-//        temp_1_20_t slope;
-
-        temp_data[channel].dwel = dwel;
-        
-        /* TODO:
-        dwel *= 4;
-        slope = (dT + dwel - 1) / dwel;
-        temp_data[channel].slope = slop;*/
-}
-
-temp_mode_t temp_mode_get(uint8_t channel)
-{
-        return temp_data[channel].mode;
-}
-
-void temp_mode_set(uint8_t channel, temp_mode_t mode)
-{
-        temp_data[channel].mode = mode;
 }
 
 static void temp_output_DA(uint8_t channel, uint16_t output)
@@ -421,6 +346,89 @@ void temp_loop(void)
         channel++;
 }
 
+uint16_t temp_dwel_get(uint8_t channel)
+{
+        return temp_data[channel].dwel;
+}
+
+void temp_dwel_set(uint8_t channel, uint16_t dwel)
+{
+//        temp_1_20_t slope;
+
+        temp_data[channel].dwel = dwel;
+        
+        /* TODO:
+        dwel *= 4;
+        slope = (dT + dwel - 1) / dwel;
+        temp_data[channel].slope = slop;*/
+}
+
+temp_1_20_t temp_get(uint8_t channel)
+{
+        temp_1_20_t T;
+
+        T = Pt_RtoT(temp_data[channel].R);
+        return T;
+}
+
+void temp_init(void)
+{
+        for(uint8_t channel = TEMP_CHANNELS; channel;)
+        {
+                channel--;
+                temp_output_DA(channel, 0);
+                temp_data[channel].T_slope = 1 * 20 / 4; /* 1°C/sec */
+                temp_data[channel].dwel = 60;
+        }
+}
+
+temp_mode_t temp_mode_get(uint8_t channel)
+{
+        return temp_data[channel].mode;
+}
+
+void temp_mode_set(uint8_t channel, temp_mode_t mode)
+{
+        temp_data[channel].mode = mode;
+}
+
+pic16_param_t temp_pic_params_get(uint8_t channel)
+{
+        const pic16_param_t *pic_E;
+        pic16_param_t pic_param;
+
+        pic_E = &temp_conf_E[channel].pic;
+        pic_param.gain_lin = eeprom_read_word(&pic_E->gain_lin);
+        pic_param.gain_int = eeprom_read_word(&pic_E->gain_int);
+
+        return pic_param;
+}
+
+void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
+{
+        const pic16_param_t *pic_E;
+
+        pic_E = &temp_conf_E[channel].pic;
+        eeprom_write_word((uint16_t *)&pic_E->gain_lin, pic_param.gain_lin);
+        eeprom_write_word((uint16_t *)&pic_E->gain_int, pic_param.gain_int);
+}
+
+temp_1_20_t temp_slope_get(uint8_t channel)
+{
+        return temp_data[channel].T_slope * 4;
+}
+
+void temp_slope_set(uint8_t channel, temp_1_20_t slope)
+{
+        slope = (slope + 2) / 4;
+        temp_data[channel].T_slope = slope;
+}
+
+void temp_trg(void)
+{
+        //SCPI_OPER_cond_set(SCPI_OPER_SWE);
+}
+
 temp_1_20_t temp_want_get(uint8_t channel)
 {
         return temp_data[channel].T_dest;
@@ -432,17 +440,6 @@ void temp_want_set(uint8_t channel, temp_1_20_t T)
         if (temp_data[channel].status == temp_status_IU_valid) {
                 temp_data[channel].status = temp_status_IU_setting;
                 temp_data[channel].T_want = Pt_RtoT(temp_data[channel].R);
-        }
-}
-
-void temp_init(void)
-{
-        for(uint8_t channel = TEMP_CHANNELS; channel;)
-        {
-                channel--;
-                temp_output_DA(channel, 0);
-                temp_data[channel].T_slope = 1 * 20 / 4; /* 1°C/sec */
-                temp_data[channel].dwel = 60;
         }
 }
 
