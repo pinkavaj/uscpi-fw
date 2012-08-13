@@ -45,7 +45,7 @@ uint8_t mcp4922_spi_cfg(void)
 }
 
 /*****************************************************************************/
-static void mcp4922_send_(uint16_t datastring)
+static void mcp4922_write(uint16_t datastring)
 {
 	PORT_MODIFY(MCP4922_PORT, MCP4922_CS, 0);
 	/* send new value to latch, Hi Lo */ 
@@ -68,6 +68,6 @@ void mcp4922_write_channel(uint8_t ch, uint16_t val)
 		val |= MCP4922_CH_B | _MCP4922_CFG_;
 #undef _MCP4922_CFG_
 
-	mcp4922_send_(val);
+	mcp4922_write(val);
 }
 
