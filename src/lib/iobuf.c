@@ -60,6 +60,25 @@ uint8_t print_common(uint8_t len)
 }
 
 /*****************************************************************************/
+void print_FP_16_16(FP_16_16_t x)
+{
+        uint16_t fix, fract;
+
+        fix = x / 65536;
+        fract = x;
+
+        print_uint32(fix);
+        putc('.');
+        x = (uint32_t)fract * 10000;
+        x += 127;
+        x /= 256;
+        x *= 10;
+        x += 127;
+        x /= 256;
+        print_uint32f(x, 5);
+}
+
+/*****************************************************************************/
 /* Print len bytes into output buffer */
 void printn(const char *str, uint8_t len)
 {

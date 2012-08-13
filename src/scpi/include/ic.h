@@ -20,13 +20,14 @@ SCPI_parse_t SCPI_IC_syst_vers(void);
 
 #ifdef SCPI_TEST
 SCPI_parse_t SCPI_IC_test_adc(void);
-SCPI_parse_t SCPI_IC_test_div(void);
-SCPI_parse_t SCPI_IC_test_mul(void);
-SCPI_parse_t SCPI_IC_test_num(void);
+SCPI_parse_t SCPI_IC_test_func_dec(void);
+SCPI_parse_t SCPI_IC_test_func_div(void);
+SCPI_parse_t SCPI_IC_test_func_int(void);
+SCPI_parse_t SCPI_IC_test_func_mul(void);
+SCPI_parse_t SCPI_IC_test_heat(void);
 SCPI_parse_t SCPI_IC_test_temp(void);
 SCPI_parse_t SCPI_IC_test_temp_res(void);
 SCPI_parse_t SCPI_IC_test_time(void);
-SCPI_parse_t SCPI_IC_test_heat(void);
 #endif
 
 #endif

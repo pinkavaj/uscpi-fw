@@ -46,7 +46,7 @@ SCPI_parse_t SCPI_IC_test_adc(void)
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_div(void)
+SCPI_parse_t SCPI_IC_test_func_div(void)
 {
 	static uint64_t nom;
 	static uint32_t num;
@@ -64,7 +64,7 @@ SCPI_parse_t SCPI_IC_test_div(void)
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_mul(void)
+SCPI_parse_t SCPI_IC_test_func_mul(void)
 {
 	static uint32_t val1, val2;
 
@@ -83,14 +83,29 @@ SCPI_parse_t SCPI_IC_test_mul(void)
 	return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_test_num(void)
+SCPI_parse_t SCPI_IC_test_func_dec(void)
 {
-	static uint32_t val;
+        FP_16_16_t x;
+        SCPI_parse_t ret;
 
-	if (_SCPI_CMD_IS_QUEST())
-		print_uint32(val);
-	else
-	        return SCPI_in_uint32(&val);
+	ret = SCPI_in_FP_16_16(&x);
+        if (ret == SCPI_parse_err)
+                return ret;
+
+	print_FP_16_16(x);
+	return SCPI_parse_end;
+}
+
+SCPI_parse_t SCPI_IC_test_func_int(void)
+{
+        uint32_t x;
+        SCPI_parse_t ret;
+
+	ret = SCPI_in_uint32(&x);
+        if (ret == SCPI_parse_err)
+                return ret;
+
+	print_uint32(x);
 	return SCPI_parse_end;
 }
 

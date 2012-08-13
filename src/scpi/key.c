@@ -25,6 +25,7 @@ _key_(dwel, "DWELL",        SHORT4B);
 _key_(enab, "ENABLE",       SHORT4B);
 _key_(err,  "ERROR",        SHORT3B);
 _key_(even, "EVENT",        SHORT4B);
+_key_(func, "FUNCTION",     SHORT4B);
 _key_(gain, "GAIN",         SHORT4B);
 _key_(int,  "INTEGRAL",     SHORT3B);
 _key_(lcon, "LCONSTANTS",   SHORT4B);
@@ -45,9 +46,9 @@ _key_(test, "TEST",         SHORT4B);
 _key_(vers, "VERSION",      SHORT4B);
 
 _key_(adc, "ADC",  SHORT3B);
+_key_(dec, "DEC",  SHORT3B);
 _key_(div, "DIV",  SHORT3B);
 _key_(heat,"HEAT", SHORT4B);
 _key_(mul, "MUL",  SHORT3B);
-_key_(num, "NUM",  SHORT3B);
 _key_(time,"TIME", SHORT4B);
 

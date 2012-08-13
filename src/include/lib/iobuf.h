@@ -3,6 +3,7 @@
 
 #include <avr/pgmspace.h>
 #include <inttypes.h>
+#include "lib/math_cust.h"
 
 typedef struct {
 	volatile uint8_t start;
@@ -18,6 +19,7 @@ void stdout_flush(void);
 uint8_t stdout_isempty(void);
 char popc(void);
 void putc(char c);
+void print_FP_16_16(FP_16_16_t x);
 void printn(const char *str, uint8_t len);
 void print_P(PGM_P str_P);
 void print_int32(int32_t x);

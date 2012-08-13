@@ -33,22 +33,24 @@ static SCPI_parse_t temp_lcon(uint8_t gain)
         pic16_param_t pic_param;
         SCPI_parse_t ret;
         int8_t channel;
-        uint16_t val;
+        FP_16_16_t val;
 
         channel = get_temp_channel();
         pic_param = temp_pic_params_get(channel);
         if (_SCPI_CMD_IS_QUEST()) {
                 if (gain)
-                        print_uint32(pic_param.gain_lin);
+                        print_FP_16_16(pic_param.gain_lin);
                 else
-                        print_uint32(pic_param.gain_int);
+                        print_FP_16_16(pic_param.gain_int);
                 return SCPI_parse_end;
         }
        
         /* FIXME: should be FP in range <0, 1) */
-        ret = SCPI_in_uint16(&val);
+        ret = SCPI_in_FP_16_16(&val);
         if (ret == SCPI_parse_err)
                 return ret;
+        if (val >= 0x10000)
+                return SCPI_err_set_(&SCPI_err_222);
         
         if (gain)
                 pic_param.gain_lin = val;
@@ -95,7 +97,7 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
 {
         uint8_t channel;
         SCPI_parse_t ret;
-        temp_1_20_t T;
+        FP_16_16_t T = 0;
 
         channel = get_temp_channel();
 
@@ -106,11 +108,14 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
                 print_uint32f((T % 20)*5, 2);
                 return SCPI_parse_end;
         }
-        ret = SCPI_in_uint16(&T);
+        ret = SCPI_in_FP_16_16(&T);
         if (ret == SCPI_parse_err)
                 return ret;
-
-        temp_want_set(T*20, channel);
+       
+        /* conversion from FP_16_16_t to temp_1_20_t
+         * T = (T + (1/2*1/20 - eps)) * 20 / 0x10000 */
+        T = (T + (0x10000 / 40 - 1)) / (0x10000 / 20);
+        temp_want_set(T, channel);
         return SCPI_parse_end;
 }
 

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "cmd_tools.h"
+#include "lib/math_cust.h"
 
 uint8_t SCPI_params_count;
 uint8_t SCPI_param_in_buf_idx;
@@ -34,24 +35,66 @@ SCPI_parse_t SCPI_in_uint16(uint16_t *x)
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
+/* TODO: použít přímou konverzi, když víme že *x není ovlivněno pokud dojdek chybě */
 SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 {
-	char *ret;
+	char *endptr;
+        uint32_t val;
 
-	*x = strtoul(SCPI_in + SCPI_param_in_buf_idx, &ret, 0);
-	SCPI_param_in_buf_idx += strlen(SCPI_in + SCPI_param_in_buf_idx) + 1;
-	if (*ret != 0) {
+	val = strtoul(SCPI_in + SCPI_param_in_buf_idx, &endptr, 10);
+	if (*endptr != 0)
                 return SCPI_err_set_(&SCPI_err_121);
-        }
+        *x = val;
+	SCPI_param_in_buf_idx += strlen(SCPI_in + SCPI_param_in_buf_idx) + 1;
 	return SCPI_parse_end;
 }
 
-/* TODO: ... */
-SCPI_parse_t SCPI_in_FP_16_16(uint32_t *x)
+#include "lib/iobuf.h"
+SCPI_parse_t SCPI_in_FP_16_16(FP_16_16_t *x)
 {
-        x = x;
+        char *endptr;
+        union {
+                struct {
+                        uint16_t fract;
+                        uint16_t num;
+                } parts;
+                FP_16_16_t FP;
+        } N;
+        uint32_t val;
 
-        return SCPI_parse_err;
+        val = strtoul(SCPI_in + SCPI_param_in_buf_idx, &endptr, 10);
+        if (val > 0xffff)
+                return SCPI_err_set_(&SCPI_err_222);
+        N.parts.num = val;
+
+        if (*endptr++ == '.' && *endptr != '\0') {
+                uint8_t len;
+
+                len = strlen(endptr);
+                if (len > 5) {
+                        len = 5;
+                        endptr[5] = 0;
+                }
+                val = strtoul(endptr, &endptr, 10);
+                while (len < 5) {
+                        val *= 10;
+                        len++;
+                }
+
+                val *= 0x100;
+                val += 4;
+                val /= 10;
+                val *= 0x100;
+                val +=  4999;
+                val /= 10000;
+                N.parts.fract = val;
+        }
+        if (*endptr != '\0')
+                return SCPI_err_set_(&SCPI_err_121);
+        
+        *x = N.FP;
+        SCPI_param_in_buf_idx += strlen(SCPI_in + SCPI_param_in_buf_idx) + 1;
+        return SCPI_parse_end;
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

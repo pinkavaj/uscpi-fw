@@ -78,10 +78,11 @@ _SCPI_CMD_(syst_err_next, 0,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_vers, 0,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 _SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_div, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_func_dec, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_func_int, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_func_mul, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_mul, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(test_num, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_temp, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
@@ -133,12 +134,17 @@ static const SCPI_branch_item_t SCPI_bt_test_temp_P[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
+static const SCPI_branch_item_t SCPI_bt_test_func_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_dec_P, &SCPI_cmd_test_func_dec_P, NULL),
+	_SCPI_BRANCH_(key_div_P, &SCPI_cmd_test_func_div_P, NULL),
+	_SCPI_BRANCH_(key_int_P, &SCPI_cmd_test_func_int_P, NULL),
+	_SCPI_BRANCH_(key_mul_P, &SCPI_cmd_test_func_mul_P, NULL),
+};
+
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
-	_SCPI_BRANCH_(key_div_P, &SCPI_cmd_test_div_P, NULL),
+	_SCPI_BRANCH_(key_func_P, NULL, SCPI_bt_test_func_P),
 	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
-	_SCPI_BRANCH_(key_mul_P, &SCPI_cmd_test_mul_P, NULL),
-	_SCPI_BRANCH_(key_num_P, &SCPI_cmd_test_num_P, NULL),
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
 	_SCPI_BRANCH_(key_time_P, &SCPI_cmd_test_time_P, NULL),
 	_SCPI_branch_END_,

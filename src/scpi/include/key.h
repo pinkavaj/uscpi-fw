@@ -29,6 +29,7 @@ extern const SCPI_key_t key_dwel_P PROGMEM;
 extern const SCPI_key_t key_enab_P PROGMEM;
 extern const SCPI_key_t key_err_P PROGMEM;
 extern const SCPI_key_t key_even_P PROGMEM;
+extern const SCPI_key_t key_func_P PROGMEM;
 extern const SCPI_key_t key_gain_P PROGMEM;
 extern const SCPI_key_t key_int_P PROGMEM;
 extern const SCPI_key_t key_lcon_P PROGMEM;
@@ -49,10 +50,10 @@ extern const SCPI_key_t key_test_P PROGMEM;
 extern const SCPI_key_t key_vers_P PROGMEM;
  
 extern const SCPI_key_t key_adc_P PROGMEM;
+extern const SCPI_key_t key_dec_P PROGMEM;
 extern const SCPI_key_t key_div_P PROGMEM;
 extern const SCPI_key_t key_heat_P PROGMEM;
 extern const SCPI_key_t key_mul_P PROGMEM;
-extern const SCPI_key_t key_num_P PROGMEM;
 extern const SCPI_key_t key_time_P PROGMEM;
 
 #endif
