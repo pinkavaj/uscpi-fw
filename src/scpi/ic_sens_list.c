@@ -83,27 +83,30 @@ SCPI_parse_t SCPI_IC_sens_list_dwel(void)
         return SCPI_parse_end;
 }
 
-SCPI_parse_t SCPI_IC_sens_list_dwel_poin(void)
-{
-        uint8_t channel;
-
-        channel = get_temp_channel();
-        SCPI_print_uint16(list_temp_poin[channel]);
-
-        return SCPI_parse_err;
-}
-
 SCPI_parse_t SCPI_IC_sens_list_temp(void)
 {
         uint8_t channel;
+        uint8_t poin = 0;
         SCPI_parse_t ret;
 
-        ret = ret;
         channel = get_temp_channel();
-        SCPI_err_set(&SCPI_err_1);
+        if (_SCPI_CMD_IS_QUEST()) {
+                uint8_t poin_end;
 
-        /* TODO: ... */
-        return SCPI_parse_err;
+                poin_end = list_temp_poin[channel];
+                while(poin < poin_end)
+                        SCPI_print_temp_1_20(list[channel][poin++].T);
+
+                return SCPI_parse_end;
+        }
+        do {
+                ret = SCPI_in_temp_1_20(&list[channel][poin++].T);
+                if (ret == SCPI_parse_err)
+                        return ret;
+        } while (poin < SCPI_params_count);
+        list_temp_poin[channel] = poin;
+
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_sens_list_temp_poin(void)
@@ -135,14 +138,8 @@ static const SCPI_cmd_t SCPI_cmd_sens_list_dwel_P PROGMEM = {
         .set_params_opt_P = LIST_MAX - 1,
 };
 
-static const SCPI_cmd_t SCPI_cmd_sens_list_dwel_poin_P PROGMEM = {
-        .parser_P = SCPI_IC_sens_list_dwel_poin, 
-        .get_P = 1,
-        .set_params_min_P = 1,
-};
-
 static const SCPI_cmd_t SCPI_cmd_sens_list_temp_P PROGMEM = {
-        .parser_P = SCPI_IC_sens_list_dwel, 
+        .parser_P = SCPI_IC_sens_list_temp, 
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 1,
@@ -150,14 +147,13 @@ static const SCPI_cmd_t SCPI_cmd_sens_list_temp_P PROGMEM = {
 };
 
 static const SCPI_cmd_t SCPI_cmd_sens_list_temp_poin_P PROGMEM = {
-        .parser_P = SCPI_IC_sens_list_dwel_poin, 
+        .parser_P = SCPI_IC_sens_list_temp_poin, 
         .get_P = 1,
-        .set_params_min_P = 1,
 };
 
 #define _SCPI_BRANCH_(k, c, b) { .key_P = &k, .cmd_P = c, .branch_P = b, }
 static const SCPI_branch_item_t SCPI_bt_sens_list_dwel_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_poin_P, &SCPI_cmd_sens_list_dwel_poin_P, NULL),
+	_SCPI_BRANCH_(key_poin_P, &SCPI_cmd_sens_list_temp_poin_P, NULL),
 	_SCPI_branch_END_,
 };
 

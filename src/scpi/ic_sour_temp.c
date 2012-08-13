@@ -115,7 +115,6 @@ SCPI_parse_t SCPI_IC_sour_temp_slop(void)
         uint8_t channel;
         SCPI_parse_t ret;
         temp_1_20_t slope;
-        FP_16_16_t slope_;
 
         channel = get_temp_channel();
         if (_SCPI_CMD_IS_QUEST()) {        
@@ -124,11 +123,10 @@ SCPI_parse_t SCPI_IC_sour_temp_slop(void)
 
                 return SCPI_parse_end;
         }
-        ret = SCPI_in_FP_16_16(&slope_);
+        ret = SCPI_in_temp_1_20(&slope);
         if (ret == SCPI_parse_err)
                 return ret;
 
-        slope = (((slope_ + (0x10000 / 40 - 1)) / 0x100) * 20) / 0x100;
         temp_slope_set(channel, slope);
         return SCPI_parse_end;
 }

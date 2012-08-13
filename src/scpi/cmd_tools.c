@@ -9,6 +9,19 @@
 uint8_t SCPI_params_count;
 uint8_t SCPI_param_in_buf_idx;
 
+SCPI_parse_t SCPI_in_temp_1_20(temp_1_20_t *T)
+{
+	SCPI_parse_t ret;
+        FP_16_16_t T_;
+
+        ret = SCPI_in_FP_16_16(&T_);
+        if (ret == SCPI_parse_err)
+                return ret;
+
+        *T = (((T_ + (0x10000 / 40 - 1)) / 0x100) * 20) / 0x100;
+        return SCPI_parse_end;
+}
+
 /* Wraper around SCPI_atoi, parse and return integer */
 SCPI_parse_t SCPI_in_uint8(uint8_t *x)
 {
