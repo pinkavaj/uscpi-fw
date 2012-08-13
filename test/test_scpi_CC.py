@@ -40,15 +40,15 @@ class StatusReportingTest(FwTest):
         # test single bits
         # invalid command
         self.writeline('*ESE 255')
+        self.writeline('*SRE 0')
         self.writeline('bagr')
         exp = 0
-        self.writeline('*SRE 0')
         self.writeline('*STB?')
         res = self.readline()
         res = int(res)
         self.assertEqual(res, exp)
 
-        exp = 0b01100000
+        exp = 0b01100100
         self.writeline('*SRE 255')
         self.writeline('*STB?')
         res = self.readline()
