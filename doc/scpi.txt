@@ -11,7 +11,7 @@ Jiří Pinkava
 
 == Common Command ==
 
-=== *RTS ===
+=== *RST ===
 
 === *TRG ===
 
