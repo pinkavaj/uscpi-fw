@@ -12,7 +12,7 @@ class DevAD974Test(FwTest):
 
     def test_ad974(self):
         cmd = 'test:adc?'
-        d_max = 300
+        d_max = 400
         
         count=100
         while count:

@@ -2,6 +2,7 @@
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
 #include "drivers/usart.h"
+#include "lib/iobuf.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -29,6 +30,7 @@ void main(void)
 	SPI_dev_init();
 	TIMER1_init();
 	USART0_init();
+	stdout_buf_reset();
 
 	TIMER1_start();
 	

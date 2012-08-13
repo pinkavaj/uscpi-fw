@@ -3,9 +3,9 @@
 
 // FIXME: remove
 #include "scpi.h"
+#include "lib/iobuf.h"
 
 #include <avr/interrupt.h>
-#include <avr/sleep.h>
 #include <inttypes.h>
 #include <string.h>
 
@@ -41,12 +41,6 @@ char USART0_in[USART0_IN_LEN];
 volatile USART0_in_len_t USART0_in_len = 0;
 /* index to first free position to store newly recieved char */
 static volatile USART0_in_len_t USART0_in_len_ = 0;
-/* Output buffer for asynchronous sending */
-static char USART0_out[USART0_OUT_LEN];
-/* position where put new character to buffer */
-static volatile uint8_t USART0_out_len = 0;
-/* position from where get character to send */
-static volatile uint8_t USART0_out_len_ = 0;
 
 static void USART0_in_process(void);
 
@@ -105,9 +99,9 @@ ISR(USART0_RXC_vect)
 /* Send data from output buffer, enable interrupt UDRIE to start */
 ISR(USART0_UDRE_vect)
 {
-	UDR0 = USART0_out[USART0_out_len_++];
-	/* No more data to send, stop sending, reset buffer */
-	if (USART0_out_len == USART0_out_len_) {
+	UDR0 = popc();
+	/* No more data to send, stop sending */
+	if (stdout_isempty()) {
 		UCSR0B &= ~_BV(UDRIE0);
 	}
 }
@@ -138,68 +132,6 @@ void USART0_init(void)
 	PORTD &= ~(1<<PD0);
 	/* enable Rx and Recieve Complete Interrupt */
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
-}
-
-void USART0_out_flush(void)
-{
-	while (USART0_out_len != USART0_out_len_) {
-		sei();
-		sleep_mode();
-		cli();
-	}
-}
-
-void USART0_out_wipe(void)
-{
-	USART0_out_len -= USART0_out_len_;
-	memmove((char *)USART0_out, (char *)USART0_out + USART0_out_len_,
-			USART0_out_len);
-	USART0_out_len_ = 0;
-}
-
-USART0_out_len_t USART0_print_common(USART0_out_len_t len)
-{
-	USART0_out_wipe();
-	if ((USART0_out_len_t)(USART0_OUT_LEN - USART0_out_len) < len) {
-		SCPI_err_set(&SCPI_err_223);
-		len = USART0_OUT_LEN - USART0_out_len;
-	}
-	/* Allow interrup to start sending */
-	UCSR0B |= _BV(UDRIE0);
-	return len;
-}
-
-/* Print len bytes into output buffer */
-void USART0_printn(const char *str, USART0_out_len_t len)
-{
-	cli();
-	len = USART0_print_common(len);
-	memcpy(USART0_out + USART0_out_len, str, len);
-	USART0_out_len += len;
-	sei();
-}
-
-/* Print string from Program memory into output buffer,
- * interrupts will be enabled by this rutine! */
-void USART0_print_P(PGM_P str_P)
-{
-	cli();
-	USART0_out_len_t len = strlen_P(str_P);
-	len = USART0_print_common(len);
-	memcpy_P(USART0_out + USART0_out_len, str_P, len);
-	USART0_out_len += len;
-	sei();
-}
-
-/* Put character into output buffer */
-void USART0_putc(char c)
-{
-	uint8_t len = 1;
-
-	cli();
-	if (USART0_print_common(len))
-		USART0_out[USART0_out_len++] = c;
-	sei(); 
 }
 
 /* Start processing bytes in input buffer,
@@ -281,3 +213,10 @@ static void USART0_in_process(void)
 	USART0_in_process_lock--;
 }
 
+/* Allow interrup to start sending */
+void USART0_start_sending(void)
+{
+	UCSR0B |= _BV(UDRIE0);
+}
+
+/* :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab */
