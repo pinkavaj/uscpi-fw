@@ -1,6 +1,13 @@
 /*****************************************************************************
- *        ****  Analog-to-Digital Converter AD974  ****
- */
+ *     ***  Analog-to-Digital Converter AD974  ***
+ *
+ * Copyright (c) 2010 Lukas Kucera <lukas.kucera@vscht.cz>,
+ * 	Jiri Pinkava <jiri.pinkava@vscht.cz>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *****************************************************************************/
 
 #include "config.h"
 #include <util/delay.h>
@@ -10,6 +17,7 @@
 #include "drivers/spi.h"
 #include "drivers/ad974.h"
 
+/*****************************************************************************/
 void ad974_io_init(void)
 {
 	PORT_MODIFY(AD974_DDR, AD974_MASK,
@@ -22,6 +30,7 @@ void ad974_io_init(void)
 	PORT_MODIFY(AD974_PORT, AD974_MASK, (AD974_RC | AD974_WR | AD974_CS));
 }
 
+/*****************************************************************************/
 uint8_t ad974_spi_mode()
 {
 	return SPI_CLOCK_1_4 |
@@ -32,6 +41,7 @@ uint8_t ad974_spi_mode()
 		SPI_ENABLE;
 }
 
+/*****************************************************************************/
 static void ad974_set_channel(uint8_t channel)
 {
 	/* set channel number, 10ns */
@@ -44,6 +54,7 @@ static void ad974_set_channel(uint8_t channel)
 	BIT_SET(AD974_PORT, AD974_WR);
 }
 
+/*****************************************************************************/
 static uint16_t ad974_get_sample_(uint8_t dummy_clk)
 {
 	BIT_CLR(AD974_PORT, AD974_CS);
@@ -73,12 +84,14 @@ static uint16_t ad974_get_sample_(uint8_t dummy_clk)
 	return (valHi<<8) + valLo;
 }
 
+/*****************************************************************************/
 uint16_t ad974_get_sample(uint8_t channel)
 {
 	ad974_set_channel(channel);
 	return ad974_get_sample_(1);
 }
 
+/*****************************************************************************/
 void ad974_get_samples(uint8_t channel, uint32_t *val, uint8_t count)
 {
 	ad974_set_channel(channel);
