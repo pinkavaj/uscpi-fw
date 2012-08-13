@@ -93,17 +93,16 @@ SCPI_parse_t SCPI_CC_rst(void)
 SCPI_parse_t SCPI_CC_sre(void)
 {
         SCPI_parse_t ret;
-        uint8_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_print_uint16(SCPI_SRE_get());
+		SCPI_print_uint16(SCPI_STB_enabled);
 
                 return SCPI_parse_end;
 	}
-	ret = SCPI_in_uint8(&val);
+	ret = SCPI_in_uint8(&SCPI_STB_enabled);
 	if (ret == SCPI_parse_err)
 		return ret;
-	SCPI_SRE_set(val);
+        SCPI_STB_enabled &= ~SCPI_STB_RQS;
 	return ret;
 }
 

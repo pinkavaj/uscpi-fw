@@ -40,22 +40,11 @@ uint8_t SCPI_STB_get(void)
         if (!SCPI_err_queue_empty())
                 status |= SCPI_STB_EEQ;
         /* SCPI_STB_USER1 | SCPI_STB_USER2 | SCPI_STB_MAV */
-        
+       
+        status &= SCPI_STB_enabled;
 	if(status)
 		status |= SCPI_STB_RQS;
 	return status;
-}
-
-/* Returns status register enabled, enabled bits in STB */
-uint8_t SCPI_SRE_get(void)
-{
-	return SCPI_STB_enabled;
-}
-
-/* Set enabled bits in STB */
-void SCPI_SRE_set(uint8_t val)
-{
-	SCPI_STB_enabled = val & ~SCPI_STB_RQS;
 }
 
 /* Return operational condition register */

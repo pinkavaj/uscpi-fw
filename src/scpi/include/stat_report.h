@@ -73,9 +73,8 @@ void SCPI_SESR_enab_set(uint8_t);
 #define SCPI_STB_SESR	(1<<5)
 #define SCPI_STB_RQS	(1<<6)
 #define SCPI_STB_OPER	(1<<7)
+extern uint8_t SCPI_STB_enabled;
 uint8_t SCPI_STB_get(void);
-uint8_t SCPI_SRE_get(void);
-void SCPI_SRE_set(uint8_t val);
 
 #endif
 
