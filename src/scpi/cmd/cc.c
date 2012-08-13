@@ -38,8 +38,6 @@ SCPI_parse_t SCPI_CC_ese(void)
 
                 return SCPI_parse_end;
 	} 
-	if (SCPI_params_count != 1)
-		return SCPI_err_set_(&SCPI_err_108);
 	ret = SCPI_in_uint8(&val);
 	if (ret == SCPI_parse_err)
 		return ret;
