@@ -3,6 +3,7 @@
 #include "drivers/timer.h"
 #include "drivers/usart.h"
 #include "lib/iobuf.h"
+#include "lib/temp.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
@@ -38,6 +39,7 @@ void main(void)
 	do {	
 		set_sleep_mode(SLEEP_MODE_IDLE);
 		sleep_mode();
+                temp_loop();
 	} while(1);
 }
 
