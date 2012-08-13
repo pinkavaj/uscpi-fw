@@ -14,6 +14,8 @@ static uint8_t SPI_dev_current;
 
 void SPI_dev_select(uint8_t dev_num)
 {
+	if (dev_num == SPI_dev_current)
+		return;
 /*	if (SPI_dev_current != -1) {
 		spi_devs[SPI_dev_current].select(0);
 	}*/
@@ -21,16 +23,28 @@ void SPI_dev_select(uint8_t dev_num)
 	switch(SPI_dev_current)
 	{
 		case SPI_DEV_AD974_0:
-			SPCR = ad974_spi_mode();
+			ad974_select();
 //			spi_devs[dev_num].select(1);
 			break;
 		case SPI_DEV_MCP4922_0:
-			SPCR = mcp4922_spi_mode();
+			mcp4922_select();
 //			spi_devs[dev_num].select(1);
 			break;
-		default:
 		case SPI_DEV_NONE:
+		default:
 			return;
+	}
+}
+
+uint16_t SPI_dev_AD_get_sample(uint8_t channel)
+{
+	switch(SPI_dev_current)
+	{
+		case SPI_DEV_AD974_0:
+			return ad974_get_sample(channel);
+		case SPI_DEV_NONE:
+		default:
+			return -1;
 	}
 }
 

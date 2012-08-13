@@ -31,14 +31,24 @@ void ad974_io_init(void)
 }
 
 /*****************************************************************************/
-uint8_t ad974_spi_mode()
+static uint16_t ad974_get_sample_(void)
 {
-	return SPI_CLOCK_1_4 |
-		SPI_PHASE_TRAIL |
-		SPI_POL_LOW |
-		SPI_DORD_MSB |
-		SPI_MODE_MASTER |
-		SPI_ENABLE;
+	BIT_CLR(AD974_PORT, AD974_CS);
+	/* start conversion, 10ns CS->RC */
+	BIT_CLR(AD974_PORT, AD974_RC);
+	/* Wait until conversion complete 4us + few x0 ns to set-up signals. */
+	_delay_us(4.2);
+//	loop_until_bit_is_set(AD974_PORT, AD974_BUSY);
+
+	/* data acquisition 1us + few ns to set up signals */
+	BIT_SET(AD974_PORT, AD974_RC);
+	_delay_us(1.2);
+	uint8_t valHi = SPI_transfer8b(0);
+	uint8_t valLo = SPI_transfer8b(0);
+
+	BIT_SET(AD974_PORT, AD974_CS);
+
+	return (valHi<<8) + valLo;
 }
 
 /*****************************************************************************/
@@ -55,51 +65,30 @@ static void ad974_set_channel(uint8_t channel)
 }
 
 /*****************************************************************************/
-static uint16_t ad974_get_sample_(uint8_t dummy_clk)
-{
-	BIT_CLR(AD974_PORT, AD974_CS);
-	/* start conversion, 10ns CS->RC */
-	BIT_CLR(AD974_PORT, AD974_RC);
-	/* Dummy clock cycle, enable generation of synchronization pulse.
-	 * This is necesary because sync. pulse is unpredictable spontaneously
-	 * generated when SPI is used to comunicate to other device(s). */
-	if (dummy_clk)
-		SPI_dummy_clk();
-	/* Wait until conversion complete 4us + few x0 ns to set-up signals. */
-	_delay_us(4.2);
-//	loop_until_bit_is_set(AD974_PORT, AD974_BUSY);
-
-	/* data acquisition 1us + few ns to set up signals */
-	BIT_SET(AD974_PORT, AD974_RC);
-	_delay_us(1.2);
-	/* dummy clock, starts synchronization pulse */
-	if (dummy_clk)
-		SPI_dummy_clk();
-	_delay_loop_1(1);
-	uint8_t valHi = SPI_transfer8b(0);
-	uint8_t valLo = SPI_transfer8b(0);
-
-	BIT_SET(AD974_PORT, AD974_CS);
-
-	return (valHi<<8) + valLo;
-}
-
-/*****************************************************************************/
 uint16_t ad974_get_sample(uint8_t channel)
 {
 	ad974_set_channel(channel);
-	return ad974_get_sample_(1);
+	return ad974_get_sample_();
 }
 
 /*****************************************************************************/
-void ad974_get_samples(uint8_t channel, uint32_t *val, uint8_t count)
+void ad974_select(void)
 {
-	ad974_set_channel(channel);
-	/* Dummy read. First value might be invalid if dummy clock cycle is 
-	 * not used. */
-	ad974_get_sample_(0);
+	SPI_set_mode(ad974_spi_mode());
+	/* AD974 need one dummy read cycle. First DAQ result is moustly invalid
+	 * because of internal comfusion. It generates at random synchronization
+	 * pulse and thus use different timming/mode when sending data.  */
+	ad974_get_sample_();
+}
 
-	while(count--)
-		*val += ad974_get_sample_(0);
+/*****************************************************************************/
+uint8_t ad974_spi_mode()
+{
+	return SPI_CLOCK_1_4 |
+		SPI_PHASE_TRAIL |
+		SPI_POL_LOW |
+		SPI_DORD_MSB |
+		SPI_MODE_MASTER |
+		SPI_ENABLE;
 }
 

@@ -68,22 +68,21 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 }
 
 #include "drivers/spi_dev.h"
-#include "drivers/ad974.h"
 #include "drivers/mcp4922.h"
 static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		SPI_dev_select(SPI_DEV_AD974_0);
 
-		for (uint8_t x = 0; ; x++) {
-			uint16_t val;
+		for (uint8_t channel = 0; ; channel++) {
+			uint16_t sample;
 
-			val = ad974_get_sample(x);
-			SCPI_out_uint32(val);
+			sample = SPI_dev_AD_get_sample(channel);
+			SCPI_out_uint32(sample);
 			SCPI_putc(',');
-			val = ad974_get_sample(x);
-			SCPI_out_uint32(val);
-			if (x == 3)
+			sample = SPI_dev_AD_get_sample(channel);
+			SCPI_out_uint32(sample);
+			if (channel == 3)
 				break;
 			SCPI_putc(',');
 		}
