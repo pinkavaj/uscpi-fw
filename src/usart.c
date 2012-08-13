@@ -12,14 +12,15 @@
 #define CHAR_RESET '\x03'
 
 #define USART0_OUT_LEN 128
-//#define PRINT_DONE 0
-/* Input state, used to handle input events when error occurs
- * need_newline - drop all chars until new newline
- * reset_parser - stop parsing current line and reset parser */
+/* Input state, used to handle input events when error occurs,
+ * drop all input until newline found, reset SCPI parser
+ * - USART errors
+ * CHAR_ERR_LINE - SCPI parser error accured*/
 #define CHAR_ERR_ESC '\x00'
 #define CHAR_ERR_FRAMING ((char)_BV(4))
 #define CHAR_ERR_OVERFLOW ((char)_BV(3))
 #define CHAR_ERR_PARITY ((char)_BV(2))
+#define CHAR_ERR_LINE ((char)_BV(1))
 
 #if FE0 != 4
 #warning "FE0 != CHAR_ERR_FRAMING, this might lead to a bit larger code."
@@ -246,6 +247,7 @@ static void USART0_in_process(void)
 		{
 			default:
 			case SCPI_parse_err:
+				char_err = CHAR_ERR_LINE;
 			case SCPI_parse_end:
 			case SCPI_parse_flush:
 				memmove(USART0_in, USART0_in + USART0_in_len, 

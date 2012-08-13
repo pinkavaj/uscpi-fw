@@ -174,10 +174,12 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 	uint8_t kw_len = SCPI_in_len - 1;
 	SCPI_in[kw_len] = '\0';
 	const SCPI_branch_item_t *branch;
-	if (_SCPI_CMD_IS_CC())
+	if (_SCPI_CMD_IS_CC()) {
 		branch = SCPI_CC_ROOT;
-	else
+	}
+	else {
 		branch = SCPI_branch;
+	}
 	/* find keywork in keyword table */
 	do {
 		uint8_t len, len_short;

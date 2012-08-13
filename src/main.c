@@ -26,11 +26,11 @@
 void main(void)
 {
 	cli();
-	TIMER1_init();
+//	SPI_init();
+//	TIMER1_init();
 	USART0_init();
-	SPI_init();
 
-	TIMER1_start();
+//	TIMER1_start();
 	
 	sei();
 	do {	
