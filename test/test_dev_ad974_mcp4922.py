@@ -11,9 +11,13 @@ class DevAD974Test(FwTest):
         #port.write('test:adc 400,400\n'.encode('ascii'))
 
     def test_ad974(self):
+        self.writeline('test:adc 600 600;*OPC?')
+        res = self.readline()
+        self.assertEqual(res, '1')
+
         cmd = 'test:adc?'
         d_max = 400
-        
+
         count=100
         while count:
             count = count - 1
