@@ -72,7 +72,8 @@ ISR(USART0_RXC_vect)
 				c |= CHAR_ERR_PARITY;
 			if (uerr & _BV(FE0))
 				c |= CHAR_ERR_FRAMING;
-			if (uerr & _BV(DOR0) || USART0_in_len_ == (USART0_IN_LEN - 2))
+			if (uerr & _BV(DOR0) || USART0_in_len_ == 
+					(USART0_IN_LEN - 2))
 				c |= CHAR_ERR_OVERFLOW;
 			
 			USART0_in[USART0_in_len_++] = c;
@@ -121,25 +122,23 @@ void USART0_init(void)
 {
 #define BAUD USART0_BAUD
 #include <util/setbaud.h>
-	/* disable recieving/sending -> flush buffers */
-	UCSR0B &= 0; /* ~(_BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0)); */
+	/* disable recieving - flush buffer */
+	UCSR0B = 0;
+	SCPI_parser_reset();
 	/* set baud rate, X freq is defined in Makefile */
         UBRR0L = UBRRL_VALUE;
         UBRR0H = UBRRH_VALUE;
 #if USE_2X
-        UCSR0A |= _BV(U2X0);
+        UCSR0A = _BV(U2X0);
 #else
-        UCSR0A &= ~(_BV(U2X0) | _BV(MPCM0) );
+        UCSR0A = 0;
 #endif
 	/* Async, no parity, 1stop bit, 8bit */
 	UCSR0C = _BV(URSEL0) | _BV(UCSZ00) | _BV(UCSZ01);
-	/* enable Tx, Rx and Recieve Complete Interrupt */
+	/* disable pull-up on RxD */
+	PORTD &= ~(1<<PD0);
+	/* enable Rx and Recieve Complete Interrupt */
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
-	SCPI_parser_reset();
-	// drop all bytes waiting in buffer
-	do {
-		uint8_t x = UDR0;
-	} while (!(UCSR0A & _BV(RXC0)));
 }
 
 /* Print len bytes into output buffer */
