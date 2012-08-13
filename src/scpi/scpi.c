@@ -41,18 +41,13 @@ static SCPI_parse_t SCPI_parse_keyword(void)
 {
 	if (isalpha(last_char)) {
 		if (SCPI_in_len > 12)
-		{
-			SCPI_err_set(&SCPI_err_112);
-			return SCPI_parse_err;
-		}
+			return SCPI_err_set_(&SCPI_err_112);
 		last_char = toupper(last_char);
 		SCPI_in[SCPI_in_len - 1] = last_char;
 		return SCPI_parse_more;
 	}
-        if (SCPI_num_suffixes_idx >= sizeof(SCPI_num_suffixes)) {
-                SCPI_err_set(&SCPI_err_130);
-                return SCPI_parse_err;
-        }
+        if (SCPI_num_suffixes_idx >= sizeof(SCPI_num_suffixes))
+                return SCPI_err_set_(&SCPI_err_130);
         SCPI_num_suffixes[SCPI_num_suffixes_idx] = 0;
 	if (isdigit(last_char)) {
 		_SCPI_parser = SCPI_parse_keyword_num;
@@ -68,19 +63,15 @@ static SCPI_parse_t SCPI_parse_keyword_num(void)
         
         num_suffix= SCPI_num_suffixes[SCPI_num_suffixes_idx];
 	if (isdigit(last_char)) {
-		if (num_suffix >= (UINT8_MAX / 10)) {
-			SCPI_err_set(&SCPI_err_114);
-			return SCPI_parse_err;
-		}
+		if (num_suffix >= (UINT8_MAX / 10))
+			return SCPI_err_set_(&SCPI_err_114);
                 num_suffix = num_suffix * 10 + (last_char - '0');
 		SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix;
 		return SCPI_parse_drop_last;
 	}
 	/* Keyword numeric suffix is number in range <1,N> */
-	if (num_suffix == 0) {
-		SCPI_err_set(&SCPI_err_114);
-		return SCPI_parse_err;
-	}
+	if (num_suffix == 0)
+		return SCPI_err_set_(&SCPI_err_114);
 	/* Internal numbering is from 0 */
 	SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix - 1;
 	return SCPI_parse_keyword();
@@ -124,10 +115,8 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
 		SCPI_key_t *key;
 
 		key = (SCPI_key_t*)pgm_read_word(&branch->key_P);
-		if (key == NULL) {
-			SCPI_err_set(&SCPI_err_113);
-			return SCPI_parse_err;
-		}
+		if (key == NULL)
+			return SCPI_err_set_(&SCPI_err_113);
 		/* if lenght of current keyword is equal to lenght of long or 
 		 * short form of keyword */
 		len = pgm_read_byte(&key->len_short_P);
@@ -149,33 +138,25 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
         } else
                 num_suffix_max = 0;
 
-        if (num_suffix > num_suffix_max) {
-	        SCPI_err_set(&SCPI_err_114);
-	        return SCPI_parse_err;
-        }
+        if (num_suffix > num_suffix_max)
+	        return SCPI_err_set_(&SCPI_err_114);
 
 	/* try setup parsing of another keyword, if found in tree */
 	if (last_char == ':') {
 		SCPI_branch = 
 			(SCPI_branch_item_t*)pgm_read_word(&branch->branch_P);
-		if (SCPI_branch == NULL) {
-			SCPI_err_set(&SCPI_err_102);
-			return SCPI_parse_err;
-		}
+		if (SCPI_branch == NULL)
+			return SCPI_err_set_(&SCPI_err_102);
 		_SCPI_parser = SCPI_parse_keyword;
 		return SCPI_parse_drop_all;
 	}
 	/* This keyword does not have associated fucntion */
-	if (SCPI_cmd == NULL) {
-		SCPI_err_set(&SCPI_err_103);
-		return SCPI_parse_err;
-	}
+	if (SCPI_cmd == NULL)
+		return SCPI_err_set_(&SCPI_err_103);
 	/* Check whatever this type of command is suported (question/set) */
 	if ((_SCPI_CMD_IS_QUEST() && !pgm_read_byte(&SCPI_cmd->get_P)) ||
-		(!_SCPI_CMD_IS_QUEST() && !pgm_read_byte(&SCPI_cmd->set_P))) {
-			SCPI_err_set(&SCPI_err_102);
-			return SCPI_parse_err;
-		}
+		(!_SCPI_CMD_IS_QUEST() && !pgm_read_byte(&SCPI_cmd->set_P)))
+			return SCPI_err_set_(&SCPI_err_102);
 	/* parameters separator must follow */
 	if (SCPI_iscmdend(last_char)) {
 		_SCPI_parser = (SCPI_parse_t (*)(void))
@@ -186,8 +167,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
 	if (isspace(last_char))
 		return SCPI_parse_drop_all;
 
-	SCPI_err_set(&SCPI_err_113);
-	return SCPI_parse_err;
+	return SCPI_err_set_(&SCPI_err_113);
 }
 
 /* Normalize parameters recieved on input, convert tehm to zero terminated 

@@ -139,6 +139,12 @@ _SCPI_ERR_(800, SCPI_SESR_QERR, "-800,\"Operation complete\"");
 static const SCPI_err_t *SCPI_err[4];
 static uint8_t SCPI_err_count = 0;
 
+SCPI_parse_t SCPI_err_set_(const SCPI_err_t *e)
+{
+        SCPI_err_set(e);
+        return SCPI_parse_err;
+}
+
 void SCPI_err_set(const SCPI_err_t *e)
 {
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)

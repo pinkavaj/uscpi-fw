@@ -13,8 +13,6 @@
 #define SCPI_in_len USART0_in_len
 #define SCPI_in_len_ USART0_in_len_
 
-#include "scpi/error.h"
-
 /*
  * SCPI_parse_more - continue recieving, need more data
  * SCPI_parse_drop_all - drop all data in buffer, continue recieving
@@ -31,6 +29,9 @@ typedef enum SCPI_parse_enum {
 	SCPI_parse_end = 4,
 	SCPI_parse_err = 5,
 } SCPI_parse_t;
+
+/* error.h need SCPI_parse_t to be defined */
+#include "scpi/error.h"
 
 #define SCPI_isstart(c) ( c == ':' || c == '*' || isalpha(c))
 SCPI_parse_t SCPI_parse(char c);

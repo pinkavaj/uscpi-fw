@@ -26,7 +26,7 @@ static SCPI_parse_t SCPI_IC_meas_temp(void)
         putc('.');
         print_uint32f((T % 20) * 5, 2);
 
-        return SCPI_parse_err;
+        return SCPI_parse_end;
 }
 
 static const SCPI_cmd_t SCPI_cmd_meas_temp_P PROGMEM = {
