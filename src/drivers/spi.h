@@ -30,6 +30,7 @@
 
 void SPI_init(void);
 void SPI_dummy_clk(void);
-uint8_t SPI_transfer8b(uint8_t out);
+uint8_t SPI_transfer8b(uint8_t val);
 
 #endif
+

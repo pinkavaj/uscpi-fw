@@ -2,6 +2,7 @@
  *        ****  Analog-to-Digital Converter AD974  ****
  */
 
+#include "config.h"
 #include <util/delay.h>
 #include <util/delay_basic.h>
 

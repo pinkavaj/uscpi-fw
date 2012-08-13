@@ -1,8 +1,5 @@
-#include <string.h>
-#include <util/delay.h>
 #include <util/delay_basic.h>
 
-#include "config.h"
 #include "iodef.h"
 #include "spi.h"
 
@@ -14,13 +11,11 @@
 #define SPI_SCK _BV(PB7)
 #define SPI_MASK (SPI_MISO | SPI_SCK | SPI_MOSI | SPI_SS)
 
-
 void SPI_init(void) {
 //	SPSR &= ~SPI2X;
 	PORT_MODIFY(SPI_DDR, SPI_MASK, 
 			(DDR_OUT(SPI_SS | SPI_MOSI | SPI_SCK) | 
 			 DDR_IN(SPI_MISO)));
-//	PORT_MODIFY()
 	SPCR = _BV(SPE) | _BV(MSTR);
 	// set pull-up on input
 	PORT_MODIFY(SPI_PORT, (SPI_MISO | SPI_MOSI), 0);
@@ -40,8 +35,9 @@ void SPI_dummy_clk(void)
 	SPCR = spcr;
 }
 
-uint8_t SPI_transfer8b(uint8_t out) {
-	SPDR = out;
+uint8_t SPI_transfer8b(uint8_t val)
+{
+	SPDR = val;
 	loop_until_bit_is_set(SPSR, SPIF);
 	return SPDR;
 }
