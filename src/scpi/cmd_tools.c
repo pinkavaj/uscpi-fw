@@ -58,4 +58,11 @@ SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 	return SCPI_parse_end;
 }
 
+/* TODO: ... */
+SCPI_parse_t SCPI_in_FP_16_16(uint32_t *x)
+{
+        x = x;
+        return SCPI_parse_err;
+}
+
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab
