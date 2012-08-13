@@ -8,18 +8,20 @@
 #include <util/atomic.h>
 
 /*
- * SCPI_parse_cont - continue recieving, need more data
- * SCPI_parse_flush - flush buffer - data processed, continue recieving
- * SCPI_parse_flush_last - drop last char from buffer, continue recieving
+ * SCPI_parse_more - continue recieving, need more data
+ * SCPI_parse_drop_all - drop all data in buffer, continue recieving
+ * SCPI_parse_drop_last - drop last char from buffer, continue recieving
+ * SCPI_parse_drop_str - drop string at begin of buffer, continue recieving
  * SCPI_parse_end - end of command, call SPIC_parser_reset to start revieving
  * SCPI_parse_err - stop recieving, drop all until newline
  * */
 typedef enum SCPI_parse_enum {
-	SCPI_parse_cont = 0,
-	SCPI_parse_flush = 1,
-	SCPI_parse_flush_last = 2,
-	SCPI_parse_end = 3,
-	SCPI_parse_err = 4
+	SCPI_parse_more = 0,
+	SCPI_parse_drop_all = 1,
+	SCPI_parse_drop_last = 2,
+	SCPI_parse_drop_str = 3,
+	SCPI_parse_end = 4,
+	SCPI_parse_err = 5,
 } SCPI_parse_t;
 
 typedef struct SCPI_err_struct {

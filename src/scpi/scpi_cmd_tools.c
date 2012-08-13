@@ -113,27 +113,6 @@ static SCPI_parse_t SCPI_cmd_err_108(void)
 	return SCPI_parse_err;
 }
 
-/* Drop parameter from input, move to next one */
-static void SCPI_in_drop_param(void)
-{
-	char *end = SCPI_in;
-	
-	do {
-		end++;
-	} while (*end);
-
-	/* FIXME: manipulace nad vstupem by měla být jedna, je potřeba cli sei? */
-	cli();
-	if (--SCPI_params_count) {
-		/* skip \0 at end of parameter */
-		end++;
-		memmove(SCPI_in, end, (SCPI_in_len - (SCPI_in - end) + 1)*sizeof(char));
-		memmove(SCPI_param_types, SCPI_param_types + 1, 
-				SCPI_params_count*sizeof(SCPI_param_type_t));
-	}
-	sei();
-}
-
 /* Wraper around SCPI_atoi, parse and return integer */
 static SCPI_parse_t SCPI_in_uint8(uint8_t *x)
 {
@@ -166,10 +145,9 @@ static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 	char *ret;
 
 	*x = strtoul(SCPI_in, &ret, 0);
-	SCPI_in_drop_param();
 	if (*ret != 0)
 		return SCPI_parse_err;
-	return SCPI_parse_end;
+	return SCPI_parse_drop_str;
 }
 
 /* Print unisgned int to output */

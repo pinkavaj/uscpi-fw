@@ -121,7 +121,7 @@ static SCPI_parse_t SCPI_parse_keyword(char c)
 		}
 		c = toupper(c);
 		SCPI_in[SCPI_in_len - 1] = c;
-		return SCPI_parse_cont;
+		return SCPI_parse_more;
 	}
 	if (isdigit(c)) {
 		_SCPI_parser = SCPI_parse_keyword_num;
@@ -140,7 +140,7 @@ static SCPI_parse_t SCPI_parse_keyword_num(char c)
 			return SCPI_parse_err;
 		}
 		num_suffix.current = x;
-		return SCPI_parse_flush_last;
+		return SCPI_parse_drop_last;
 	}
 	/* Keyword numeric suffix is number in range <1,N> */
 	if (num_suffix.current == 0) {
@@ -162,7 +162,7 @@ static SCPI_parse_t SCPI_parse_keyword_question(char c)
 			SCPI_putc(';');
 		else
 			_SCPI_PREV_RESULT_set();
-		return SCPI_parse_flush_last;
+		return SCPI_parse_drop_last;
 	}
 	return SCPI_parse_keyword_sep(c);
 }
@@ -222,7 +222,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 			return SCPI_parse_err;
 		}
 		_SCPI_parser = SCPI_parse_keyword;
-		return SCPI_parse_flush;
+		return SCPI_parse_drop_all;
 	}
 	/* This keyword does not have associated fucntion */
 	if (SCPI_cmd == NULL) {
@@ -243,7 +243,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(char c)
 	}
 	_SCPI_parser = SCPI_parse_params;
 	if (isspace(c))
-		return SCPI_parse_flush;
+		return SCPI_parse_drop_all;
 
 	SCPI_err_set(&SCPI_err_113);
 	return SCPI_parse_err;
@@ -260,7 +260,7 @@ static SCPI_parse_t SCPI_parse_params(char c)
 			goto SCPI_parse_params_eof;
 		/* Drop whitespaces at start of parameter list */
 		if(isspace(c))
-			return SCPI_parse_flush;
+			return SCPI_parse_drop_all;
 	}
 
 	pt = SCPI_param_types[SCPI_params_count];
@@ -268,7 +268,7 @@ static SCPI_parse_t SCPI_parse_params(char c)
 	/* End of parameter reached, normalize param. separator (' ', ',') */
 	if (_SCPI_PARSE_PARAM_SEP()) {
 		if (isspace(c) && !SCPI_iscmdend(c))
-			return SCPI_parse_flush_last;
+			return SCPI_parse_drop_last;
 		if (c == ',') {
 			/* Parameter separator already present */
 			if (pt & SCPI_PAR_END) {
@@ -277,7 +277,7 @@ static SCPI_parse_t SCPI_parse_params(char c)
 			}
 			SCPI_param_types[SCPI_params_count] |= 
 					SCPI_PAR_END;
-			return SCPI_parse_flush_last;
+			return SCPI_parse_drop_last;
 		}
 		/* Start of new parameter or end of command found */
 		if (SCPI_iscmdend(c)) {
@@ -306,7 +306,7 @@ static SCPI_parse_t SCPI_parse_params(char c)
 			pt = SCPI_PAR_NUM_INT;
 		} else if (c == '+') {
 			SCPI_param_types[SCPI_params_count] = SCPI_PAR_NUM_INT;
-			return SCPI_parse_flush_last;
+			return SCPI_parse_drop_last;
 		} else if (c == '-') 
 			pt = SCPI_PAR_NUM_INT | SCPI_PAR_NUM_SIG_MINUS;
 		else if (c == '.')
@@ -323,7 +323,7 @@ static SCPI_parse_t SCPI_parse_params(char c)
 		}
 
 		SCPI_param_types[SCPI_params_count] = pt;
-		return SCPI_parse_cont;
+		return SCPI_parse_more;
 	}
 
 	if ((pt & SCPI_PAR_NUM_TYPE) == SCPI_PAR_NUM_INT) {
@@ -341,24 +341,24 @@ static SCPI_parse_t SCPI_parse_params(char c)
 			}
 			_SCPI_PARSE_PARAM_PREF_reset();
 			SCPI_param_types[SCPI_params_count] = pt;
-			return SCPI_parse_cont;
+			return SCPI_parse_more;
 		}
 		switch(pt & SCPI_PAR_NUM_INT_TYPE) {
 			case SCPI_PAR_NUM_INT_HEX:
 				if (c >= 'A' && c <= 'F')
-					return SCPI_parse_cont;
+					return SCPI_parse_more;
 			default:
 			case SCPI_PAR_NUM_INT_DEC:
 				if (isdigit(c))
-					return SCPI_parse_cont;
+					return SCPI_parse_more;
 				break;
 			case SCPI_PAR_NUM_INT_OCT:
 				if (c >= '0' && c <= '7')
-					return SCPI_parse_cont;
+					return SCPI_parse_more;
 				break;
 			case SCPI_PAR_NUM_INT_BIN:
 				if (c == '0' || c == '1')
-					return SCPI_parse_cont;
+					return SCPI_parse_more;
 				break;
 		}
 		/* Is floating point number ? */
@@ -378,19 +378,19 @@ static SCPI_parse_t SCPI_parse_params(char c)
 		if (_SCPI_PARSE_PARAM_PREF()) {
 			_SCPI_PARSE_PARAM_PREF_reset();
 			/* TODO: check for nonprintable characters */
-			return SCPI_parse_cont;
+			return SCPI_parse_more;
 		}
 		if (c == '\\') {
 			_SCPI_PARSE_PARAM_PREF_set();
-			return SCPI_parse_flush_last;
+			return SCPI_parse_drop_last;
 		}
 		if (c == '"')
 			goto SCPI_parse_params_end2;
-		return SCPI_parse_cont;
+		return SCPI_parse_more;
 	}
 	if ((pt & SCPI_PAR_CHAR_TYPE) == SCPI_PAR_CHAR_ALPHA) {
 		if (isalpha(c))
-			return SCPI_parse_cont;
+			return SCPI_parse_more;
 		goto SCPI_parse_params_end;
 	}
 	/* This will never happend */
@@ -411,7 +411,7 @@ SCPI_parse_params_end:
 		}
 SCPI_parse_params_end2:
 		_SCPI_PARSE_PARAM_SEP_set();
-		return SCPI_parse_cont;
+		return SCPI_parse_more;
 	}
 	SCPI_err_set(&SCPI_err_220);
 	return SCPI_parse_err;
@@ -450,16 +450,16 @@ SCPI_parse_t SCPI_parse(char c)
 		if (c == '\n')
 			return SCPI_parse_end_(SCPI_parse_end);
 		else if (isspace(c))
-			return SCPI_parse_flush;
+			return SCPI_parse_drop_all;
 
 		_SCPI_parser = SCPI_parse_keyword;
 
 		if (c == '*') {
 			_SCPI_CMD_IS_CC_set();
-			return SCPI_parse_flush;
+			return SCPI_parse_drop_all;
 		} else if (c == ':') {
 			/* start parsing at root level */
-			return SCPI_parse_flush;
+			return SCPI_parse_drop_all;
 		}
 	}
 
@@ -469,7 +469,7 @@ SCPI_parse_t SCPI_parse(char c)
 	if (ret == SCPI_parse_end) {
 		if (c == ';') {
 			SCPI_parser_reset_();
-			return SCPI_parse_flush;
+			return SCPI_parse_drop_all;
 		}
 		return SCPI_parse_end_(ret);
 	}

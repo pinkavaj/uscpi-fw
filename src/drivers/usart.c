@@ -240,20 +240,41 @@ static void USART0_in_process(void)
 			case SCPI_parse_err:
 				char_err = CHAR_ERR_LINE;
 			case SCPI_parse_end:
-			case SCPI_parse_flush:
-				memmove(USART0_in, USART0_in + USART0_in_len, 
-						USART0_in_len_ - USART0_in_len);
+			case SCPI_parse_drop_all:
 				USART0_in_len_ -= USART0_in_len;
+				memmove(USART0_in, USART0_in + USART0_in_len, USART0_in_len_);
 				USART0_in_len = 0;
 				break;
-			case SCPI_parse_flush_last:
+			case SCPI_parse_drop_last:
 				memmove(USART0_in + USART0_in_len - 1, 
 						USART0_in + USART0_in_len, 
 						USART0_in_len_ - USART0_in_len);
 				USART0_in_len--;
 				USART0_in_len_--;
 				break;
-			case SCPI_parse_cont:
+			case SCPI_parse_drop_str:
+				{
+					uint8_t idx = 0;
+					while (USART0_in[idx]) {
+						if (idx == USART0_in_len)
+							break;
+						idx++;
+						USART0_in_len_--;
+					};
+					
+					if (USART0_in[idx] == 0 && idx < USART0_in_len) {
+						idx++;
+						USART0_in_len_--;
+					}
+					memmove(USART0_in, USART0_in + idx, USART0_in_len_);
+				}
+
+				/* FIXME: if (--SCPI_params_count) { 
+					memmove(SCPI_param_types, SCPI_param_types + 1, 
+					SCPI_params_count*sizeof(SCPI_param_type_t));
+				 * */
+				break;
+			case SCPI_parse_more:
 				break;
 		}
 		if (c == '\n') {
