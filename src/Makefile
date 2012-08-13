@@ -19,7 +19,7 @@ INC=-I. -Iinclude -I/usr/lib/avr/include/
 
 SRC=-c main.c
 SRC+=lib/heating.c lib/iobuf.c lib/math_cust.S lib/pic16.c
-SRC+=scpi/scpi.c
+SRC+=scpi/scpi.c scpi/scpi_cmd_ic_test.c
 SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
 

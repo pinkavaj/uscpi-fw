@@ -19,15 +19,15 @@
 #define SCPI_OPER_USR5	(1<<12)
 #define SCPI_OPER_INST	(1<<13)
 #define SCPI_OPER_PROG	(1<<14)
-static uint16_t SCPI_OPER_cond = 0;
-static uint16_t SCPI_OPER_enab = 0;
-static uint16_t SCPI_OPER_even = 0;
 #define SCPI_OPER_trans_to1 0xffff
 #define SCPI_OPER_trans_to0 0x0
-static void SCPI_OPER_cond_set(uint16_t val);
-static void SCPI_OPER_cond_reset(uint16_t val);
-static void SCPI_OPER_enab_update(void);
-static uint16_t SCPI_OPER_even_get(void);
+uint16_t SCPI_OPER_cond(void);
+void SCPI_OPER_cond_set(uint16_t val);
+void SCPI_OPER_cond_reset(uint16_t val);
+uint16_t SCPI_OPER_enab(void);
+void SCPI_OPER_enab_update(void);
+void SCPI_OPER_enab_set_(uint16_t val);
+uint16_t SCPI_OPER_even_get(void);
 /* Questionable Status */
 #define SCPI_QUES_VOLT	(1<<0)
 #define SCPI_QUES_CURR	(1<<1)
@@ -44,15 +44,15 @@ static uint16_t SCPI_OPER_even_get(void);
 #define SCPI_QUES_USR4	(1<<12)
 #define SCPI_QUES_INST	(1<<13)
 #define SCPI_QUES_CMDW	(1<<14)
-static uint16_t SCPI_QUES_cond;
-static uint16_t SCPI_QUES_enab;
-static uint16_t SCPI_QUES_even;
+uint16_t SCPI_QUES_cond;
+uint16_t SCPI_QUES_enab;
+uint16_t SCPI_QUES_even;
 #define SCPI_QUES_trans_to1 0xffff
 #define SCPI_QUES_trans_to0 0x0
-static void SCPI_QUES_cond_set(uint16_t val);
-static void SCPI_QUES_cond_reset(uint16_t val);
-static void SCPI_QUES_enab_update(void);
-static uint16_t SCPI_QUES_even_get(void);
+void SCPI_QUES_cond_set(uint16_t val);
+void SCPI_QUES_cond_reset(uint16_t val);
+void SCPI_QUES_enab_update(void);
+uint16_t SCPI_QUES_even_get(void);
 /* SCPI Standard Event Status Register/Enable */
 #define SCPI_SESR_OPC	(1<<0)
 #define SCPI_SESR_REQC	(1<<1)
@@ -62,11 +62,11 @@ static uint16_t SCPI_QUES_even_get(void);
 #define SCPI_SESR_CERR	(1<<5)
 #define SCPI_SESR_UREQ	(1<<6)
 #define SCPI_SESR_POWON	(1<<7)
-static uint8_t SCPI_SESR = 0;
-static uint8_t SCPI_SESR_enab = 0;
-static uint8_t SCPI_SESR_get(void);
-static void SCPI_SESR_set(uint8_t val);
-static void SCPI_SESR_enab_update(void);
+uint8_t SCPI_SESR_enab(void);
+uint8_t SCPI_SESR_get(void);
+void SCPI_SESR_set(uint8_t val);
+void SCPI_SESR_set_(uint8_t);
+void SCPI_SESR_enab_update(void);
 /* SCPI Status Byte */
 #define SCPI_STB_USER1	(1<<0)
 #define SCPI_STB_USER2	(1<<1)
@@ -76,46 +76,47 @@ static void SCPI_SESR_enab_update(void);
 #define SCPI_STB_SESR	(1<<5)
 #define SCPI_STB_RQS	(1<<6)
 #define SCPI_STB_OPER	(1<<7)
-static uint8_t SCPI_STB = 0;
-static uint8_t SCPI_SRE_ = 0;
-#define SCPI_STB_set(x) do { SCPI_STB |= x & ~SCPI_STB_RQS; } while(0)
-#define SCPI_STB_reset(x) do { SCPI_STB &= ~x; } while(0)
-#define SCPI_SRE_update() do { SCPI_SRE_ &= ~SCPI_STB_RQS; } while(0)
+uint8_t SCPI_SRE(void);
+uint8_t SCPI_STB(void);
+void SCPI_STB_set(uint8_t);
+void SCPI_STB_reset(uint8_t);
+void SCPI_SRE_update(void);
+void SCPI_SRE_set_(uint8_t val);
 
 /* SCPI Common Commands */
-static SCPI_parse_t SCPI_CC_cls(char c);
-static SCPI_parse_t SCPI_CC_ese(char c);
-static SCPI_parse_t SCPI_CC_esr(char c);
-static SCPI_parse_t SCPI_CC_idn(char c);
-static SCPI_parse_t SCPI_CC_opc(char c);
-static SCPI_parse_t SCPI_CC_rst(char c);
-static SCPI_parse_t SCPI_CC_sre(char c);
-static SCPI_parse_t SCPI_CC_stb(char c);
-static SCPI_parse_t SCPI_CC_tst(char c);
-static SCPI_parse_t SCPI_CC_wai(char c);
+SCPI_parse_t SCPI_CC_cls(char c);
+SCPI_parse_t SCPI_CC_ese(char c);
+SCPI_parse_t SCPI_CC_esr(char c);
+SCPI_parse_t SCPI_CC_idn(char c);
+SCPI_parse_t SCPI_CC_opc(char c);
+SCPI_parse_t SCPI_CC_rst(char c);
+SCPI_parse_t SCPI_CC_sre(char c);
+SCPI_parse_t SCPI_CC_stb(char c);
+SCPI_parse_t SCPI_CC_tst(char c);
+SCPI_parse_t SCPI_CC_wai(char c);
 
 /* SCPI Instrument Commands */
-static SCPI_parse_t SCPI_IC_stat_oper_cond(char c);
-static SCPI_parse_t SCPI_IC_stat_oper_enab(char c);
-static SCPI_parse_t SCPI_IC_stat_oper_even(char c);
-static SCPI_parse_t SCPI_IC_stat_pres(char c);
-static SCPI_parse_t SCPI_IC_stat_ques_cond(char c);
-static SCPI_parse_t SCPI_IC_stat_ques_enab(char c);
-static SCPI_parse_t SCPI_IC_stat_ques_even(char c);
-static SCPI_parse_t SCPI_IC_syst_err_next(char c);
-static SCPI_parse_t SCPI_IC_syst_vers(char c);
+SCPI_parse_t SCPI_IC_stat_oper_cond(char c);
+SCPI_parse_t SCPI_IC_stat_oper_enab(char c);
+SCPI_parse_t SCPI_IC_stat_oper_even(char c);
+SCPI_parse_t SCPI_IC_stat_pres(char c);
+SCPI_parse_t SCPI_IC_stat_ques_cond(char c);
+SCPI_parse_t SCPI_IC_stat_ques_enab(char c);
+SCPI_parse_t SCPI_IC_stat_ques_even(char c);
+SCPI_parse_t SCPI_IC_syst_err_next(char c);
+SCPI_parse_t SCPI_IC_syst_vers(char c);
 
-static SCPI_parse_t SCPI_IC_test_adc(char c);
-static SCPI_parse_t SCPI_IC_test_div(char c);
-static SCPI_parse_t SCPI_IC_test_mul(char c);
-static SCPI_parse_t SCPI_IC_test_num(char c);
-static SCPI_parse_t SCPI_IC_test_time(char c);
+SCPI_parse_t SCPI_IC_test_adc(char c);
+SCPI_parse_t SCPI_IC_test_div(char c);
+SCPI_parse_t SCPI_IC_test_mul(char c);
+SCPI_parse_t SCPI_IC_test_num(char c);
+SCPI_parse_t SCPI_IC_test_time(char c);
 
 /* SCPI Tools */
-static SCPI_parse_t SCPI_in_uint8(uint8_t *x);
-static SCPI_parse_t SCPI_in_uint16(uint16_t *x);
-static SCPI_parse_t SCPI_in_uint32(uint32_t *x);
-static SCPI_parse_t SCPI_cmd_err_108(void);
+SCPI_parse_t SCPI_in_uint8(uint8_t *x);
+SCPI_parse_t SCPI_in_uint16(uint16_t *x);
+SCPI_parse_t SCPI_in_uint32(uint32_t *x);
+SCPI_parse_t SCPI_cmd_err_108(void);
 
 #endif
 

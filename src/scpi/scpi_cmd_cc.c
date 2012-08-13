@@ -3,14 +3,14 @@
 #include <string.h>
 
 #include "scpi_cmd.h"
-#include "../lib/extlib.h"
+#include "lib/extlib.h"
 
 
 /* Small hack to jup to reset vector */
 SCPI_parse_t __vectors(void);
 
 /* Clear Status */
-static SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
+SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 {
 	ATOMIC_BLOCK(ATOMIC_FORCEON) {
 		SCPI_err_count = 0;
@@ -24,28 +24,30 @@ static SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 
 /* Standard Event Status Enable */
 /* Standard Event Status Enable Query  */
-static SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
+SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SESR_enab);
+		print_uint32(SCPI_SESR_enab());
 		return SCPI_parse_end;
 	} 
 	if (SCPI_params_count != 1)
 		return SCPI_cmd_err_108();
-	SCPI_parse_t ret = SCPI_in_uint8(&SCPI_SESR);
+	uint8_t val = 0;
+	SCPI_parse_t ret = SCPI_in_uint8(&val);
+	SCPI_SESR_set_(val);
 	SCPI_SESR_enab_update();
 	return ret;
 }
 
 /* Event Status Register Query */
-static SCPI_parse_t SCPI_CC_esr(char UNUSED(c))
+SCPI_parse_t SCPI_CC_esr(char UNUSED(c))
 {
 	print_uint32(SCPI_SESR_get());
 	return SCPI_parse_end;
 }
 
 /* Identification Query */
-static SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
+SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
 {
 	static const char IDN_P[] PROGMEM = 
 		STR(INFO_COMPANY) ","
@@ -60,7 +62,7 @@ static SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
 
 /* Operation Complete Command  */
 /* Operation Complete Query */
-static SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
+SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
 		putc('1');
@@ -71,28 +73,30 @@ static SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
 }
 
 /* Reset */
-static SCPI_parse_t SCPI_CC_rst(char UNUSED(c))
+SCPI_parse_t SCPI_CC_rst(char UNUSED(c))
 {
 	return __vectors();
 }
 
 /* Service Request Enable */
 /* Service Request Enable Query  */
-static SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
+SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		print_uint32(SCPI_SRE_);
+		print_uint32(SCPI_SRE());
 		return SCPI_parse_end;
 	}
-	SCPI_parse_t ret = SCPI_in_uint8(&SCPI_SRE_);
+	uint8_t val = 0;
+	SCPI_parse_t ret = SCPI_in_uint8(&val);
+	SCPI_SRE_set_(val);
 	SCPI_SRE_update();
 	return ret;
 }
 
 /* Read Status Byte Query */
-static SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
+SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
 {
-	uint8_t x = SCPI_STB & SCPI_SRE_;
+	uint8_t x = SCPI_STB() & SCPI_SRE();
 	if (x)
 		x |= SCPI_STB_RQS;
 	print_uint32(x);
@@ -100,7 +104,7 @@ static SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
 }
 
 /* Self-Test Query  */
-static SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
+SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
 {
 	putc('1');
 	return SCPI_parse_end;
@@ -108,7 +112,7 @@ static SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
 
 /* Wait-to-Continue - implementation is empty when operation executed 
  * synchronusly */
-static SCPI_parse_t SCPI_CC_wai(char UNUSED(c))
+SCPI_parse_t SCPI_CC_wai(char UNUSED(c))
 {
 	return SCPI_parse_end;
 }

@@ -4,46 +4,102 @@
 
 #include "scpi_cmd.h"
 
-/* Set bit(s) in Operation Status Register */
-static void SCPI_OPER_cond_set(uint16_t val)
+uint16_t SCPI_OPER_cond_ = 0;
+uint16_t SCPI_OPER_enab_ = 0;
+uint16_t SCPI_OPER_even = 0;
+
+uint8_t SCPI_SESR_ = 0;
+uint8_t SCPI_SESR_enab_ = 0;
+
+uint8_t SCPI_STB_ = 0;
+uint8_t SCPI_SRE_ = 0;
+
+
+uint8_t SCPI_STB(void)
 {
-	SCPI_OPER_cond |= val;
+	return SCPI_STB_;
+}
+
+void SCPI_STB_set(uint8_t x)
+{ 
+	SCPI_STB_ |= x & ~SCPI_STB_RQS;
+}
+
+void SCPI_STB_reset(uint8_t x)
+{ 
+	SCPI_STB_ &= ~x; 
+}
+
+uint8_t SCPI_SRE(void)
+{
+	return SCPI_SRE_;
+}
+
+void SCPI_SRE_set_(uint8_t val)
+{
+	SCPI_SRE_ = val;
+}
+
+void SCPI_SRE_update(void)
+{ 
+	SCPI_SRE_ &= ~SCPI_STB_RQS; 
+}
+
+uint16_t SCPI_OPER_cond(void)
+{
+	return SCPI_OPER_cond_;
+}
+
+uint16_t SCPI_OPER_enab(void)
+{
+	return SCPI_OPER_enab_;
+}
+
+void SCPI_OPER_enab_set_(uint16_t val)
+{
+	SCPI_OPER_enab_ = val;
+}
+
+/* Set bit(s) in Operation Status Register */
+void SCPI_OPER_cond_set(uint16_t val)
+{
+	SCPI_OPER_cond_ |= val;
 	val &= SCPI_OPER_trans_to1;
 	SCPI_OPER_even |= val;
-	if (SCPI_OPER_even & SCPI_OPER_enab)
+	if (SCPI_OPER_even & SCPI_OPER_enab_)
 		SCPI_STB_set(SCPI_STB_OPER);
 }
 
 /* Reset bit(s) in Operation Status Register */
-static void SCPI_OPER_cond_reset(uint16_t val)
+void SCPI_OPER_cond_reset(uint16_t val)
 {
-	SCPI_OPER_cond &= ~val;
+	SCPI_OPER_cond_ &= ~val;
 	val &= SCPI_OPER_trans_to0;
 	SCPI_OPER_even |= val;
-	if (SCPI_OPER_even & SCPI_OPER_enab)
+	if (SCPI_OPER_even & SCPI_OPER_enab_)
 		SCPI_STB_set(SCPI_STB_OPER);
 }
 
 /* Update sumary register after OPERation enabled register changed */
-static void SCPI_OPER_enab_update(void)
+void SCPI_OPER_enab_update(void)
 {
-	if (SCPI_OPER_even & SCPI_OPER_enab)
+	if (SCPI_OPER_even & SCPI_OPER_enab_)
 		SCPI_STB_set(SCPI_STB_OPER);
 	else
 		SCPI_STB_reset(SCPI_STB_OPER);
 }
 
 /* Get value from OPERation event register */
-static uint16_t SCPI_OPER_even_get(void)
+uint16_t SCPI_OPER_even_get(void)
 {
-	uint16_t x = SCPI_OPER_even & SCPI_OPER_enab;
+	uint16_t x = SCPI_OPER_even & SCPI_OPER_enab_;
 	SCPI_OPER_even = 0;
 	SCPI_STB_reset(SCPI_STB_OPER);
 	return x;
 }
 
 /* Set bit(s) in Operation Status Register */
-static void SCPI_QUES_cond_set(uint16_t val)
+void SCPI_QUES_cond_set(uint16_t val)
 {
 	SCPI_QUES_cond |= val;
 	val &= SCPI_QUES_trans_to1;
@@ -53,7 +109,7 @@ static void SCPI_QUES_cond_set(uint16_t val)
 }
 
 /* Reset bit(s) in Operation Status Register */
-static void SCPI_QUES_cond_reset(uint16_t val)
+void SCPI_QUES_cond_reset(uint16_t val)
 {
 	SCPI_QUES_cond &= ~val;
 	val &= SCPI_QUES_trans_to0;
@@ -63,7 +119,7 @@ static void SCPI_QUES_cond_reset(uint16_t val)
 }
 
 /* Update sumary register after QUEStionable enable register changed */
-static void SCPI_QUES_enab_update(void)
+void SCPI_QUES_enab_update(void)
 {
 	if (SCPI_QUES_even & SCPI_QUES_enab)
 		SCPI_STB_set(SCPI_STB_QUES);
@@ -72,7 +128,7 @@ static void SCPI_QUES_enab_update(void)
 }
 
 /* Get value of QUEStionable event register */
-static uint16_t SCPI_QUES_even_get(void)
+uint16_t SCPI_QUES_even_get(void)
 {
 	uint16_t x = SCPI_QUES_even & SCPI_QUES_enab;
 	SCPI_QUES_even = 0;
@@ -80,41 +136,51 @@ static uint16_t SCPI_QUES_even_get(void)
 	return x;
 }
 
-/* Get value of Standard Event Status Register */
-static uint8_t SCPI_SESR_get(void)
+void SCPI_SESR_set_(uint8_t val)
 {
-	uint8_t x = SCPI_SESR & SCPI_SESR_enab;
-	SCPI_SESR = 0;
+	SCPI_SESR_ = val;
+}
+
+/* Get value of Standard Event Status Register */
+uint8_t SCPI_SESR_get(void)
+{
+	uint8_t x = SCPI_SESR_ & SCPI_SESR_enab_;
+	SCPI_SESR_ = 0;
 	SCPI_STB_reset(SCPI_STB_SESR);
 	return x;
 }
 
 /* Set event bit in Standard Event Status Register */
-static void SCPI_SESR_set(uint8_t val)
+void SCPI_SESR_set(uint8_t val)
 {
-	SCPI_SESR |= val;
-	if (SCPI_SESR & SCPI_SESR_enab)
+	SCPI_SESR_ |= val;
+	if (SCPI_SESR_ & SCPI_SESR_enab_)
 		SCPI_STB_set(SCPI_STB_SESR);
 }
 
-/* Update sumary register when Stantard Event Status Enable Register changed */
-static void SCPI_SESR_enab_update(void)
+uint8_t SCPI_SESR_enab(void)
 {
-	if (SCPI_SESR & SCPI_SESR_enab)
+	return SCPI_SESR_enab_;
+}
+
+/* Update sumary register when Stantard Event Status Enable Register changed */
+void SCPI_SESR_enab_update(void)
+{
+	if (SCPI_SESR_ & SCPI_SESR_enab_)
 		SCPI_STB_set(SCPI_STB_SESR);
 	else 
 		SCPI_STB_reset(SCPI_STB_SESR);
 }
 
 /* Shortcut to exit with error 108 - too much parameters */
-static SCPI_parse_t SCPI_cmd_err_108(void)
+SCPI_parse_t SCPI_cmd_err_108(void)
 {
 	SCPI_err_set(&SCPI_err_108);
 	return SCPI_parse_err;
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
-static SCPI_parse_t SCPI_in_uint8(uint8_t *x)
+SCPI_parse_t SCPI_in_uint8(uint8_t *x)
 {
 	uint32_t val;
 	SCPI_parse_t ret;
@@ -127,7 +193,7 @@ static SCPI_parse_t SCPI_in_uint8(uint8_t *x)
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
-static SCPI_parse_t SCPI_in_uint16(uint16_t *x)
+SCPI_parse_t SCPI_in_uint16(uint16_t *x)
 {
 	uint32_t val;
 	SCPI_parse_t ret;
@@ -140,7 +206,7 @@ static SCPI_parse_t SCPI_in_uint16(uint16_t *x)
 }
 
 /* Wraper around SCPI_atoi, parse and return integer */
-static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
+SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 {
 	char *ret;
 
