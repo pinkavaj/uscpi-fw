@@ -31,6 +31,7 @@ void main(void)
 	SPI_dev_init();
 	TIMER1_init();
 	USART0_init();
+        temp_init();
 	stdout_buf_reset();
 
 	TIMER1_start();

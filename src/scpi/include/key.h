@@ -32,6 +32,7 @@ extern const SCPI_key_t key_even_P PROGMEM;
 extern const SCPI_key_t key_gain_P PROGMEM;
 extern const SCPI_key_t key_int_P PROGMEM;
 extern const SCPI_key_t key_lcon_P PROGMEM;
+extern const SCPI_key_t key_meas_P PROGMEM;
 extern const SCPI_key_t key_mode_P PROGMEM;
 extern const SCPI_key_t key_next_P PROGMEM;
 extern const SCPI_key_t key_oper_P PROGMEM;

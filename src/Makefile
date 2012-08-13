@@ -23,6 +23,7 @@ SRC+=scpi/scpi.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
      scpi/cc.c \
+     scpi/ic_meas.c \
      scpi/ic_test.c \
      scpi/ic_sour_temp.c \
      scpi/ic_stat.c \
@@ -98,4 +99,7 @@ test:
 
 pttable:
 	python3 ../../dhcu_2.0/tools/pt_table.py >lib/thermometer_pt.c
+	grep -A1000 "begin of header" lib/thermometer_pt.c | \
+		grep -B1000 "end of header" | \
+		grep -v " of header" >include/lib/thermometer_pt.h
 

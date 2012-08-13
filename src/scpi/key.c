@@ -28,6 +28,7 @@ _key_(even, "EVENT",        SHORT4B);
 _key_(gain, "GAIN",         SHORT4B);
 _key_(int,  "INTEGRAL",     SHORT3B);
 _key_(lcon, "LCONSTANTS",   SHORT4B);
+_key_(meas, "MEASURE",      SHORT4B);
 _key_(mode, "MODE",         SHORT4B);
 _key_(next, "NEXT",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);

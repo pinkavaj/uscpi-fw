@@ -145,6 +145,7 @@ static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 };
 
 const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
+	_SCPI_BRANCH_(key_meas_P, NULL, SCPI_bt_meas_P),
 	_SCPI_BRANCH_(key_sour_P, NULL, SCPI_bt_sour_P),
 	_SCPI_BRANCH_(key_stat_P, NULL, SCPI_bt_stat_P),
 	_SCPI_BRANCH_(key_syst_P, NULL, SCPI_bt_syst_P),

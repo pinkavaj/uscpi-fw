@@ -2,6 +2,7 @@
 #define __SCPI_IC_H__
 
 #include "scpi.h"
+#include "ic_meas.h"
 #include "ic_sour_temp.h"
 
 extern uint8_t SCPI_params_count;

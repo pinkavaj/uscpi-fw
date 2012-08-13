@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <string.h>
 
 #include "cmd_tools.h"
 #include "ic_sour_temp.h"
@@ -11,10 +10,8 @@
 /* Return channel <N> defined in CMD ( :TEMPerature<N> ) */
 static uint8_t get_temp_channel(void)
 {
-        if (SCPI_num_suffixes_idx != 1) {
+        if (SCPI_num_suffixes_idx != 1)
                 SCPI_err_set(&SCPI_err_2);
-                return SCPI_parse_err;
-        }
 
         return SCPI_num_suffixes[0];
 }
@@ -97,12 +94,24 @@ SCPI_parse_t SCPI_IC_sour_temp_rtim(void)
 SCPI_parse_t SCPI_IC_sour_temp_spo(void)
 {
         uint8_t channel;
+        SCPI_parse_t ret;
+        temp_1_20_t T;
 
         channel = get_temp_channel();
-        SCPI_err_set(&SCPI_err_1);
 
-        /* TODO: ... */
-        return SCPI_parse_err;
+        if (_SCPI_CMD_IS_QUEST()) {
+                T = temp_want_get(channel);
+                print_uint32(T / 20);
+                putc('.');
+                print_uint32f((T % 20)*5, 2);
+                return SCPI_parse_end;
+        }
+        ret = SCPI_in_uint16(&T);
+        if (ret == SCPI_parse_err)
+                return ret;
+
+        temp_want_set(T*20, channel);
+        return SCPI_parse_end;
 }
 
 static const SCPI_cmd_t SCPI_cmd_sour_temp_dwel_P PROGMEM = {
