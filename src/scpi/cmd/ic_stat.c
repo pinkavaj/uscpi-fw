@@ -89,8 +89,6 @@ SCPI_parse_t SCPI_IC_stat_ques_even(void)
 /* FIXME: just to hide warning, remove as soon as posible */
 void fake(void)
 {
-	SCPI_OPER_cond_set(0);
-	SCPI_OPER_cond_reset(0);
 	SCPI_QUES_cond_set(0);
 	SCPI_QUES_cond_reset(0);
 }

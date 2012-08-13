@@ -4,6 +4,7 @@
 #include "drivers/timer.h"
 #include "lib/math_cust.h"
 #include "lib/thermometer_pt.h"
+#include "scpi.h"
 #include "stat_report.h"
 #include "temp.h"
 
@@ -32,9 +33,7 @@ typedef struct {
 } temp_correct_IU_t;
 
 /* TODO: stavy vstupu (ok, zkrat, .. ?) */
-/* temp_status_IU_stabilizing   - recovering from one of invalid states 
- * temp_status_IU_setting       - approaching to target temperature usign
- *      ramp with slope */
+/* temp_status_IU_stabilizing   - recovering from one of invalid states */
 /* FIXME: rozdělit stavy regulačního automatu T a výstupu měření */
 typedef enum {
         temp_status_IU_valid = 0,
@@ -42,7 +41,6 @@ typedef enum {
         temp_status_IU_disconnected = 2,
         temp_status_IU_invalid = 4,
         temp_status_IU_stabilizing = 8,
-        temp_status_IU_setting = 16,
 } temp_status_IU_t;
 
 /* Temperature channel working data */
@@ -118,6 +116,16 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
                 },
         },*/
 };
+
+temp_1_20_t temp_slop2public(uint8_t slop)
+{
+        return (slop * 4);
+}
+
+uint8_t temp_slop2internal(temp_1_20_t T)
+{
+        return (T + 2) / 4;
+}
 
 static temp_data_IU_t temp_meas_IU(uint8_t channel)
 {
@@ -279,33 +287,37 @@ static void temp_loop_(uint8_t channel)
                 temp_data[channel].status = temp_status_IU_stabilizing;
                 return;
         } else if (temp_data[channel].status == temp_status_IU_stabilizing) {
-                temp_data[channel].status = temp_status_IU_setting;
+                temp_data[channel].status = temp_status_IU_valid;
                 temp_data[channel].T_want = Pt_RtoT(R);
-        } else if (temp_data[channel].status == temp_status_IU_setting) {
-                temp_1_20_t T_dest, T_want, T_want_old;
-                uint8_t T_slope;
+        }
 
-                T_dest = temp_data[channel].T_dest;
-                T_want_old = T_want = temp_data[channel].T_want;
-                T_slope = temp_data[channel].T_slope;
+        if (SCPI_OPER.condition & SCPI_OPER_SWE) {
+                if (temp_data[channel].mode == temp_mode_fix) {
+                        temp_1_20_t T_dest, T_want, T_want_old;
+                        uint8_t T_slope;
 
-                if (T_dest < T_want) {
-                        T_want -= T_slope;
-                        /* if (numeric underflow || ...) */
-                        if (T_want > T_want_old || T_want < T_dest)
-                                T_want = T_dest;
-                } else {
-                        T_want += T_slope;
-                        if (T_want < T_want_old || T_want > T_dest)
-                                T_want = T_dest;
-                }
+                        T_dest = temp_data[channel].T_dest;
+                        T_want_old = T_want = temp_data[channel].T_want;
+                        T_slope = temp_data[channel].T_slope;
 
-                temp_data[channel].T_want = T_want;
+                        if (T_dest < T_want) {
+                                T_want -= T_slope;
+                                /* if (numeric underflow || ...) */
+                                if (T_want > T_want_old || T_want < T_dest)
+                                        T_want = T_dest;
+                        } else {
+                                T_want += T_slope;
+                                if (T_want < T_want_old || T_want > T_dest)
+                                        T_want = T_dest;
+                        }
 
-                if (T_dest == T_want)
-                        temp_data[channel].status = temp_status_IU_valid;
-        } else if (temp_data[channel].status == temp_status_IU_valid) {
-                if (temp_data[channel].mode == temp_mode_list) {
+                        temp_data[channel].T_want = T_want;
+
+                        /* FIXME: stop sweping */
+                        if (T_dest == T_want)
+                                temp_data[channel].status = temp_status_IU_valid;
+
+                } else if (temp_data[channel].mode == temp_mode_list) {
                         /* TODO: ... */
                 } else if (temp_data[channel].mode == temp_mode_prog) {
                         /* TODO: ... */
@@ -353,14 +365,7 @@ uint16_t temp_dwel_get(uint8_t channel)
 
 void temp_dwel_set(uint8_t channel, uint16_t dwel)
 {
-//        temp_1_20_t slope;
-
         temp_data[channel].dwel = dwel;
-        
-        /* TODO:
-        dwel *= 4;
-        slope = (dT + dwel - 1) / dwel;
-        temp_data[channel].slope = slop;*/
 }
 
 temp_1_20_t temp_get(uint8_t channel)
@@ -415,18 +420,21 @@ void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
 
 temp_1_20_t temp_slope_get(uint8_t channel)
 {
-        return temp_data[channel].T_slope * 4;
+        return temp_slop2public(temp_data[channel].T_slope);
 }
 
 void temp_slope_set(uint8_t channel, temp_1_20_t slope)
 {
-        slope = (slope + 2) / 4;
-        temp_data[channel].T_slope = slope;
+        temp_data[channel].T_slope = temp_slop2internal(slope);
 }
 
 void temp_trg(void)
 {
-        //SCPI_OPER_cond_set(SCPI_OPER_SWE);
+        if (SCPI_OPER.condition & SCPI_OPER_SWE) {
+                SCPI_err_set(&SCPI_err_210);
+                return;
+        }
+        SCPI_OPER_cond_set(SCPI_OPER_SWE);
 }
 
 temp_1_20_t temp_want_get(uint8_t channel)
@@ -438,7 +446,6 @@ void temp_want_set(uint8_t channel, temp_1_20_t T)
 {
         temp_data[channel].T_dest = T;
         if (temp_data[channel].status == temp_status_IU_valid) {
-                temp_data[channel].status = temp_status_IU_setting;
                 temp_data[channel].T_want = Pt_RtoT(temp_data[channel].R);
         }
 }

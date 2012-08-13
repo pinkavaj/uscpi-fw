@@ -7,6 +7,7 @@
 #define LIST_MAX 4
 
 typedef struct {
+        uint8_t slop;
         temp_1_20_t T;
         uint16_t dwel;
 } list_t;

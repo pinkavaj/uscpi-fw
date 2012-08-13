@@ -83,6 +83,44 @@ SCPI_parse_t SCPI_IC_sens_list_dwel(void)
         return SCPI_parse_end;
 }
 
+SCPI_parse_t SCPI_IC_sens_list_slop(void)
+{
+        uint8_t channel;
+        uint8_t poin = 0;
+        SCPI_parse_t ret;
+        temp_1_20_t slop;
+
+        channel = get_temp_channel();
+        if (_SCPI_CMD_IS_QUEST()) {
+                uint8_t poin_end;
+
+                poin_end = list_temp_poin[channel];
+                while (poin < poin_end)
+                        SCPI_print_temp_1_20(
+                                        temp_slop2public(
+                                                list[channel][poin++].slop));
+                return SCPI_parse_end;
+        }
+        do {
+                ret = SCPI_in_temp_1_20(&slop);
+                if (ret == SCPI_parse_err)
+                        return ret;
+                list[channel][poin++].slop = temp_slop2internal(slop);
+        } while (poin < SCPI_params_count);
+        /* if specified only one value, is used for all items in list */
+        if (poin == 1) {
+                uint16_t slop;
+
+                slop = list[channel][0].slop;
+                do {
+                        list[channel][poin++].slop = slop;
+                } while(poin < LIST_MAX);
+        } else 
+                list_temp_poin[channel] = poin;
+
+        return SCPI_parse_end;
+}
+
 SCPI_parse_t SCPI_IC_sens_list_temp(void)
 {
         uint8_t channel;
@@ -138,6 +176,14 @@ static const SCPI_cmd_t SCPI_cmd_sens_list_dwel_P PROGMEM = {
         .set_params_opt_P = LIST_MAX - 1,
 };
 
+static const SCPI_cmd_t SCPI_cmd_sens_list_slop_P PROGMEM = {
+        .parser_P = SCPI_IC_sens_list_slop, 
+        .get_P = 1,
+        .set_P = 1,
+        .set_params_min_P = 1,
+        .set_params_opt_P = LIST_MAX - 1,
+};
+
 static const SCPI_cmd_t SCPI_cmd_sens_list_temp_P PROGMEM = {
         .parser_P = SCPI_IC_sens_list_temp, 
         .get_P = 1,
@@ -157,6 +203,11 @@ static const SCPI_branch_item_t SCPI_bt_sens_list_dwel_P[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
+static const SCPI_branch_item_t SCPI_bt_sens_list_slop_P[] PROGMEM = {
+	_SCPI_BRANCH_(key_poin_P, &SCPI_cmd_sens_list_temp_poin_P, NULL),
+	_SCPI_branch_END_,
+};
+
 static const SCPI_branch_item_t SCPI_bt_sens_list_temp_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_poin_P, &SCPI_cmd_sens_list_temp_poin_P, NULL),
 	_SCPI_branch_END_,
@@ -166,6 +217,8 @@ const SCPI_branch_item_t SCPI_bt_sens_list_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_coun_P, &SCPI_cmd_sens_list_coun_P, NULL),
 	_SCPI_BRANCH_(key_dwel_P, &SCPI_cmd_sens_list_dwel_P, 
                         SCPI_bt_sens_list_dwel_P),
+	_SCPI_BRANCH_(key_slop_P, &SCPI_cmd_sens_list_slop_P, 
+                        SCPI_bt_sens_list_slop_P),
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_sens_list_temp_P, 
                         SCPI_bt_sens_list_temp_P),
 	_SCPI_branch_END_,
