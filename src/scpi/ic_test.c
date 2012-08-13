@@ -105,6 +105,20 @@ SCPI_parse_t SCPI_IC_test_temp(char UNUSED(c))
         return SCPI_parse_end;
 }
 
+SCPI_parse_t SCPI_IC_test_temp_res(char UNUSED(c))
+{
+        uint16_t val;
+
+        if (SCPI_params_count != 1)
+                return SCPI_parse_err;
+
+        SCPI_in_uint16(&val);
+        val = Pt_TtoR(val);
+
+        print_uint32(val);
+        return SCPI_parse_end;
+}
+
 SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
 {
 	print_uint32(time_sec);

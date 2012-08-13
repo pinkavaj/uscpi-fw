@@ -136,6 +136,7 @@ static const char SCPI_kw_next_P[] PROGMEM = "NEXT";
 static const char SCPI_kw_oper_P[] PROGMEM = "OPERATION";
 static const char SCPI_kw_pres_P[] PROGMEM = "PRESET";
 static const char SCPI_kw_ques_P[] PROGMEM = "QUESTIONABLE";
+static const char SCPI_kw_res_P[]  PROGMEM = "RESISTANCE";
 static const char SCPI_kw_stat_P[] PROGMEM = "STATUS";
 static const char SCPI_kw_syst_P[] PROGMEM = "SYSTEM";
 static const char SCPI_kw_temp_P[] PROGMEM = "TEMPERATURE";
@@ -157,6 +158,7 @@ _SCPI_key_(next, SHORT4B);
 _SCPI_key_(oper, SHORT4B);
 _SCPI_key_(pres, SHORT4B);
 _SCPI_key_(ques, SHORT4B);
+_SCPI_key_(res, SHORT3B);
 _SCPI_key_(stat, SHORT4B);
 _SCPI_key_(syst, SHORT4B);
 _SCPI_key_(temp, SHORT4B);
@@ -195,6 +197,7 @@ _SCPI_CMD_(test_heat, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_mul,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_num,  GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_temp, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_temp_res, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_time, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
@@ -233,13 +236,18 @@ static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
+static const SCPI_branch_item_t SCPI_bt_test_temp_P[] PROGMEM = {
+	_SCPI_BRANCH_(SCPI_key_res_P, &SCPI_cmd_test_temp_res_P, NULL),
+	_SCPI_branch_END_,
+};
+
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_div_P, &SCPI_cmd_test_div_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_heat_P, &SCPI_cmd_test_heat_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_mul_P, &SCPI_cmd_test_mul_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_num_P, &SCPI_cmd_test_num_P, NULL),
-	_SCPI_BRANCH_(SCPI_key_temp_P, &SCPI_cmd_test_temp_P, NULL),
+	_SCPI_BRANCH_(SCPI_key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
 	_SCPI_BRANCH_(SCPI_key_time_P, &SCPI_cmd_test_time_P, NULL),
 	_SCPI_branch_END_,
 };

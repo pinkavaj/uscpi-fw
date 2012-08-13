@@ -13,14 +13,14 @@ class Pt:
         self.R0 = float(R0)
 
     def temperature(self, R):
-        "Compute temperature from resistivity."
+        "Compute temperature from resistance."
         a = 2 * self.R0 * self.B
         b = self.R0 * self.A
         c = self.R0 - R
         return ((-b) + sqrt( b ** 2 - 2 * a * c)) / a
 
-    def resistivity(self, temp):
-        "Compute resistivity from temperature (°C)."
+    def resistance(self, temp):
+        "Compute resistance from temperature (°C)."
         temp = float(temp)
         return self.R0 * (1 + (self.A * temp) + self.B * (temp ** 2))
 
@@ -31,5 +31,5 @@ if __name__ == '__main__':
     s = Pt(10)
     print("R0 = 10{\Omega}")
     print("T = Pt(R=13) = %f" % s.temperature(13))
-    print("R = Pt(T=105°C) = %f" % s.resistivity(105))
+    print("R = Pt(T=105°C) = %f" % s.resistance(105))
 
