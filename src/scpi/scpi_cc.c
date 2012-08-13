@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "scpi_cmd.h"
+#include "scpi_cmd_tools.h"
 #include "scpi_parser.h"
 #include "status_reporting.h"
 #include "lib/extlib.h"

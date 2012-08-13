@@ -25,12 +25,5 @@ SCPI_parse_t SCPI_IC_test_time(char c);
 SCPI_parse_t SCPI_IC_test_heat(char c);
 #endif
 
-/* SCPI Tools */
-SCPI_parse_t SCPI_in_uint8(uint8_t *x);
-SCPI_parse_t SCPI_in_uint16(uint16_t *x);
-SCPI_parse_t SCPI_in_uint32(uint32_t *x);
-SCPI_parse_t SCPI_cmd_err_108(void);
-
 #endif
-
 /* :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab */

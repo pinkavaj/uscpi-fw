@@ -54,6 +54,29 @@ void SCPI_err_set(const SCPI_err_t *e)
 	}
 }
 
+const SCPI_err_t* SCPI_err_pop(void)
+{
+	const SCPI_err_t *e;
+
+	ATOMIC_BLOCK(ATOMIC_FORCEON) {
+		if (SCPI_err_count == 0) 
+			e = &SCPI_err_0;
+		else {
+			e = SCPI_err[0];
+			memmove(SCPI_err, SCPI_err + 1,
+					(SCPI_ERR_MAX - 1) * sizeof(void *));
+			/* Error queue overflow indicated by 
+			 * SCPI_err_count > SCPI_ERR_MAX */
+			if (--SCPI_err_count == SCPI_ERR_MAX) 
+				SCPI_err[SCPI_ERR_MAX - 1] = &SCPI_err_350;
+			if (!SCPI_err_count)
+				SCPI_STB_reset(SCPI_STB_EEQ);
+		}
+	}
+
+	return e;
+}
+
 void SCPI_err_queue_reset(void)
 {
 	SCPI_err_count = 0;

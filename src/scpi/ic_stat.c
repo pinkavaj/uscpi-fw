@@ -2,9 +2,11 @@
 #include <string.h>
 
 #include "scpi_cmd.h"
+#include "scpi_cmd_tools.h"
+#include "scpi_parser.h"
+#include "status_reporting.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
-
 
 /* Value of OPERation Status Register */
 SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
@@ -66,36 +68,6 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 {
 	print_uint32(SCPI_QUES_even_get());
-	return SCPI_parse_end;
-}
-
-/* Get (next) error from error queue */
-SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
-{
-	const SCPI_err_t *e;
-
-	ATOMIC_BLOCK(ATOMIC_FORCEON) {
-		if (SCPI_err_count == 0) 
-			e = &SCPI_err_0;
-		else {
-			e = SCPI_err[0];
-			memmove(SCPI_err, SCPI_err + 1, 
-					(SCPI_ERR_MAX - 1) * sizeof(void *));
-			/* Error queue overflow indicated by 
-			 * SCPI_err_count > SCPI_ERR_MAX */
-			if (--SCPI_err_count == SCPI_ERR_MAX) 
-				SCPI_err[SCPI_ERR_MAX - 1] = &SCPI_err_350;
-			if (!SCPI_err_count)
-				SCPI_STB_reset(SCPI_STB_EEQ);
-		}
-	}
-	print_P((const char*)pgm_read_word(&e->str_P));
-	return SCPI_parse_end;
-}
-
-SCPI_parse_t SCPI_IC_syst_vers(char UNUSED(c))
-{
-	print_P(SCPI_version_P);
 	return SCPI_parse_end;
 }
 

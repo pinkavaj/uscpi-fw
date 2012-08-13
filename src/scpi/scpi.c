@@ -44,7 +44,7 @@ static uint8_t SCPI_param_in_buf_idx;
 static SCPI_parse_t (*_SCPI_parser)(char);
 
 #include "scpi_tree.c"
-#include "scpi_ic.c"
+//#include "scpi_ic.c"
 #include "scpi_cmd_tools.c"
 
 /* Get SCPI keyword [a-zA-Z] or skip to next parser */

@@ -26,6 +26,7 @@ extern const SCPI_err_t SCPI_err_361;
 extern const SCPI_err_t SCPI_err_362;
 extern const SCPI_err_t SCPI_err_363;
 
+const SCPI_err_t* SCPI_err_pop(void);
 void SCPI_err_queue_reset(void);
 void SCPI_err_set(const SCPI_err_t *e);
 
