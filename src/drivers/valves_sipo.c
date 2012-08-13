@@ -17,6 +17,17 @@ void valves_sipo_init(void)
 	BIT_SET(VALVE_SIPO1x_PORT, VALVE_SIPO1x_SCL);
 }
 
+/**
+ * Send wanted valve state into SIPO.
+ **/
+static void valve_sipo1_send(void)
+{
+	SPI_transfer8b(sipo_state);
+	BIT_SET(VALVE_SIPO1x_PORT, VALVE_SIPO1x_RCK);
+	_delay_loop_1(1);
+	BIT_CLR(VALVE_SIPO1x_PORT, VALVE_SIPO1x_RCK);
+}
+
 // TODO: volat valves_sipo1_timeout jednou za 0.5 sec
 
 /**
@@ -36,17 +47,6 @@ void valves_sipo1_timeout(void)
 
         sipo_state = (sipo_state & ~(a << 1)) |  (b >> 1);
         valve_sipo1_send();
-}
-
-/**
- * Send wanted valve state into SIPO.
- **/
-static void valve_sipo1_send(void)
-{
-	SPI_transfer8b(sipo_state);
-	BIT_SET(VALVE_SIPO1x_PORT, VALVE_SIPO1x_RCK);
-	_delay_loop_1(1);
-	BIT_CLR(VALVE_SIPO1x_PORT, VALVE_SIPO1x_RCK);
 }
 
 void valve_sipo1_0_close(void)

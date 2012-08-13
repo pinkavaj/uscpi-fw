@@ -120,27 +120,30 @@ static SCPI_parse_t SCPI_IC_test_func_int(void)
 
 static SCPI_parse_t SCPI_IC_test_port(void)
 {
-        uint8_t x;
+        uint8_t port;
         SCPI_parse_t ret;
 
-	ret = SCPI_in_uint8(&x);
+		ret = SCPI_in_uint8(&port);
         if (ret == SCPI_parse_err)
                 return ret;
 
-		uint16_t val;
-		if (x == 0) {
-			val = PORTA;
-		} else if (x == 1) {
-			val = PORTB;
-		} else if (x == 2) {
-			val = PORTC;
-		} else if (x == 3) {
-			val = PORTD;
-		} else {
-			val = 0xffff;
-		}
+		if (_SCPI_CMD_IS_QUEST()) {
+			uint16_t val;
+			if (port == 0) {
+				val = PORTA;
+			} else if (port == 1) {
+				val = PORTB;
+			} else if (port == 2) {
+				val = PORTC;
+			} else if (port == 3) {
+				val = PORTD;
+			} else {
+				val = 0xffff;
+			}
 
-	SCPI_print_uint16(val);
+			SCPI_print_uint16(val);
+        	return SCPI_parse_end;
+		}
 
         return SCPI_parse_end;
 }
