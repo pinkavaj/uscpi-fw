@@ -113,18 +113,12 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
 	}
 	/* find keywork in keyword table */
 	do {
-		uint8_t len;
-		SCPI_key_t *key;
+		const SCPI_key_t *key;
 
-		key = (SCPI_key_t*)pgm_read_word(&branch->key_P);
+		key = (const SCPI_key_t*)pgm_read_word(&branch->key_P);
 		if (key == NULL)
 			return SCPI_err_set_(&SCPI_err_113);
-		/* if lenght of current keyword is equal to lenght of long or 
-		 * short form of keyword */
-		len = pgm_read_byte(&key->len_short_P);
-                if (len != kw_len)
-                        len = kw_len + 1;
-		if(!strncmp_P(SCPI_in, key->keyword_P, len))
+		if(!keycmp_P(SCPI_in, key))
 			break;
 		branch++;
 	} while(1);
