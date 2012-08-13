@@ -5,19 +5,8 @@
 #include "stat_report.h"
 #include "scpi.h"
 
-typedef struct {
-	/* TODO: add transition filter support */
-	uint16_t condition;
-	uint16_t transition_up;
-	uint16_t transition_down;
-	uint16_t enabled;
-	uint16_t event;
-} SCPI_status_reg_t;
-
-static SCPI_status_reg_t SCPI_OPER = {
-        .transition_down = SCPI_OPER_SWE,
-};
-static SCPI_status_reg_t SCPI_QUES;
+SCPI_status_reg_t SCPI_OPER;
+SCPI_status_reg_t SCPI_QUES;
 
 static struct {
 	uint8_t status;
@@ -47,24 +36,6 @@ uint8_t SCPI_STB_get(void)
 	return status;
 }
 
-/* Return operational condition register */
-uint16_t SCPI_OPER_cond_get(void)
-{
-	return SCPI_OPER.condition;
-}
-
-/* return operational condition enabled register */
-uint16_t SCPI_OPER_enab_get(void)
-{
-	return SCPI_OPER.enabled;
-}
-
-/* Set new value for operational status enabled */
-void SCPI_OPER_enab_set(uint16_t val)
-{
-	SCPI_OPER.enabled = val;
-}
-
 /* Set bit(s) in Operation Status Register */
 void SCPI_OPER_cond_set(uint16_t val)
 {
@@ -92,11 +63,6 @@ uint16_t SCPI_OPER_even_get(void)
 	return val;
 }
 
-uint16_t SCPI_QUES_cond_get(void)
-{
-	return SCPI_QUES.condition;
-}
-
 /* Set bit(s) in Operation Status Register */
 void SCPI_QUES_cond_set(uint16_t val)
 {
@@ -110,17 +76,6 @@ void SCPI_QUES_cond_reset(uint16_t val)
 	SCPI_QUES.condition &= ~val;
 	val &= SCPI_QUES.transition_down;
 	SCPI_QUES.event |= val;
-}
-
-uint16_t SCPI_QUES_enab_get(void)
-{
-	return SCPI_QUES.enabled;
-}
-
-/* update QUEStionable enable register changed */
-void SCPI_QUES_enab_set(uint16_t enabled)
-{
-	SCPI_QUES.enabled = enabled;
 }
 
 /* Get value of QUEStionable event register */

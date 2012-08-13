@@ -13,7 +13,7 @@
 /* Value of OPERation Status Register */
 SCPI_parse_t SCPI_IC_stat_oper_cond(void)
 {
-	SCPI_print_uint16(SCPI_OPER_cond_get());
+	SCPI_print_uint16(SCPI_OPER.condition);
 
         return SCPI_parse_end;
 }
@@ -22,19 +22,17 @@ SCPI_parse_t SCPI_IC_stat_oper_cond(void)
 SCPI_parse_t SCPI_IC_stat_oper_enab(void)
 {
         SCPI_parse_t ret;
-        uint16_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_print_uint16(SCPI_OPER_enab_get());
+		SCPI_print_uint16(SCPI_OPER.enabled);
 
                 return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_err_set_(&SCPI_err_108);
-	ret = SCPI_in_uint16(&val);
+	ret = SCPI_in_uint16(&SCPI_OPER.enabled);
         if (ret == SCPI_parse_err)
                 return ret;
-	SCPI_OPER_enab_set(val);
 
 	return ret;
 }
@@ -50,14 +48,18 @@ SCPI_parse_t SCPI_IC_stat_oper_even(void)
 /* Reset all status enable registers (and others) to default state */
 SCPI_parse_t SCPI_IC_stat_pres(void)
 {
-	SCPI_QUES_enab_set(0);
-	SCPI_OPER_enab_set(0);
+	SCPI_QUES.enabled = 0;
+        SCPI_QUES.transition_down = 0;
+        SCPI_QUES.transition_up = 0;
+	SCPI_OPER.enabled = 0;
+        SCPI_OPER.transition_down = SCPI_OPER_SWE;
+        SCPI_OPER.transition_up = 0;
 	return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_stat_ques_cond(void)
 {
-	SCPI_print_uint16(SCPI_QUES_cond_get());
+	SCPI_print_uint16(SCPI_QUES.condition);
 
         return SCPI_parse_end;
 }
@@ -65,19 +67,17 @@ SCPI_parse_t SCPI_IC_stat_ques_cond(void)
 SCPI_parse_t SCPI_IC_stat_ques_enab(void)
 {
         SCPI_parse_t ret;
-        uint16_t val;
 
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_print_uint16(SCPI_QUES_enab_get());
+		SCPI_print_uint16(SCPI_QUES.enabled);
 
                 return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
 		return SCPI_err_set_(&SCPI_err_108);
-	ret = SCPI_in_uint16(&val);
+	ret = SCPI_in_uint16(&SCPI_QUES.enabled);
         if (ret == SCPI_parse_err)
                 return SCPI_parse_err;
-	SCPI_QUES_enab_set(val);
 	return ret;
 }
 

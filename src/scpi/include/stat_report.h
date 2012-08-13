@@ -3,6 +3,15 @@
 
 #include <inttypes.h>
 
+typedef struct {
+	/* TODO: add transition filter support */
+	uint16_t condition;
+	uint16_t transition_up;
+	uint16_t transition_down;
+	uint16_t enabled;
+	uint16_t event;
+} SCPI_status_reg_t;
+
 /* SCPI Operation Status */
 #define SCPI_OPER_CALI	(1<<0)
 #define SCPI_OPER_SETT	(1<<1)
@@ -19,11 +28,9 @@
 #define SCPI_OPER_USR5	(1<<12)
 #define SCPI_OPER_INST	(1<<13)
 #define SCPI_OPER_PROG	(1<<14)
-uint16_t SCPI_OPER_cond_get(void);
+SCPI_status_reg_t SCPI_OPER; 
 void SCPI_OPER_cond_set(uint16_t val);
 void SCPI_OPER_cond_reset(uint16_t val);
-uint16_t SCPI_OPER_enab_get(void);
-void SCPI_OPER_enab_set(uint16_t val);
 uint16_t SCPI_OPER_even_get(void);
 /* Questionable Status */
 #define SCPI_QUES_VOLT	(1<<0)
@@ -41,9 +48,7 @@ uint16_t SCPI_OPER_even_get(void);
 #define SCPI_QUES_USR4	(1<<12)
 #define SCPI_QUES_INST	(1<<13)
 #define SCPI_QUES_CMDW	(1<<14)
-uint16_t SCPI_QUES_enab_get(void);
-void SCPI_QUES_enab_set(uint16_t enabled);
-uint16_t SCPI_QUES_cond_get(void);
+SCPI_status_reg_t SCPI_QUES;
 void SCPI_QUES_cond_set(uint16_t val);
 void SCPI_QUES_cond_reset(uint16_t val);
 uint16_t SCPI_QUES_even_get(void);
