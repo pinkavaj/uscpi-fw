@@ -10,8 +10,10 @@
 /* Return channel <N> defined in CMD ( :TEMPerature<N> ) */
 static uint8_t get_temp_channel(void)
 {
+#if TEMP_CHANNELS != 1
         if (SCPI_num_suffixes_idx != 1)
                 SCPI_err_set(&SCPI_err_2);
+#endif
 
         return SCPI_num_suffixes[0];
 }
