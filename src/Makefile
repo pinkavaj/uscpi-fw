@@ -3,6 +3,11 @@
 
 # port where JTAG programmer is connected
 PROG_PORT=/dev/ttyS0
+PROG_BAUDRATE=115200
+
+#PROG_PORT=/dev/ttyUSB0
+#PROG_BAUDRATE=19200
+
 DEV_PORT=/dev/ttyUSB0
 
 # Name of target controller
@@ -37,7 +42,12 @@ SRC+=scpi/scpi.c \
      scpi/key.c \
      scpi/stat_report.c
 SRC+=drivers/usart.c drivers/timer.c
-SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
+SRC+=drivers/spi_dev.c \
+	 drivers/spi.c \
+	 drivers/ad974.c \
+	 drivers/max1068.c \
+	 drivers/mcp4922.c \
+	 drivers/tlv5610.c
 
 OBJ=main.o math_cust.o
 CC=avr-gcc
@@ -68,10 +78,12 @@ CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 all: hex
 
 load: hex
-	avrdude -p m162 -c avr910 -b 115200 -P ${PROG_PORT} \
+	avrdude -p m162 -c avr910 -b ${PROG_BAUDRATE} -P ${PROG_PORT} \
 		-U flash:w:${PROJECT}.hex:i 2>&1 | \
 		grep -v "Device code" || true
-	avrdude -p m162 -c avr910 -b 115200 -P ${PROG_PORT} \
+
+pass:
+	avrdude -p m162 -c avr910 -b ${PROG_BAUDRATE} -P ${PROG_PORT} \
 		-U eeprom:w:${PROJECT}_eeprom.hex:i 2>&1 | \
 		grep -v "Device code" || true
 

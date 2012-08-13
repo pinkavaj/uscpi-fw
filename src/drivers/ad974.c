@@ -9,6 +9,8 @@
  * published by the Free Software Foundation.
  *****************************************************************************/
 
+#ifdef DEVICE_IMPA444_ASU
+
 #include "config.h"
 #include <util/delay.h>
 #include <util/delay_basic.h>
@@ -90,7 +92,7 @@ void ad974_select(void)
 }
 
 /*****************************************************************************/
-uint8_t ad974_spi_mode()
+uint8_t ad974_spi_mode(void)
 {
 	return SPI_CLOCK_1_4 |
 		SPI_PHASE_TRAIL |
@@ -100,3 +102,10 @@ uint8_t ad974_spi_mode()
 		SPI_ENABLE;
 }
 
+#else
+
+void ad974_io_init(void)
+{
+}
+
+#endif

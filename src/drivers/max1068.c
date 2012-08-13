@@ -25,31 +25,55 @@ void max1068_io_init(void)
 	PORT_MODIFY(MAX1068_PORT, MAX1068_MASK, (MAX1068_0_CS | MAX1068_1_CS));
 }
 
-void max1068_X_select(void)
+uint8_t max1068_spi_mode(void)
 {
-        /* FIXME: select/deselect pro nastavení CS */
-/*        SPI_set_mode();*/
+	return SPI_CLOCK_1_4 |
+		SPI_PHASE_TRAIL |
+		SPI_POL_LOW |
+		SPI_DORD_MSB |
+		SPI_MODE_MASTER |
+		SPI_ENABLE;
 }
 
-uint16_t max1068_get_sample(uint8_t channel)
+void max1068_select(void)
 {
-        uint16_t result;
+    SPI_set_mode(max1068_spi_mode());
+}
 
-        BIT_CLR(MAX1068_PORT, MAX1068_0_CS);
-	
-	#define MAX1068_SETTINGS 0x01
-	/* single channel, no scan; always on; internal clock */
-        channel =<< 5;		// send address in form AAAsssss
-        channel |= MAX1068_SETTINGS;
+/* FIXME: deselect */
 
-        SPI_transfer8b(channel);
-        _delay_us(8);		// wait for conversion
-        result = SPI_transfer16b(0);
+uint16_t max1068_get_sample_(uint8_t channel)
+{
+	/* single channel, no scan, always on, internal clock */
+#define MAX1068_SETTINGS 0x01
+	// 0bAAAccccc; A - channel address, c - configuration bit
+	channel = (channel << 5) | MAX1068_SETTINGS;
 
-        BIT_SET(MAX1068_PORT, MAX1068_0_CS);
+	SPI_transfer8b(channel);
+	_delay_us(8);		// wait for conversion
+	return SPI_transfer16b(0);
+}
 
-        return result;
+uint16_t max1068_0_get_sample(uint8_t channel)
+{
+	uint16_t result;
+
+	BIT_CLR(MAX1068_PORT, MAX1068_0_CS);
+	result = max1068_get_sample_(channel);
+	BIT_SET(MAX1068_PORT, MAX1068_0_CS);
+
+	return result;
+}
+
+uint16_t max1068_1_get_sample(uint8_t channel)
+{
+	uint16_t result;
+
+	BIT_CLR(MAX1068_PORT, MAX1068_1_CS);
+	result = max1068_get_sample_(channel);
+	BIT_SET(MAX1068_PORT, MAX1068_1_CS);
+
+	return result;
 }
 
 /* FIXME: dodělat další elementární fukce + hlavička */
-

@@ -9,7 +9,7 @@
 #define DDR_OUT(b) (b)
 
 
-#if DEVICE_NAME == IMPA444_ASU
+#if DEVICE_NAME == DEVICE_IMPA444_ASU
 /* AD974 */
 #define AD974_PORT	PORTA
 #define AD974_DDR	DDRA
@@ -35,7 +35,7 @@
 #define MCP4922_LD _BV(PA7)
 #define MCP4922_MASK (MCP4922_CS | MCP4922_LD)
 
-#elif DEVICE_NAME == MSA_HCU814
+#elif DEVICE_NAME == DEVICE_MSA_HCU814
 
 /* DAQ8H = DAQ subsystem for HCU814 
    2x MAX1068 + 1x TLV5610 */
@@ -61,6 +61,8 @@
 #define TLV5610_CLR  _BV(PA4) // out, 1
 #define TLV5610_LD   _BV(PA5) // out, 1
 #define TLV5610_MASK	( TLV5610_CS | TLV5610_CLR | TLV5610_LD)
+
+#endif
 
 #endif
 

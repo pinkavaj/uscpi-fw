@@ -15,13 +15,12 @@
 
 #include "drivers/iodef.h"
 #include "drivers/spi.h"
-#include "drivers/max1068.h"
+#include "drivers/tlv5610.h"
 
 #define TLV5610_DATA_MASK	0x0fff
 #define TLV5610_ADDRESS_MASK	0xf000
 
 /* ukazka definic, tyto features nepouzivame */
-
 #define TLV5610_ADDRESS_CTRL0	0x8000
 #define TLV5610_ADDRESS_CTRL1	0x9000
 #define TLV5610_ADDRESS_PRESET	0xA000
@@ -62,7 +61,6 @@ void tlv5610_io_init(void)  // vlastni DAC neni treba inicializovat
 /*****************************************************************************/
 void tlv5610_select(void)
 {
-        /* FIXME: select/deselect -> nastavení CS */
 	SPI_set_mode(tlv5610_spi_mode());
 }
 
@@ -84,28 +82,25 @@ uint8_t tlv5610_width(void)
 }
 
 /*****************************************************************************/
-static void tlv5610_write(uint16_t datastring)
+static void tlv5610_write_channel(uint8_t ch, uint16_t val)
 {
-	BIT_CLR(TLV5610_PORT, TLV5610_CS);
-
-	/* send new value to latch, Hi Lo */ 
-	SPI_transfer16b(datastring);
-	/* send latch to output 40ns to setup, 100ns width */
-	BIT_CLR(TLV5610_PORT, TLV5610_LD);
-	_delay_loop_1(1);
-	BIT_SET(TLV5610_PORT, TLV5610_LD);
-
-	BIT_SET(TLV5610_PORT, TLV5610_CS);
+	// nepouziji masku, ale vypocet s kontrolou
+	if (/* ch >= 0 && */ ch < 8) {
+		val = val | ((uint16_t)ch << 12);
+		/* send new value to latch, Hi Lo */ 
+		SPI_transfer16b(val);
+		/* send latch to output 40ns to setup, 100ns width */
+		BIT_CLR(TLV5610_PORT, TLV5610_LD);
+		_delay_loop_1(1);
+		BIT_SET(TLV5610_PORT, TLV5610_LD);
+	}
 }
 
 /*****************************************************************************/
-void tlv5610_write_channel(uint8_t ch, uint16_t val)
+void tlv5610_0_write_channel(uint8_t ch, uint16_t val)
 {
-/* test channel */
-	// nepouziji masku, ale vypocet s kontrolou
-	if (ch >= 0 && ch =< 7) {
-		val = val | ((uint16_t)ch << 12);
-		tlv5610_write(val);
-	}
+	BIT_CLR(TLV5610_PORT, TLV5610_CS);
+	tlv5610_write_channel(ch, val);
+	BIT_SET(TLV5610_PORT, TLV5610_CS);
 }
 

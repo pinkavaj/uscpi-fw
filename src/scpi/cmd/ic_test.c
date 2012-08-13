@@ -17,10 +17,19 @@
 #include "lib/thermometer_pt.h"
 #include "temp.h"
 
+#if (DEVICE_NAME == DEVICE_IMPA444_ASU)
+#define SPI_DEV_AD_0 SPI_DEV_AD974_0
+#define SPI_DEV_DA_0 SPI_DEV_MCP4922_0
+#elif (DEVICE_NAME == DEVICE_MSA_HCU814)
+#define SPI_DEV_AD_0 SPI_DEV_MAX1068_0
+#define SPI_DEV_AD_1 SPI_DEV_MAX1068_1
+#define SPI_DEV_DA_0 SPI_DEV_TLV5610_0
+#endif
+
 static SCPI_parse_t SCPI_IC_test_adc(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SPI_dev_select(SPI_DEV_AD974_0);
+		SPI_dev_select(SPI_DEV_AD_0);
 
 		for (uint8_t channel = 0; ; channel++) {
 			uint16_t sample;
@@ -35,7 +44,7 @@ static SCPI_parse_t SCPI_IC_test_adc(void)
 	} else {
                 uint16_t val;
 
-		SPI_dev_select(SPI_DEV_MCP4922_0);
+		SPI_dev_select(SPI_DEV_DA_0);
 
 		SCPI_in_uint16(&val);
 		SPI_dev_DA_set_output(0, val);
