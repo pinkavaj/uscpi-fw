@@ -22,7 +22,7 @@ PROJECT=uSCPIfw
 # (NOT .s !!!) for assembly source code files.
 INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 
-SRC=-c main.c
+SRC=main.c
 SRC+=lib/iobuf.c \
      lib/math_cust.S \
      lib/pic16.c \
@@ -54,7 +54,7 @@ SRC+=drivers/spi_dev.c \
 #	 drivers/max1068.c \
 #	 drivers/tlv5610.c \
 
-OBJ=main.o math_cust.o
+OBJ=$(SRC:%.c=%.o)
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
@@ -64,9 +64,9 @@ CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 	-Wall -Wstrict-prototypes -Wstrict-aliasing=1 -Wextra -pedantic \
 	-ffreestanding -fshort-enums -fstrict-aliasing -funsigned-char \
 	-funsigned-bitfields ${INC} \
-	--combine -fwhole-program 
+	-flto
 #debug
-#CFLAGS=-g --std=gnu99 -O1 -mmcu=$(MCU) -mrelax ${INC} -DF_CPU=${F_CPU} --combine
+#CFLAGS=-g --std=gnu99 -O1 -mmcu=$(MCU) -mrelax ${INC} -DF_CPU=${F_CPU} -flto
 
 # 
 # experimental stuff
@@ -78,7 +78,7 @@ CFLAGS=-g --std=gnu99 -Os -mmcu=$(MCU) -mrelax \
 #  Make code a little bigger, but might be usefull
 #  -mcall-prologues
 # Deprecated, not working, broke program
-#CFLAGS+= --combine -fwhole-program 
+#CFLAGS+= -flto
 
 all: hex
 
@@ -96,11 +96,13 @@ hex: link
 	$(OBJCOPY) -R .eeprom -O ihex ${PROJECT}.out ${PROJECT}.hex
 	$(OBJCOPY) -j .eeprom -O ihex ${PROJECT}.out ${PROJECT}_eeprom.hex
 
-link: build
+link: build ${OBJ}
 	$(CC) $(CFLAGS) ${OBJ} -o ${PROJECT}.out
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $^ -o $@
+
 build: ver clean
-	$(CC) $(CFLAGS) ${SRC}
 
 ver:
 	sed -i "s/VER_BUILD .*/VER_BUILD `svnversion | sed "s/.*://"`/" \

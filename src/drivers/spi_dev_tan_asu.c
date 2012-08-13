@@ -84,5 +84,3 @@ void SPI_dev_init(void) {
 /*	max1068_io_init();
 	tlv5610_io_init();*/
 }
-
-
