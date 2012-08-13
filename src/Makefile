@@ -18,7 +18,9 @@ PROJECT=uSCPIfw
 # Use .cc, .cpp or .C suffix for C++ files, use .S
 # (NOT .s !!!) for assembly source code files.
 INC=-I. -I/usr/lib/avr/include/
-SRC=-c main.c -c scpi.c -c usart.c -c timer.c -c spi.c -c math.S
+SRC=-c main.c -c math.S
+SRC+=-c scpi/scpi.c 
+SRC+=-c drivers/usart.c -c drivers/timer.c -c drivers/spi.c
 #OBJ=main.o scpi.o
 OBJ=main.o math.o
 CC=avr-gcc

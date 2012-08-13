@@ -2,7 +2,7 @@
 #include "usart.h"
 
 // FIXME: remove
-#include "scpi.h"
+#include "../scpi/scpi.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>

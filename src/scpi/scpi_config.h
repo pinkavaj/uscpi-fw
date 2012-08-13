@@ -1,7 +1,7 @@
 #ifndef __SCPI_CONFIG_H__
 #define __SCPI_CONFIG_H__
 
-#include "usart.h"
+#include "../drivers/usart.h"
 
 /* SCPI settings (IO) */
 

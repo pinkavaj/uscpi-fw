@@ -1,7 +1,7 @@
 #include "config.h"
-#include "spi.h"
-#include "timer.h"
-#include "usart.h"
+#include "drivers/spi.h"
+#include "drivers/timer.h"
+#include "drivers/usart.h"
 
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
