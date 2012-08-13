@@ -17,7 +17,8 @@
 #define	temp2 R30
 #define	temp3 R31
 
-#define	counter R28
+#define	counter R30
+#define zero R1
 #define dummy R2
 /*****************************************************************************/
 
@@ -45,13 +46,9 @@ R25:R22
 
 /*****************************************************************************/
 
-	push 	counter
-
-/*****************************************************************************/
 	clr	temp0
 	clr	temp1
-	movw	temp2, temp0
-	ldi	counter, 64
+	ldi	counter, 40
 
 udi1:
 	lsl	acc0
@@ -62,23 +59,22 @@ udi1:
 	rol	acc5
 	rol	acc6
 	rol	acc7
-
 	rol	temp0
 	rol	temp1
-	rol	temp2
-	rol	temp3
 
-	cp	temp0, reg0
-	cpc	temp1, reg1
-	cpc	temp2, reg2
-	cpc	temp3, reg3
+	cp	acc5, reg0
+	cpc	acc6, reg1
+	cpc	acc7, reg2
+	cpc	temp0, reg3
+	cpc	temp1, zero
 
 	brcs udi2
 
-	sub	temp0, reg0
-	sbc	temp1, reg1
-	sbc	temp2, reg2
-	sbc	temp3, reg3
+	sub	acc5, reg0
+	sbc	acc6, reg1
+	sbc	acc7, reg2
+	sbc	temp0, reg3
+	sbc	temp1, zero
 
 	inc	acc0
 
@@ -89,10 +85,7 @@ udi2:
 	movw	r22,	acc0
 	movw	r24,	acc2
 /*****************************************************************************/
-	pop 	counter
-
 	ret
-/*****************************************************************************/
 
 /*****************************************************************************/
 
