@@ -78,7 +78,7 @@ static SCPI_parse_t SCPI_parse_keyword_num(void)
 		return SCPI_err_set_(&SCPI_err_114);
 	/* Internal numbering is from 0 */
 	SCPI_num_suffixes[SCPI_num_suffixes_idx] = num_suffix - 1;
-	return SCPI_parse_keyword();
+	return SCPI_parse_keyword_question();
 }
 
 /* Just check whatever is keyword question (c == '?') */
@@ -129,7 +129,7 @@ static SCPI_parse_t SCPI_parse_keyword_sep(void)
         /* Check numeric suffix */
         num_suffix = SCPI_num_suffixes[SCPI_num_suffixes_idx];
         if (SCPI_cmd != NULL) {
-                num_suffix_max = pgm_read_word(&SCPI_cmd->num_suffix_max_P);
+                num_suffix_max = pgm_read_byte(&SCPI_cmd->num_suffix_max_P);
                 if (num_suffix_max > 0) {
                         SCPI_num_suffixes_idx++;
                 }
