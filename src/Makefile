@@ -18,7 +18,7 @@ PROJECT=uSCPIfw
 INC=-I. -Iinclude -I/usr/lib/avr/include/
 
 SRC=-c main.c
-SRC+=lib/heating.c lib/iobuf.c lib/math_cust.S lib/pic16.c
+SRC+=lib/heating.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/pt_temp_res.c
 SRC+=scpi/scpi.c scpi/scpi_cmd_ic_test.c scpi/status_reporting.c
 SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
@@ -53,10 +53,15 @@ all: hex
 
 load: hex
 	avrdude -p m162 -c avr910 -b 115200 -P ${PROG_PORT} \
-		-U flash:w:${PROJECT}.hex:i 2>&1 || true
+		-U flash:w:${PROJECT}.hex:i 2>&1 | \
+		grep -v "Device code" || true
+	avrdude -p m162 -c avr910 -b 115200 -P ${PROG_PORT} \
+		-U eeprom:w:${PROJECT}_eeprom.hex:i 2>&1 | \
+		grep -v "Device code" || true
 
 hex: link
 	$(OBJCOPY) -R .eeprom -O ihex ${PROJECT}.out ${PROJECT}.hex
+	$(OBJCOPY) -j .eeprom -O ihex ${PROJECT}.out ${PROJECT}_eeprom.hex
 
 link: build
 	$(CC) $(CFLAGS) ${OBJ} -o ${PROJECT}.out
@@ -80,5 +85,8 @@ clean:
 	find .  -name "*.out" -exec rm \{\} \;
 
 test:
-	cd ../test && ./run_tests ${DEV_PORT}
+	cd ../test && make
+
+pttable:
+	python ../../dhcu_2.0/tools/pt_table.py >lib/pt_temp_res.c
 

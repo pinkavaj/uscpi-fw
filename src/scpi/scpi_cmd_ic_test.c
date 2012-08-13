@@ -8,6 +8,7 @@
 
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
+#include "lib/heating.h"
 #include "lib/math_cust.h"
 
 SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
@@ -92,6 +93,20 @@ SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
 {
 	print_uint32(time_sec);
 	return SCPI_parse_end;
+}
+
+SCPI_parse_t SCPI_IC_test_heat(char UNUSED(c))
+{
+        uint16_t Icode, Ucode;
+
+        for(uint8_t channel = 0; channel < 1; channel++)
+        {
+                heating_daq_test(channel, &Icode, &Ucode);
+                print_uint32(Icode);
+                putc(',');
+                print_uint32(Ucode);
+        }
+        return SCPI_parse_end;
 }
 
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

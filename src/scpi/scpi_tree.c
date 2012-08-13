@@ -143,6 +143,7 @@ static const char SCPI_kw_vers_P[] PROGMEM = "VERSION";
 
 static const char SCPI_kw_adc_P[] PROGMEM = "ADC";
 static const char SCPI_kw_div_P[] PROGMEM = "DIV";
+static const char SCPI_kw_heat_P[] PROGMEM = "HEAT";
 static const char SCPI_kw_mul_P[] PROGMEM = "MUL";
 static const char SCPI_kw_num_P[] PROGMEM = "NUM";
 static const char SCPI_kw_test_P[] PROGMEM = "TEST";
@@ -162,6 +163,7 @@ _SCPI_key_(vers, SHORT4B);
 
 _SCPI_key_(adc, SHORT3B);
 _SCPI_key_(div, SHORT3B);
+_SCPI_key_(heat, SHORT4B);
 _SCPI_key_(mul, SHORT3B);
 _SCPI_key_(num, SHORT3B);
 _SCPI_key_(test, SHORT4B);
@@ -188,6 +190,7 @@ _SCPI_CMD_(syst_vers,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 _SCPI_CMD_(test_adc,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_div,  GET(YES, PARAMS_N), SET(YES, PARAMS(3, OPT_0, ATONCE_Y)));
+_SCPI_CMD_(test_heat, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_mul,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_num,  GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(test_time, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
@@ -231,6 +234,7 @@ static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
 	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_div_P, &SCPI_cmd_test_div_P, NULL),
+	_SCPI_BRANCH_(SCPI_key_heat_P, &SCPI_cmd_test_heat_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_mul_P, &SCPI_cmd_test_mul_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_num_P, &SCPI_cmd_test_num_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_time_P, &SCPI_cmd_test_time_P, NULL),

@@ -73,6 +73,9 @@ void TIMER1_jiff_alarm(uint8_t jiffer_idx)
 void TIMER1_delay_rel(uint16_t ticks)
 {
 	ticks += OCR1B;
+        if (ticks > TIMER1_TICKS_PER_PERIOD ||
+                        ticks < OCR1B)
+                ticks -= TIMER1_TICKS_PER_PERIOD;
 	OCR1B = ticks;
 	TIFR |= _BV(OCF1B);
 	TIMSK |= _BV(OCIE1B);

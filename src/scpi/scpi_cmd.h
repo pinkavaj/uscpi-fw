@@ -26,11 +26,14 @@ SCPI_parse_t SCPI_IC_stat_ques_even(char c);
 SCPI_parse_t SCPI_IC_syst_err_next(char c);
 SCPI_parse_t SCPI_IC_syst_vers(char c);
 
+#ifdef SCPI_TEST
 SCPI_parse_t SCPI_IC_test_adc(char c);
 SCPI_parse_t SCPI_IC_test_div(char c);
 SCPI_parse_t SCPI_IC_test_mul(char c);
 SCPI_parse_t SCPI_IC_test_num(char c);
 SCPI_parse_t SCPI_IC_test_time(char c);
+SCPI_parse_t SCPI_IC_test_heat(char c);
+#endif
 
 /* SCPI Tools */
 SCPI_parse_t SCPI_in_uint8(uint8_t *x);
