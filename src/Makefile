@@ -19,6 +19,7 @@ PROJECT=uSCPIfw
 # (NOT .s !!!) for assembly source code files.
 INC=-I. -I/usr/lib/avr/include/
 SRC=-c main.c -c math.S
+SRC=lib/math.S
 SRC+=-c scpi/scpi.c 
 SRC+=-c drivers/usart.c -c drivers/timer.c -c drivers/spi.c
 #OBJ=main.o scpi.o
