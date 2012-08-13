@@ -49,15 +49,17 @@ typedef enum {
 
 /* Temperature channel working data */
 /* R            - R from last measurement
- * T_want       - requested value of regulation
- * T_dest       - destination T for slope */
+ * T_dest       - destination T for slope
+ * T_slope      - slope of ramp to reach T_dest in units: °C*20/(sec*4)
+ * T_want       - requested value of regulation */
 typedef struct {
-        pic16_data_t pic;
         temp_mode_t mode;
+        pic16_data_t pic;
         FP_2_14_t R;
-        temp_1_20_t T_want;
-        temp_1_20_t T_dest;
         temp_status_IU_t status;
+        temp_1_20_t T_dest;
+        uint8_t T_slope;
+        temp_1_20_t T_want;
 } temp_data_t;
 
 /* Temperature channel constants */
@@ -145,6 +147,17 @@ void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
         pic_E = &temp_conf_E[channel].pic;
         eeprom_write_word((uint16_t *)&pic_E->gain_lin, pic_param.gain_lin);
         eeprom_write_word((uint16_t *)&pic_E->gain_int, pic_param.gain_int);
+}
+
+temp_1_20_t temp_slope_get(uint8_t channel)
+{
+        return temp_data[channel].T_slope * 4;
+}
+
+void temp_slope_set(uint8_t channel, temp_1_20_t slope)
+{
+        slope = (slope + 2) / 4;
+        temp_data[channel].T_slope = slope;
 }
 
 temp_data_IU_t temp_meas_IU(uint8_t channel)
@@ -321,18 +334,19 @@ static void temp_loop_(uint8_t channel)
                 temp_data[channel].T_want = Pt_RtoT(R);
         } else if (temp_data[channel].status == temp_status_IU_setting) {
                 temp_1_20_t T_dest, T_want, T_want_old;
-                int16_t slope = 5;
+                uint8_t T_slope;
 
                 T_dest = temp_data[channel].T_dest;
                 T_want_old = T_want = temp_data[channel].T_want;
+                T_slope = temp_data[channel].T_slope;
 
                 if (T_dest < T_want) {
-                        T_want -= slope;
+                        T_want -= T_slope;
                         /* if (numeric underflow || ...) */
                         if (T_want > T_want_old || T_want < T_dest)
                                 T_want = T_dest;
                 } else {
-                        T_want += slope;
+                        T_want += T_slope;
                         if (T_want < T_want_old || T_want > T_dest)
                                 T_want = T_dest;
                 }
@@ -403,6 +417,7 @@ void temp_init(void)
         {
                 channel--;
                 temp_output_DA(channel, 0);
+                temp_data[channel].T_slope = 1 * 20 / 4; /* 1°C/sec */
         }
 }
 

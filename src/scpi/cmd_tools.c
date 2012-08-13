@@ -97,4 +97,16 @@ SCPI_parse_t SCPI_in_FP_16_16(FP_16_16_t *x)
         return SCPI_parse_end;
 }
 
+void SCPI_print_temp_1_20(temp_1_20_t T)
+{
+        uint16_t T_fract;
+
+        T_fract = T % 20;
+        T = T / 20;
+
+        print_uint32(T);
+        putc('.');
+        print_uint32f(T_fract * 5, 2);
+}
+
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

@@ -110,12 +110,23 @@ SCPI_parse_t SCPI_IC_sour_temp_mode(void)
 SCPI_parse_t SCPI_IC_sour_temp_slop(void)
 {
         uint8_t channel;
+        SCPI_parse_t ret;
+        temp_1_20_t slope;
+        FP_16_16_t slope_;
 
         channel = get_temp_channel();
-        SCPI_err_set(&SCPI_err_1);
+        if (_SCPI_CMD_IS_QUEST()) {        
+                slope = temp_slope_get(channel);
+                SCPI_print_temp_1_20(slope);
+                return SCPI_parse_end;
+        }
+        ret = SCPI_in_FP_16_16(&slope_);
+        if (ret == SCPI_parse_err)
+                return ret;
 
-        /* TODO: ... */
-        return SCPI_parse_err;
+        slope = (((slope_ + (0x10000 / 40 - 1)) / 0x100) * 20) / 0x100;
+        temp_slope_set(channel, slope);
+        return SCPI_parse_end;
 }
 
 SCPI_parse_t SCPI_IC_sour_temp_spo(void)
@@ -128,9 +139,7 @@ SCPI_parse_t SCPI_IC_sour_temp_spo(void)
 
         if (_SCPI_CMD_IS_QUEST()) {
                 T = temp_want_get(channel);
-                print_uint32(T / 20);
-                putc('.');
-                print_uint32f((T % 20)*5, 2);
+                SCPI_print_temp_1_20(T);
                 return SCPI_parse_end;
         }
         ret = SCPI_in_FP_16_16(&T);
@@ -213,7 +222,7 @@ const SCPI_branch_item_t SCPI_bt_sour_temp_P[] PROGMEM = {
 	_SCPI_BRANCH_(key_lcon_P, &SCPI_cmd_sour_temp_lcon_gain_P, 
                         SCPI_bt_sour_temp_lcon_P),
 	_SCPI_BRANCH_(key_mode_P, &SCPI_cmd_sour_temp_mode_P, NULL),
-	_SCPI_BRANCH_(key_rtim_P, &SCPI_cmd_sour_temp_slop_P, NULL),
+	_SCPI_BRANCH_(key_slop_P, &SCPI_cmd_sour_temp_slop_P, NULL),
 	_SCPI_BRANCH_(key_spo_P, &SCPI_cmd_sour_temp_spo_P, NULL),
 	_SCPI_branch_END_,
 };

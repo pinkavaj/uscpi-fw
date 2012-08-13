@@ -2,6 +2,7 @@
 #define __SCPI_CMD_TOOLS_H__
 
 #include "scpi.h"
+#include "lib/thermometer_pt.h"
 
 /* used to identify type of parameter */
 #define SCPI_PARAMS_MAX 16
@@ -13,6 +14,7 @@ SCPI_parse_t SCPI_in_FP_16_16(uint32_t *x);
 SCPI_parse_t SCPI_in_uint8(uint8_t *x);
 SCPI_parse_t SCPI_in_uint16(uint16_t *x);
 SCPI_parse_t SCPI_in_uint32(uint32_t *x);
+void SCPI_print_temp_1_20(temp_1_20_t T);
 
 #endif
 
