@@ -29,13 +29,6 @@
 
 #define SPI_ENABLE (1<<SPE)
 
-typedef struct SPI_dev {
-	uint8_t mode;
-//	uint8_t clock_2x;
-//	void (*select)(int enable);
-	void (*transfer)(void *recv, void *send, int count);
-} SPI_dev_t;
-
 uint8_t SPI_transfer8b(uint8_t out);
 
 #endif
