@@ -262,7 +262,7 @@ static FP_2_14_t temp_get_R(uint8_t channel, temp_data_IU_t data_IU)
         uint32_t R, R_0, R_slope;
 
         /* R = U * R_slope / I;
-         * R_norm = R / R_0 */
+         * R_norm = R / R_0; */
         R_0 = eeprom_read_dword(&temp_conf_E[channel].R_0);
         R_slope = eeprom_read_dword(&temp_conf_E[channel].R_slope);
 
