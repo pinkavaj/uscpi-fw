@@ -1,0 +1,7 @@
+* 74HCT595 = SIPO
+  * PD6 - /SCL (reset) (1->0->1)
+  * PD7 - RCK (0->1->0)
+  * zbytek na SPI
+
+* 74HCT373 = latch
+
