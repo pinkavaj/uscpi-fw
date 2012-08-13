@@ -62,8 +62,8 @@ static SCPI_parse_t SCPI_parse_keyword(void)
 static SCPI_parse_t SCPI_parse_keyword_num(void)
 {
 	uint8_t num_suffix;
-        
-        num_suffix= SCPI_num_suffixes[SCPI_num_suffixes_idx];
+
+        num_suffix = SCPI_num_suffixes[SCPI_num_suffixes_idx];
 	if (isdigit(last_char)) {
 		if (num_suffix >= (UINT8_MAX / 10))
 			return SCPI_err_set_(&SCPI_err_114);

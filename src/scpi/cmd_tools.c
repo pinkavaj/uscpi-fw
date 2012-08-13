@@ -67,31 +67,34 @@ SCPI_parse_t SCPI_in_FP_16_16(FP_16_16_t *x)
                 return SCPI_err_set_(&SCPI_err_222);
         N.parts.num = val;
 
-        if (*endptr++ == '.' && *endptr != '\0') {
-                uint8_t len;
+        if (*endptr == '.') {
+		endptr++;
+		if (*endptr != 0) {
+        		uint8_t len;
 
-                len = strlen(endptr);
-                if (len > 5) {
-                        len = 5;
-                        endptr[5] = 0;
-                }
-                val = strtoul(endptr, &endptr, 10);
-                while (len < 5) {
-                        val *= 10;
-                        len++;
-                }
+        		len = strlen(endptr);
+        		if (len > 5) {
+                		len = 5;
+                		endptr[5] = 0;
+        		}
+        		val = strtoul(endptr, &endptr, 10);
+        		while (len < 5) {
+                		val *= 10;
+                		len++;
+        		}
 
-                val *= 0x100;
-                val += 4;
-                val /= 10;
-                val *= 0x100;
-                val +=  4999;
-                val /= 10000;
-                N.parts.fract = val;
+        		val *= 0x100;
+        		val += 4;
+        		val /= 10;
+        		val *= 0x100;
+        		val +=  4999;
+        		val /= 10000;
+        		N.parts.fract = val;
+        	}
         }
-        if (*endptr != '\0')
+        if (*endptr != 0)
                 return SCPI_err_set_(&SCPI_err_121);
-        
+
         *x = N.FP;
         SCPI_param_in_buf_idx += strlen(SCPI_in + SCPI_param_in_buf_idx) + 1;
         return SCPI_parse_end;
