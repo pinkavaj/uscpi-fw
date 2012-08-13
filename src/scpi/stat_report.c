@@ -70,7 +70,7 @@ void SCPI_OPER_cond_set(uint16_t val)
 {
 	SCPI_OPER.condition |= val;
 	/* Fixme: má reagovat na změnu ne na pokus o změnu (ne na 1 -> 1 ...) */
-	val &= SCPI_OPER_trans_to1;
+	val &= SCPI_OPER.transition_up;
 	SCPI_OPER.event |= val;
 }
 
@@ -78,7 +78,7 @@ void SCPI_OPER_cond_set(uint16_t val)
 void SCPI_OPER_cond_reset(uint16_t val)
 {
 	SCPI_OPER.condition &= ~val;
-	val &= SCPI_OPER_trans_to0;
+	val &= SCPI_OPER.transition_down;
 	SCPI_OPER.event |= val;
 }
 
@@ -101,14 +101,14 @@ uint16_t SCPI_QUES_cond_get(void)
 void SCPI_QUES_cond_set(uint16_t val)
 {
 	SCPI_QUES.condition |= val;
-	val &= SCPI_QUES_trans_to1;
+	val &= SCPI_QUES.transition_up;
 	SCPI_QUES.event |= val;
 }
 
 void SCPI_QUES_cond_reset(uint16_t val)
 {
 	SCPI_QUES.condition &= ~val;
-	val &= SCPI_QUES_trans_to0;
+	val &= SCPI_QUES.transition_down;
 	SCPI_QUES.event |= val;
 }
 

@@ -19,8 +19,6 @@
 #define SCPI_OPER_USR5	(1<<12)
 #define SCPI_OPER_INST	(1<<13)
 #define SCPI_OPER_PROG	(1<<14)
-#define SCPI_OPER_trans_to1 0xffff
-#define SCPI_OPER_trans_to0 0x0
 uint16_t SCPI_OPER_cond_get(void);
 void SCPI_OPER_cond_set(uint16_t val);
 void SCPI_OPER_cond_reset(uint16_t val);
@@ -43,8 +41,6 @@ uint16_t SCPI_OPER_even_get(void);
 #define SCPI_QUES_USR4	(1<<12)
 #define SCPI_QUES_INST	(1<<13)
 #define SCPI_QUES_CMDW	(1<<14)
-#define SCPI_QUES_trans_to1 0xffff
-#define SCPI_QUES_trans_to0 0x0
 uint16_t SCPI_QUES_enab_get(void);
 void SCPI_QUES_enab_set(uint16_t enabled);
 uint16_t SCPI_QUES_cond_get(void);
