@@ -1,37 +1,46 @@
 #!/usr/bin/env python3
 
+import math
 import random
 import serial
 import sys
 import time
 
 
-count=1000
+count=100
 
 random.seed()
 port=serial.Serial(port=sys.argv[1], baudrate=sys.argv[2], timeout=1)
 port.open()
-print(sys.argv[1])
 
-i=0
-while i < count:
-    nomA = random.randint(0,2**16-2)
-    nomB = random.randint(0,2**16-1)
-    num = random.randint(nomA+1,2**32-1)
-    cmd = 'test:div %i,%i,%i\n' % (nomA, nomB, num, )
+i=1
+nom_max_log = math.log(2**64, 10)
+num_max_log = math.log(2**32-1, 10)
+while i <= count:
+    nom = int(10**(random.random()*nom_max_log)) - 1
+    nomHi = int(nom/(2**32))
+    nomLo = nom % (2**32)
+    num_min_log = math.log(nomHi+1, 10)
+    num = int(10**(num_min_log + random.random()*(num_max_log-num_min_log)))
+
+    cmd = 'test:div %i,%i,%i\n' % (nomHi, nomLo, num, )
     try:
         port.write(cmd.encode('ascii'))
-        time.sleep(0.5)
+        # FIXME: proč je potřeba tahle pauza?
+        time.sleep(0.005)
         port.write('test:div?\n'.encode('ascii'))
         res = port.readline()
         res = int(res)
-        exp = int(((nomA*2**32) + nomB)/num)
+        exp = int(((nomHi*2**32) + nomLo)/num)
         if res != exp:
-            raise Exception("Failed cmd: %s res: %s exp: %s" % (cmd, repr(res),
-                repr(exp)))
+            raise Exception()
+        print('.',end='')
+        sys.stdout.flush()
         i = i + 1
     except:
         print ("Failed cmd: \n%s \nres: %s exp: %s\n" % (cmd, repr(res),
             repr(exp), ))
         raise
+
+print("OK")
 
