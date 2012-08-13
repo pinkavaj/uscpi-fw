@@ -3,12 +3,10 @@
 #include <string.h>
 
 #include "config.h"
-#include "cmd_tree.h"
 #include "cmd_tools.h"
 #include "lib/iobuf.h"
 #include "scpi.h"
 #include "scpi_parser.h"
-#include "scpi_cmd.h"
 #include "scpi/error.c"
 
 /* If c is command separator returns c, 0 othervise */

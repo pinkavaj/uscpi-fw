@@ -9,6 +9,8 @@
 extern uint8_t SCPI_num_suffixes[2];
 extern uint8_t SCPI_num_suffixes_idx;
 
+extern uint8_t SCPI_params_count;
+
 /* FIXME: přejmenovat na SCPI_bits */
 uint8_t SCPI_opts;
 /* command is question (ends with '?') */

@@ -1,14 +1,14 @@
 #include <avr/version.h>
-#include <ctype.h>
-#include <string.h>
 
 #include "config.h"
-#include "scpi_cmd.h"
+#include "cmd.h"
 #include "cmd_tools.h"
 #include "scpi_parser.h"
 #include "stat_report.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
+
+/* TODO: přesunout sem strom */
 
 /* Small hack to jup to reset vector */
 SCPI_parse_t __vectors(void);

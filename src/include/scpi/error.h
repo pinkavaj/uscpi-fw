@@ -1,5 +1,5 @@
-#ifndef __SCPI_ERR_H__
-#define __SCPI_ERR_H__
+#ifndef __SCPI_ERROR_H__
+#define __SCPI_ERROR_H__
 
 typedef struct {
 	const char *str_P;

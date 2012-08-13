@@ -1,7 +1,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "scpi_cmd.h"
+#include "cmd.h"
 #include "cmd_tools.h"
 #include "scpi_parser.h"
 #include "lib/extlib.h"
@@ -12,6 +12,8 @@
 #include "lib/math_cust.h"
 #include "lib/thermometer_pt.h"
 #include "lib/temp.h"
+
+/* TODO: přemístit sem definici klíče */
 
 SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {

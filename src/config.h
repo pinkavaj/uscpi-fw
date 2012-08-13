@@ -1,5 +1,5 @@
-#ifndef __CONFIG__
-#define __CONFIG__
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
 
 #include <stdint.h>
 
@@ -11,7 +11,7 @@
 #define VER_MAJ 0
 #define VER_MINOR 0
 #define VER_REV 0
-#define VER_BUILD 732M
+#define VER_BUILD 736M
 #define INFO_AUTHOR Lukas-Kucera_Jiri-Pinkava
 #define INFO_COMPANY VSCHT
 #ifndef INFO_MODEL

@@ -1,5 +1,5 @@
-#ifndef __PIC_H__
-#define __PIC_H__
+#ifndef __PIC16_H__
+#define __PIC16_H__
 
 #include <inttypes.h>
 

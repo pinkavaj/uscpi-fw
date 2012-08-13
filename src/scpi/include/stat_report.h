@@ -1,5 +1,5 @@
-#ifndef __SCPI_STATUS_REPORTING_H__
-#define __SCPI_STATUS_REPORTING_H__
+#ifndef __SCPI_STAT_REPORT_H__
+#define __SCPI_STAT_REPORT_H__
 
 #include <inttypes.h>
 

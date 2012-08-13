@@ -1,5 +1,5 @@
-#ifndef __HEATING_H__
-#define __HEATING_H__
+#ifndef __TEMP_H__
+#define __TEMP_H__
 
 #include "lib/pic16.h"
 

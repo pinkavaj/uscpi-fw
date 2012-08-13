@@ -1,0 +1,52 @@
+#include "key.h"
+
+#define SHORT3B 3
+#define SHORT4B 4
+#define _key_(kw, key, slen) \
+        __extension__ const SCPI_key_t key_ ## kw ## _P PROGMEM = \
+        { .len_short_P = slen, .keyword_P = key, }
+
+/* SCPI Common Commands, list of keywords */
+_key_(cls, "CLS", SHORT3B);
+_key_(ese, "ESE", SHORT3B);
+_key_(esr, "ESR", SHORT3B);
+_key_(idn, "IDN", SHORT3B);
+_key_(opc, "OPC", SHORT3B);
+_key_(rst, "RST", SHORT3B);
+_key_(sre, "SRE", SHORT3B);
+_key_(stb, "STB", SHORT3B);
+_key_(tst, "TST", SHORT3B);
+_key_(wai, "WAI", SHORT3B);
+
+/* SCPI Instrument Commands, list of keywords */
+_key_(cond, "CONDITION",    SHORT4B);
+/*_key_(der,  "DERIVATIVE",   SHORT3B);*/
+_key_(dwel, "DWELL",        SHORT4B);
+_key_(enab, "ENABLE",       SHORT4B);
+_key_(err,  "ERROR",        SHORT3B);
+_key_(even, "EVENT",        SHORT4B);
+_key_(gain, "GAIN",         SHORT4B);
+_key_(int,  "INTEGRAL",     SHORT3B);
+_key_(lcon, "LCONSTANTS",   SHORT4B);
+_key_(mode, "MODE",         SHORT4B);
+_key_(next, "NEXT",         SHORT4B);
+_key_(oper, "OPERATION",    SHORT4B);
+_key_(pres, "PRESET",       SHORT4B);
+_key_(ques, "QUESTIONABLE", SHORT4B);
+_key_(res,  "RESISTANCE",   SHORT3B);
+_key_(rtim, "RTIME",        SHORT4B);
+_key_(sour, "SOURCE",       SHORT4B);
+_key_(spo,  "SPOINT",       SHORT3B);
+_key_(stat, "STATUS",       SHORT4B);
+_key_(syst, "SYSTEM",       SHORT4B);
+_key_(temp, "TEMPERATURE",  SHORT4B);
+_key_(test, "TEST",         SHORT4B);
+_key_(vers, "VERSION",      SHORT4B);
+
+_key_(adc, "ADC",  SHORT3B);
+_key_(div, "DIV",  SHORT3B);
+_key_(heat,"HEAT", SHORT4B);
+_key_(mul, "MUL",  SHORT3B);
+_key_(num, "NUM",  SHORT3B);
+_key_(time,"TIME", SHORT4B);
+

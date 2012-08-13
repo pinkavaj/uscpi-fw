@@ -3,8 +3,10 @@
 
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
-#include "scpi_cmd.h"
+#include "cmd.h"
 #include "scpi/error.h"
+
+/* TODO: přemístit sem definici klíče */
 
 SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 {

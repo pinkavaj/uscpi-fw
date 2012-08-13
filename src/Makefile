@@ -27,6 +27,7 @@ SRC+=scpi/scpi.c \
      scpi/ic_sour_temp.c \
      scpi/ic_stat.c \
      scpi/ic_syst.c \
+     scpi/key.c \
      scpi/stat_report.c
 SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c

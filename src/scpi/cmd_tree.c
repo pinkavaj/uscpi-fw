@@ -1,10 +1,11 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "scpi.h"
-#include "scpi_cc.h"
-#include "scpi_cmd.h"
 #include "cmd_tree.h"
+#include "scpi_cc.h"
+#include "ic.h"
+#include "scpi.h"
+#include "key.h"
 
 /* SCPI command tree item parameters */
 #define YES 1
@@ -26,8 +27,6 @@
 #define SHORT3B (3)
 #define SHORT4B (4)
 
-#define _SCPI_branch_END_ { .key_P = NULL, .cmd_P = NULL, .branch_P = NULL, }
-
 /* SCPI Common Commands */
 #define _SCPI_CMD_(c, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## c ## _P PROGMEM = \
@@ -42,21 +41,6 @@ _SCPI_CMD_(sre, GET(YES, PARAMS_N), SET(YES, PARAMS(1, OPT_0, ATONCE_Y)));
 _SCPI_CMD_(stb, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(tst, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(wai, GET(NO_, PARAMS_N), SET(YES, PARAMS(0, OPT_0, ATONCE_Y)));
-
-#define _key_(kw, key, slen) \
-        __extension__ static const SCPI_key_t key_ ## kw ## _P PROGMEM = \
-        { .len_short_P = slen, .keyword_P = key, }
-
-_key_(cls, "CLS", SHORT3B);
-_key_(ese, "ESE", SHORT3B);
-_key_(esr, "ESR", SHORT3B);
-_key_(idn, "IDN", SHORT3B);
-_key_(opc, "OPC", SHORT3B);
-_key_(rst, "RST", SHORT3B);
-_key_(sre, "SRE", SHORT3B);
-_key_(stb, "STB", SHORT3B);
-_key_(tst, "TST", SHORT3B);
-_key_(wai, "WAI", SHORT3B);
 
 #define _SCPI_BRANCH_(k, c, b) { .key_P = &k, .cmd_P = c, .branch_P = b, }
 /* Table of SCPI Common Commands */
@@ -74,59 +58,12 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
-/* SCPI Instrument Commands, list of keywords */
-_key_(cond, "CONDITION",    SHORT4B);
-/*_key_(der,  "DERIVATIVE",   SHORT3B);*/
-_key_(dwel, "DWELL",        SHORT4B);
-_key_(enab, "ENABLE",       SHORT4B);
-_key_(err,  "ERROR",        SHORT3B);
-_key_(even, "EVENT",        SHORT4B);
-_key_(gain, "GAIN",         SHORT4B);
-_key_(int,  "INTEGRAL",     SHORT3B);
-_key_(lcon, "LCONSTANTS",   SHORT4B);
-_key_(mode, "MODE",         SHORT4B);
-_key_(next, "NEXT",         SHORT4B);
-_key_(oper, "OPERATION",    SHORT4B);
-_key_(pres, "PRESET",       SHORT4B);
-_key_(ques, "QUESTIONABLE", SHORT4B);
-_key_(res,  "RESISTANCE",   SHORT3B);
-_key_(rtim, "RTIME",        SHORT4B);
-_key_(sour, "SOURCE",       SHORT4B);
-_key_(spo,  "SPOINT",       SHORT3B);
-_key_(stat, "STATUS",       SHORT4B);
-_key_(syst, "SYSTEM",       SHORT4B);
-_key_(temp, "TEMPERATURE",  SHORT4B);
-_key_(test, "TEST",         SHORT4B);
-_key_(vers, "VERSION",      SHORT4B);
-
-_key_(adc, "ADC",  SHORT3B);
-_key_(div, "DIV",  SHORT3B);
-_key_(heat,"HEAT", SHORT4B);
-_key_(mul, "MUL",  SHORT3B);
-_key_(num, "NUM",  SHORT3B);
-_key_(time,"TIME", SHORT4B);
-
 #undef _SCPI_CMD_
 #define _SCPI_CMD_(p, n, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## p ## _P PROGMEM = \
 	{.parser_P = SCPI_IC_ ## p, g, s, .num_suffix_max_P = n}
 
 /* SCPI Instrument Commands */
-_SCPI_CMD_(sour_temp_dwel, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-/*_SCPI_CMD_(sour_temp_lcon_der, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));*/
-_SCPI_CMD_(sour_temp_lcon_gain, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(sour_temp_lcon_int, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(sour_temp_mode, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(sour_temp_rtim, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(sour_temp_spo, 0, GET(YES, PARAMS_N), SET(YES, 
-			PARAMS(1, OPT_0, ATONCE_Y)));
-_SCPI_CMD_(sour_temp, 1, GET(NO_, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_oper_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_oper_enab, 0, GET(YES, PARAMS_N), SET(YES, 
 			PARAMS(1, OPT_0, ATONCE_Y)));
@@ -150,24 +87,8 @@ _SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
 _SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
-static const SCPI_branch_item_t SCPI_bt_sour_temp_lcon_P[] PROGMEM = {
-/*	_SCPI_BRANCH_(key_der_P, &SCPI_cmd_sour_temp_lcon_der_P, NULL),*/
-	_SCPI_BRANCH_(key_gain_P, &SCPI_cmd_sour_temp_lcon_gain_P, NULL),
-	_SCPI_BRANCH_(key_int_P, &SCPI_cmd_sour_temp_lcon_int_P, NULL),
-	_SCPI_branch_END_,
-};
-
-static const SCPI_branch_item_t SCPI_bt_sour_temp_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_dwel_P, &SCPI_cmd_sour_temp_dwel_P, NULL),
-	_SCPI_BRANCH_(key_lcon_P, &SCPI_cmd_sour_temp_lcon_gain_P, 
-                        SCPI_bt_sour_temp_lcon_P),
-	_SCPI_BRANCH_(key_mode_P, &SCPI_cmd_sour_temp_mode_P, NULL),
-	_SCPI_BRANCH_(key_rtim_P, &SCPI_cmd_sour_temp_rtim_P, NULL),
-	_SCPI_BRANCH_(key_spo_P, &SCPI_cmd_sour_temp_spo_P, NULL),
-	_SCPI_branch_END_,
-};
-
 static const SCPI_branch_item_t SCPI_bt_sour_P[] PROGMEM = {
+        /* TODO: přenést položku do temperature */
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_sour_temp_P, SCPI_bt_sour_temp_P),
 	_SCPI_branch_END_,
 };

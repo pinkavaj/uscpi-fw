@@ -1,12 +1,14 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "scpi_cmd.h"
+#include "cmd.h"
 #include "cmd_tools.h"
 #include "scpi_parser.h"
 #include "stat_report.h"
 #include "lib/extlib.h"
 #include "lib/iobuf.h"
+
+/* TODO: přemístit sem definici klíče */
 
 /* Value of OPERation Status Register */
 SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
