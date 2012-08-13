@@ -20,7 +20,8 @@ _key_(wai, "WAI", SHORT3B);
 
 /* SCPI Instrument Commands, list of keywords */
 _key_(cond, "CONDITION",    SHORT4B);
-/*_key_(der,  "DERIVATIVE",   SHORT3B);*/
+_key_(coun, "COUNT",        SHORT4B);
+_key_(der,  "DERIVATIVE",   SHORT3B);
 _key_(dwel, "DWELL",        SHORT4B);
 _key_(enab, "ENABLE",       SHORT4B);
 _key_(err,  "ERROR",        SHORT3B);
@@ -28,6 +29,7 @@ _key_(even, "EVENT",        SHORT4B);
 _key_(fix,  "FIXED",        SHORT3B);
 _key_(func, "FUNCTION",     SHORT4B);
 _key_(gain, "GAIN",         SHORT4B);
+_key_(inf,  "INFINITY",     SHORT3B);
 _key_(int,  "INTEGRAL",     SHORT3B);
 _key_(lcon, "LCONSTANTS",   SHORT4B);
 _key_(list, "LIST",         SHORT4B);
@@ -35,11 +37,13 @@ _key_(meas, "MEASURE",      SHORT4B);
 _key_(mode, "MODE",         SHORT4B);
 _key_(next, "NEXT",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);
+_key_(poin, "POINTS",       SHORT4B);
 _key_(pres, "PRESET",       SHORT4B);
 _key_(prog, "PROGRAM",      SHORT4B);
 _key_(ques, "QUESTIONABLE", SHORT4B);
 _key_(res,  "RESISTANCE",   SHORT3B);
 _key_(rtim, "RTIME",        SHORT4B);
+_key_(seq,  "SEQUENCE",     SHORT3B);
 _key_(slop, "SLOPE",        SHORT4B);
 _key_(sour, "SOURCE",       SHORT4B);
 _key_(spo,  "SPOINT",       SHORT3B);

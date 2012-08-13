@@ -18,11 +18,17 @@ PROJECT=uSCPIfw
 INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 
 SRC=-c main.c
-SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/thermometer_pt.c
+SRC+=lib/iobuf.c \
+     lib/list.c \
+     lib/math_cust.S \
+     lib/pic16.c \
+     lib/temp.c \
+     lib/thermometer_pt.c
 SRC+=scpi/scpi.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
      scpi/cc.c \
+     scpi/ic_list.c \
      scpi/ic_meas.c \
      scpi/ic_test.c \
      scpi/ic_sour_temp.c \
