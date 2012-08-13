@@ -1,45 +1,38 @@
 #!/usr/bin/env python3
 
+from fwtest import FwTest
+
 import math
 import random
-import serial
-import sys
+import unittest
 
 
-count=100
+class NumTest(FwTest):
+    def setUp(self):
+        FwTest.setUp(self)
+        count = 100
 
-random.seed()
-port=serial.Serial(port=sys.argv[1], baudrate=sys.argv[2], timeout=1)
-port.open()
+        self.numbers = [0, 1, 2, 3, 4, 0xff, 0x100, 0xfffffff1, 0xfffffffe, 
+                0xffffffff]
+        random.seed()
+        num_max_log=math.log((2**31), 10)
+        while count:
+            count = count - 1
+            self.numbers.append(int(10**(random.random()*num_max_log)*2) - 1)
 
-def test(num):
-    """Test input for specified number"""
-    exp = num
-    res = None
-    cmd = 'test:num %i\n' % num
-    try:
-        port.write(cmd.encode('ascii'))
-        port.write('test:num?\n'.encode('ascii'))
-        res = port.readline()
-        res = int(res)
-        if res != exp:
-            raise Exception()
-        print('.',end='')
-        sys.stdout.flush()
-    except:
-        print ("Failed cmd: \n%s \nres: %s exp: %s\n" % 
-                (cmd, repr(res), repr(exp), ))
-        raise
+    def test_num(self):
+        """Test input for specified numbers"""
 
-for n in (0, 1, 2, 3, 4, 0xff, 0x100, 0xfffffff1, 0xfffffffe, 0xffffffff):
-    test(n)
+        for num in self.numbers:
+            exp = num
+            cmd = 'test:num %i' % num
+            self.writeline(cmd)
+            self.writeline('test:num?')
+            res = self.readline()
+            res = int(res)
+            self.assertEqual(res, exp)
 
-i=1
-num_max_log=math.log((2**31), 10)
-while i <= count:
-    num = int(10**(random.random()*num_max_log)*2) - 1
-    test(num)
-    i = i + 1
 
-print("OK")
+if __name__ == '__main__':
+    unittest.main()
 
