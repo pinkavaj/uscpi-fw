@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "cmd_tree.h"
-#include "scpi_cc.h"
+#include "cc.h"
 #include "ic.h"
 #include "scpi.h"
 #include "key.h"

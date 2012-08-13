@@ -22,7 +22,7 @@ SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/thermometer_pt.c
 SRC+=scpi/scpi.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
-     scpi/scpi_cc.c \
+     scpi/cc.c \
      scpi/ic_test.c \
      scpi/ic_sour_temp.c \
      scpi/ic_stat.c \
