@@ -18,6 +18,9 @@ typedef enum {
         temp_mode_prog = 2,
 } temp_mode_t;
 
+/* Temp sweep indicator bit field. */
+extern uint8_t temp_swe;
+
 /* Convert betwen internal and externap slope representation */
 uint8_t temp_slop2internal(temp_1_20_t T);
 temp_1_20_t temp_slop2public(uint8_t slop);

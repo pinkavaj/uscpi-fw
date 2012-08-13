@@ -133,12 +133,12 @@ SCPI_parse_t SCPI_IC_sens_list_temp(void)
 
                 poin_end = list_temp_poin[channel];
                 while(poin < poin_end)
-                        SCPI_print_temp_1_20(list[channel][poin++].T);
+                        SCPI_print_temp_1_20(list[channel][poin++].T_spo);
 
                 return SCPI_parse_end;
         }
         do {
-                ret = SCPI_in_temp_1_20(&list[channel][poin++].T);
+                ret = SCPI_in_temp_1_20(&list[channel][poin++].T_spo);
                 if (ret == SCPI_parse_err)
                         return ret;
         } while (poin < SCPI_params_count);

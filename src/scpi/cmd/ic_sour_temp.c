@@ -14,7 +14,6 @@ static uint8_t get_temp_channel(void)
         if (SCPI_num_suffixes_idx != 1)
                 SCPI_err_set(&SCPI_err_2);
 #endif
-
         return SCPI_num_suffixes[0];
 }
 
@@ -101,19 +100,14 @@ SCPI_parse_t SCPI_IC_sour_temp_mode(void)
                         case temp_mode_list:
                                 SCPI_print_P(key_list_P.keyword_P);
                                 break;
-                        case temp_mode_prog:
-                                SCPI_print_P(key_prog_P.keyword_P);
-                                break;
                 }
                 return SCPI_parse_end;
         }
         
         if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_fix_P))
                 mode = temp_mode_fix;
-        /*else if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_list_P))
+        else if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_list_P))
                 mode = temp_mode_list;
-        else if (!keycmp_P(SCPI_in + SCPI_param_in_buf_idx, &key_prog_P))
-                mode = temp_mode_prog;*/
         else
                 return SCPI_err_set_(&SCPI_err_224);
         

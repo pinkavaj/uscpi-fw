@@ -5,8 +5,12 @@
 #include "lib/math_cust.h"
 #include "lib/thermometer_pt.h"
 #include "scpi.h"
-#include "stat_report.h"
+//#include "stat_report.h"
+#include "list.h"
 #include "temp.h"
+
+// DEBUG only
+#include "lib/iobuf.h"
 
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */
@@ -44,38 +48,43 @@ typedef enum {
 } temp_status_IU_t;
 
 /* Temperature channel working data */
-/* R            - R from last measurement
- * T_dest       - destination T for slope
- * T_slope      - slope of ramp to reach T_dest in units: °C*20/(sec*4)
+/* dwel         - dwell for fixed mode
+ * dwel_downcount - current value for dwell downcount
+ * R            - R from last measurement
+ * slop         - slope of ramp to reach T_spo in units: [°C / sec * 4 / 20]
+ * T_spo        - destination T for slop
  * T_want       - requested value of regulation */
 typedef struct {
         uint16_t dwel;
+        uint16_t dwel_downcount;
+        uint8_t list_idx;
         temp_mode_t mode;
         pic16_data_t pic;
         FP_2_14_t R;
+        uint8_t slop;
         temp_status_IU_t status;
-        temp_1_20_t T_dest;
-        uint8_t T_slope;
+        temp_1_20_t T_spo;
         temp_1_20_t T_want;
 } temp_data_t;
 
 /* Temperature channel constants */
-/* R_slope      - R = U_code/I_code*R_slope 
+/* R_slop       - R = U_code/I_code*R_slop 
  * R_0          - R of sensor at 0°C */
 typedef struct {
         pic16_param_t pic;
 	temp_correct_IU_t correct_IU;
         temp_dev_AD_t dev_AD;
         temp_dev_DA_t dev_DA;
-        FP_16_16_t R_slope;
+        FP_16_16_t R_slop;
         FP_16_16_t R_0;
 } temp_conf_t;
 
+/* Bit map of sweep indicators for individual channels. */
 temp_data_t temp_data[TEMP_CHANNELS];
 static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
         {
                 .R_0 = 0x0c0000,
-                .R_slope = 0x0023A147,
+                .R_slop = 0x0023A147,
 		.correct_IU = {
 			.I_offs = 0,
 			.U_offs = 0,
@@ -96,7 +105,7 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
         },
 /*        {
                 .R_0 = 0x0a0000,
-                .R_slope = 0x0023A147,
+                .R_slop = 0x0023A147,
 		.correct_IU = {
 			.I_offs = 0,
 			.U_offs = 0,
@@ -116,6 +125,8 @@ static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
                 },
         },*/
 };
+
+uint8_t temp_swe;
 
 temp_1_20_t temp_slop2public(uint8_t slop)
 {
@@ -243,14 +254,14 @@ static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
 static FP_2_14_t temp_calc_R(uint8_t channel, temp_data_IU_t data_IU)
 {
         uint64_t tmp64;
-        uint32_t R, R_0, R_slope;
+        uint32_t R, R_0, R_slop;
 
-        /* R = U * R_slope / I;
+        /* R = U * R_slop / I;
          * R_norm = R / R_0; */
         R_0 = eeprom_read_dword(&temp_conf_E[channel].R_0);
-        R_slope = eeprom_read_dword(&temp_conf_E[channel].R_slope);
+        R_slop = eeprom_read_dword(&temp_conf_E[channel].R_slop);
 
-        tmp64 = math_mul_32_32_r64(R_slope, data_IU.U);
+        tmp64 = math_mul_32_32_r64(R_slop, data_IU.U);
         R = math_div_64_32_r32(tmp64, data_IU.I);
         /* conversion to FP_2_14_t is done by >> 2 */
         tmp64 = math_mul_32_32_r64(R, 0x10000 >> 2);
@@ -291,36 +302,61 @@ static void temp_loop_(uint8_t channel)
                 temp_data[channel].T_want = Pt_RtoT(R);
         }
 
-        if (SCPI_OPER.condition & SCPI_OPER_SWE) {
-                if (temp_data[channel].mode == temp_mode_fix) {
-                        temp_1_20_t T_dest, T_want, T_want_old;
-                        uint8_t T_slope;
+        if (temp_swe && (1 << channel)) {
+                temp_1_20_t T_spo, T_want, T_want_old;
+                uint8_t slop;
+                temp_mode_t mode;
 
-                        T_dest = temp_data[channel].T_dest;
-                        T_want_old = T_want = temp_data[channel].T_want;
-                        T_slope = temp_data[channel].T_slope;
+                mode = temp_data[channel].mode;
+                T_want_old = T_want = temp_data[channel].T_want;
+                if (mode == temp_mode_fix) {
+                        T_spo = temp_data[channel].T_spo;
+                        slop = temp_data[channel].slop;
+                } else if (mode == temp_mode_list) {
+                        T_spo = list[channel][temp_data[channel].list_idx].T_spo;
+                        slop = list[channel][temp_data[channel].list_idx].slop;
+                }
 
-                        if (T_dest < T_want) {
-                                T_want -= T_slope;
+                // TODO: remove, debug only
+                //print_uint32(slop);
+                /* setpoint reached, do dwell */
+                if(T_spo == T_want) {
+                        temp_data[channel].dwel_downcount--;
+                } else {
+                        if (T_spo < T_want) {
+                                T_want -= slop;
                                 /* if (numeric underflow || ...) */
-                                if (T_want > T_want_old || T_want < T_dest)
-                                        T_want = T_dest;
+                                if (T_want > T_want_old || T_want < T_spo)
+                                        T_want = T_spo;
                         } else {
-                                T_want += T_slope;
-                                if (T_want < T_want_old || T_want > T_dest)
-                                        T_want = T_dest;
+                                T_want += slop;
+                                if (T_want < T_want_old || T_want > T_spo)
+                                        T_want = T_spo;
                         }
 
                         temp_data[channel].T_want = T_want;
+                }
 
-                        /* FIXME: stop sweping */
-                        if (T_dest == T_want)
-                                temp_data[channel].status = temp_status_IU_valid;
+                if (T_spo == T_want && !temp_data[channel].dwel_downcount) {
+                        if (mode == temp_mode_fix) {
+                                temp_swe &= ~(1 << channel);
+                                temp_data[channel].status = 
+                                        temp_status_IU_valid;
+                        } else if (mode == temp_mode_list) {
+                                temp_data[channel].list_idx++;
+                                if (temp_data[channel].list_idx == 
+                                                list_temp_poin[channel]) {
+                                        temp_data[channel].list_idx = 0;
 
-                } else if (temp_data[channel].mode == temp_mode_list) {
-                        /* TODO: ... */
-                } else if (temp_data[channel].mode == temp_mode_prog) {
-                        /* TODO: ... */
+                                        if (list_coun[channel] != LIST_COUN_INF) {
+                                        /* TODO: "list_coun[channel]--" if not inf. 
+                                        temp_swe &= ~(1 << channel);
+                                         * */
+                                        }
+                                }
+                                temp_data[channel].dwel_downcount = 
+                                        list[channel][temp_data[channel].list_idx].dwel;
+                        }
                 }
         }
         temp_data[channel].R = R;
@@ -382,7 +418,7 @@ void temp_init(void)
         {
                 channel--;
                 temp_output_DA(channel, 0);
-                temp_data[channel].T_slope = 1 * 20 / 4; /* 1°C/sec */
+                temp_data[channel].slop = 1 * 20 / 4; /* 1 °C / sec */
                 temp_data[channel].dwel = 60;
         }
 }
@@ -420,31 +456,39 @@ void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
 
 temp_1_20_t temp_slope_get(uint8_t channel)
 {
-        return temp_slop2public(temp_data[channel].T_slope);
+        return temp_slop2public(temp_data[channel].slop);
 }
 
-void temp_slope_set(uint8_t channel, temp_1_20_t slope)
+void temp_slope_set(uint8_t channel, temp_1_20_t slop)
 {
-        temp_data[channel].T_slope = temp_slop2internal(slope);
+        temp_data[channel].slop = temp_slop2internal(slop);
 }
 
 void temp_trg(void)
 {
-        if (SCPI_OPER.condition & SCPI_OPER_SWE) {
+        if (temp_swe) {
+                temp_swe = 0;
                 SCPI_err_set(&SCPI_err_210);
-                return;
         }
-        SCPI_OPER_cond_set(SCPI_OPER_SWE);
+        for (uint8_t channel = 0; channel < TEMP_CHANNELS; channel++) {
+                temp_swe |= 1 << channel;
+                if (temp_data[channel].mode == temp_mode_fix) {
+                        temp_data[channel].dwel_downcount = temp_data[channel].dwel;
+                } else if (temp_data[channel].mode == temp_mode_list) {
+                        temp_data[channel].list_idx = 0;
+                        temp_data[channel].dwel_downcount = list[channel][0].dwel;
+                }
+        }
 }
 
 temp_1_20_t temp_want_get(uint8_t channel)
 {
-        return temp_data[channel].T_dest;
+        return temp_data[channel].T_spo;
 }
 
 void temp_want_set(uint8_t channel, temp_1_20_t T)
 {
-        temp_data[channel].T_dest = T;
+        temp_data[channel].T_spo = T;
         if (temp_data[channel].status == temp_status_IU_valid) {
                 temp_data[channel].T_want = Pt_RtoT(temp_data[channel].R);
         }
