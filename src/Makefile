@@ -3,6 +3,7 @@
 
 # port where JTAG programmer is connected
 PROG_PORT=/dev/ttyS0
+DEV_PORT=/dev/ttyUSB0
 
 # Name of target controller
 # (see the available avr-gcc mmcu options for possible values)
@@ -76,4 +77,7 @@ clean:
 		[ "${f}" != "" ] || continue; \
 		rm "${x}" || exit -1; \
 	done
+
+test:
+	cd ../test && ./run_tests ${DEV_PORT}
 

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+function help() {
+	echo "Environment variables:"
+	echo "	DEV_PORT - serial port used to comunicate with device"
+	echo "	BAUDRATE [115200] - baudrate used to comunicate with device"
+	echo "Usage:"
+	echo "	${0} [<serial port> [<baude rate>]]"
+}
+
+
+if [ "${1}_" == "_" ]; then
+	if [ "${DEV_PORT}_" == "_" ]; then
+		echo "Error: Device port not defined!"
+		help
+		exit -1
+	fi
+elif [ "${1}" == "-h" ] || [ "${1}" == "--help" ]; then
+	help
+	exit 0
+fi
+DEV_PORT=${DEV_PORT:=${1}}
+
+BAUDRATE=${BAUDRATE:=115200}
+
+stty -F ${DEV_PORT} ${BAUDRATE}
+
