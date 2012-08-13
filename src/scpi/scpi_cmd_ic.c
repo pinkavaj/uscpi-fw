@@ -101,7 +101,7 @@ static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-#include "math_cust.h"
+#include "lib/math_cust.h"
 static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 {
 	static uint64_t nom;
