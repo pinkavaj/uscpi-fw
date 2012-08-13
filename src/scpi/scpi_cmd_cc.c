@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "scpi_cmd.h"
+#include "../lib/extlib.h"
 
 
 /* Small hack to jup to reset vector */

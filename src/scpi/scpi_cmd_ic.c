@@ -67,13 +67,14 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
-#include "../drivers/spi.h"
+#include "../drivers/spi_dev.h"
+#include "../drivers/ad974.h"
 static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {
 	uint16_t val;
 
-	SPI_select_dev(SPI_DEV_AD974_0);
-	SPI_transfer(&val, NULL, sizeof(val));
+	SPI_dev_select(SPI_DEV_AD974_0);
+	val = ad974_get_sample(0);
 	SCPI_out_uint32(val);
 	return SCPI_parse_end;
 }

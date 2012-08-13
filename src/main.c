@@ -1,5 +1,5 @@
 #include "config.h"
-#include "drivers/spi.h"
+#include "drivers/spi_dev.h"
 #include "drivers/timer.h"
 #include "drivers/usart.h"
 
@@ -26,7 +26,7 @@
 void main(void)
 {
 	cli();
-	SPI_init();
+	SPI_dev_init();
 	TIMER1_init();
 	USART0_init();
 

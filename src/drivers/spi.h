@@ -5,16 +5,31 @@
 #include <avr/sfr_defs.h>
 #include <inttypes.h>
 
-/* indexes for SPI devices, use continous numbering to get optimal C code */
-#define SPI_DEV_AD974_0 0
-#define SPI_DEV_MCP4922_0 1
-/* this shoul have number last_num + 2 */
-#define SPI_DEV_NONE 2
+#define SPI_CLOCK (3<<SPR0)
+#define SPI_CLOCK_1_4 (0<<SPR0)
+#define SPI_CLOCK_1_16 (1<<SPR0)
+#define SPI_CLOCK_1_64 (2<<SPR0)
+#define SPI_CLOCK_1_128 (3<<SPR0)
+
+#define SPI_PHASE (1<<CPHA)
+#define SPI_PHASE_LEAD (0<<CPHA)
+#define SPI_PHASE_TRAIL (1<<CPHA)
+
+#define SPI_POL (1<<CPOL)
+#define SPI_POL_LOW (0<<CPOL)
+#define SPI_POL_HIGH (1<<CPOL)
+
+#define SPI_DORD (1<<DORD)
+#define SPI_DORD_LSB (1<<DORD)
+#define SPI_DORD_MSB (0<<DORD)
+
+#define SPI_MODE (1<<MSTR)
+#define SPI_MODE_SLAVE (0<<MSTR)
+#define SPI_MODE_MASTER (1<<MSTR)
+
+#define SPI_ENABLE (1<<SPE)
 
 void SPI_init(void);
-void SPI_select_dev(uint8_t dev_num);
-void SPI_transfer(void *recv, void *send, uint8_t count);
-
-void ad974_set_channel(uint8_t channel);
+uint8_t SPI_transfer8b(uint8_t out);
 
 #endif
