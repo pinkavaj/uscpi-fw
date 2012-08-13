@@ -18,8 +18,8 @@ PROJECT=uSCPIfw
 # Use .cc, .cpp or .C suffix for C++ files, use .S
 # (NOT .s !!!) for assembly source code files.
 INC=-I. -I/usr/lib/avr/include/
-SRC=-c main.c -c math.S
-SRC=lib/math.S
+SRC=-c main.c
+SRC+=lib/math.S
 SRC+=-c scpi/scpi.c 
 SRC+=-c drivers/usart.c -c drivers/timer.c
 SRC+=-c drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
@@ -76,10 +76,9 @@ size:
 	size ${PROJECT}.out
 
 clean:
-	for f in *.hex *.o *.out; do \
-		[ "${f}" != "" ] || continue; \
-		rm "${x}" || exit -1; \
-	done
+	find .  -name "*.hex" -exec rm \{\} \;
+	find .  -name "*.o" -exec rm \{\} \;
+	find .  -name "*.out" -exec rm \{\} \;
 
 test:
 	cd ../test && ./run_tests ${DEV_PORT}
