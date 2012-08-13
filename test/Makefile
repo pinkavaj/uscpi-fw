@@ -4,6 +4,9 @@ all: daq input math scpi sour timer1
 daq:
 	./test_dev_ad974_mcp4922.py
 
+func:
+	./test_func_dec.py
+
 input:
 	./test_input.py
 
