@@ -72,7 +72,7 @@ static SCPI_parse_t SCPI_IC_test(char UNUSED(c))
 {
 	uint16_t val = 0x55aa;
 
-	SPI_select_dev(0);
+	SPI_select_dev(SPI_DEV_AD974_0);
 	SPI_transfer(&val, NULL, sizeof(val));
 	SCPI_out_uint(val);
 	return SCPI_parse_end;
