@@ -320,33 +320,33 @@ static void temp_loop_(uint8_t channel)
                 temp_data[channel].status = temp_status_IU_setting;
                 temp_data[channel].T_want = Pt_RtoT(R);
         } else if (temp_data[channel].status == temp_status_IU_setting) {
-                temp_1_20_t T_dest, T_want, Tdiff;
+                temp_1_20_t T_dest, T_want, T_want_old;
                 int16_t slope = 5;
 
                 T_dest = temp_data[channel].T_dest;
-                T_want = temp_data[channel].T_want;
+                T_want_old = T_want = temp_data[channel].T_want;
 
-                if (T_dest < T_want)
-                        Tdiff = T_want - T_dest;
-                else
-                        Tdiff = T_dest - T_want;
-
-                if (Tdiff > (uint16_t)slope) {
-                        if (T_dest < T_want)
-                                T_want -= slope;
-                        else
-                                T_want += slope;
-                } else
-                        T_want = T_dest;
-                /* FIXME: kontrolovatl vystup na rozsah, přepracovat */
+                if (T_dest < T_want) {
+                        T_want -= slope;
+                        /* if (numeric underflow || ...) */
+                        if (T_want > T_want_old || T_want < T_dest)
+                                T_want = T_dest;
+                } else {
+                        T_want += slope;
+                        if (T_want < T_want_old || T_want > T_dest)
+                                T_want = T_dest;
+                }
 
                 temp_data[channel].T_want = T_want;
 
                 if (T_dest == T_want)
                         temp_data[channel].status = temp_status_IU_valid;
         } else if (temp_data[channel].status == temp_status_IU_valid) {
-                /* TODO: depends on current selected mode */
-                //return;
+                if (temp_data[channel].mode == temp_mode_list) {
+                        /* TODO: ... */
+                } else if (temp_data[channel].mode == temp_mode_prog) {
+                        /* TODO: ... */
+                }
         }
         temp_data[channel].R = R;
         
