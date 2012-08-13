@@ -142,73 +142,64 @@ void USART0_init(void)
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
 }
 
+void USART0_out_wait(USART0_out_len_t size)
+{
+	/* requested size > all available space in output buffer */
+	/* TODO: chack size > USART0_OUT_LEN ??? */
+	while (size > USART0_OUT_LEN - (USART0_out_len - USART0_out_len_)) {
+		sleep_mode();
+	}
+	cli();
+	memmove((char *)USART0_out, (char *)USART0_out + USART0_out_len_,
+			USART0_OUT_LEN - USART0_out_len_);
+	USART0_out_len -= USART0_out_len_;
+	USART0_out_len_ = 0;
+	sei();
+}
+
 /* Print len bytes into output buffer */
-void USART0_printn(const char *c, unsigned int len)
+void USART0_printn(const char *c, USART0_out_len_t len)
 {
 	if (!len)
 		return;
+	/* make space in bufffer, if posible */
+	USART0_out_wait(0);
 	cli();
-	/* Allow interrup to start sending */
+	/* Start sending when sei() */
 	UCSR0B |= _BV(UDRIE0);
-	if (USART0_out_len < USART0_OUT_LEN) {
-USART0_printn_put:
-		do {
-			USART0_out[USART0_out_len++] = *(c++);
-		} while (--len > 0 && USART0_out_len < USART0_OUT_LEN);
-		if (len)
-			goto USART0_printn_move;
-		sei(); 
-		return;
-	} 
-USART0_printn_move:
-	if (USART0_out_len_ > 0) {
-		memmove((char *)USART0_out, 
-				(char *)USART0_out + USART0_out_len_,
-				USART0_OUT_LEN - USART0_out_len_);
-		USART0_out_len -= USART0_out_len_;
-		USART0_out_len_ = 0;
-		goto USART0_printn_put;
+	if (USART0_OUT_LEN - USART0_out_len < len ) {
+	/* TODO: chack len > aktualni volny prostor v bufferu */
 	}
-	sei();
-	sleep_mode();
-	cli();
-	goto USART0_printn_move;
+	memcpy(USART0_out + USART0_out_len, c, len);
+	USART0_out_len += len;
 }
 
 /* Print string from Program memory into output buffer,
  * interrupts will be enabled by this rutine! */
 void USART0_print_P(PGM_P c)
 {
+	/* make space in bufffer, if posible */
+	USART0_out_wait(0);
 	cli();
 	/* Allow interrup to start sending */
 	UCSR0B |= _BV(UDRIE0);
-	if (USART0_out_len < USART0_OUT_LEN) {
-		uint8_t c_;
-USART0_printn_put:
-		do {
-			c_ = pgm_read_byte(c++);
-			if (!c_) {
-				sei(); 
-				return;
-			}
-			USART0_out[USART0_out_len++] = c_;
-		} while (USART0_out_len < USART0_OUT_LEN);
+	size_t len = strlen_P(c);
+	if ((size_t)(USART0_OUT_LEN - USART0_out_len) < len) {
+	/* TODO: chack len > aktualni volny prostor v bufferu */
 	}
-// TODO: udělat samostatnou proceduru čekající na ulovnění potřebného místa v
-// bufferu. v printech nic nekontrolovat
-	do {
-		if (USART0_out_len_ > 0) {
-			memmove((char *)USART0_out, 
-					(char *)USART0_out + USART0_out_len_,
-					USART0_OUT_LEN - USART0_out_len_);
-			USART0_out_len -= USART0_out_len_;
-			USART0_out_len_ = 0;
-			goto USART0_printn_put;
-		}
-		sei();
-		sleep_mode();
-		cli();
-	} while(1);
+	memcpy_P(USART0_out + USART0_out_len, c, len);
+	USART0_out_len += len;
+}
+
+/* Put character into output buffer */
+void USART0_putc(char c)
+{
+	/* make space in bufffer, if posible */
+	USART0_out_wait(0);
+	cli();
+	USART0_out[USART0_out_len++] = c;
+	UCSR0B |= _BV(UDRIE0);
+	sei(); 
 }
 
 /* Start processing bytes in input buffer,
@@ -271,31 +262,5 @@ static void USART0_in_process(void)
 		}
 	}
 	USART0_in_process_lock--;
-}
-
-/* Put character into output buffer */
-void USART0_putc(char c)
-{
-	cli();
-	if (USART0_out_len < USART0_OUT_LEN) {
-USART0_putc_put:
-		USART0_out[USART0_out_len++] = c;
-		UCSR0B |= _BV(UDRIE0);
-		sei(); 
-		return;
-	} 
-USART0_putc_move:
-	if (USART0_out_len_ > 0) {
-		memmove((char *)USART0_out, 
-				(char *)USART0_out + USART0_out_len_,
-				USART0_OUT_LEN - USART0_out_len_);
-		USART0_out_len -= USART0_out_len_;
-		USART0_out_len_ = 0;
-		goto USART0_putc_put;
-	}
-	sei();
-	sleep_mode();
-	cli();
-	goto USART0_putc_move;
 }
 
