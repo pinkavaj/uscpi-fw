@@ -5,6 +5,10 @@
 #define NULL 0
 #endif
 
+/* Ancillyary macros to create string from something and join it together */
+#define STR(s) STR_(s)
+#define STR_(s) #s
+
 /* Allow marking function parameters as unused to quaiet warnings, this
  * also force that this parameter really cannot be used */
 #ifdef UNUSED

@@ -2,8 +2,12 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "config.h"
 #include "scpi_cmd.h"
+#include "scpi_parser.h"
+#include "status_reporting.h"
 #include "lib/extlib.h"
+#include "lib/iobuf.h"
 
 /* Small hack to jup to reset vector */
 SCPI_parse_t __vectors(void);

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "scpi.h"
+#include "scpi_cc.h"
 #include "scpi_cmd.h"
 #include "scpi_tree.h"
 

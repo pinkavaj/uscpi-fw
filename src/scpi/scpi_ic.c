@@ -2,6 +2,8 @@
 #include <string.h>
 
 #include "scpi_cmd.h"
+#include "lib/extlib.h"
+#include "lib/iobuf.h"
 
 
 /* Value of OPERation Status Register */

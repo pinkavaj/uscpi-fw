@@ -15,11 +15,11 @@ PROJECT=uSCPIfw
 # (list all files to compile, e.g. 'a.c b.cpp as.S')
 # Use .cc, .cpp or .C suffix for C++ files, use .S
 # (NOT .s !!!) for assembly source code files.
-INC=-I. -Iinclude -I/usr/lib/avr/include/
+INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 
 SRC=-c main.c
 SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/pt_RT_table.c
-SRC+=scpi/scpi.c scpi/scpi_cmd_ic_test.c scpi/status_reporting.c
+SRC+=scpi/scpi.c scpi/scpi_cc.c scpi/scpi_ic_test.c scpi/status_reporting.c
 SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c drivers/spi.c drivers/ad974.c drivers/mcp4922.c
 

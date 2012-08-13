@@ -13,6 +13,8 @@
 #define SCPI_in_len USART0_in_len
 #define SCPI_in_len_ USART0_in_len_
 
+#include "scpi_err.h"
+
 /*
  * SCPI_parse_more - continue recieving, need more data
  * SCPI_parse_drop_all - drop all data in buffer, continue recieving
@@ -30,35 +32,9 @@ typedef enum SCPI_parse_enum {
 	SCPI_parse_err = 5,
 } SCPI_parse_t;
 
-typedef struct SCPI_err_struct {
-	const char *str_P;
-	uint8_t SES_P;
-} SCPI_err_t;
-
 #define SCPI_isstart(c) ( c == ':' || c == '*' || isalpha(c))
-void SCPI_err_set(const SCPI_err_t *e);
 SCPI_parse_t SCPI_parse(char c);
 void SCPI_parser_reset(void);
-
-static const SCPI_err_t SCPI_err_0; 
-static const SCPI_err_t SCPI_err_100;
-static const SCPI_err_t SCPI_err_102;
-static const SCPI_err_t SCPI_err_103;
-static const SCPI_err_t SCPI_err_104;
-static const SCPI_err_t SCPI_err_108;
-static const SCPI_err_t SCPI_err_109;
-static const SCPI_err_t SCPI_err_110;
-static const SCPI_err_t SCPI_err_112;
-static const SCPI_err_t SCPI_err_113;
-static const SCPI_err_t SCPI_err_114;
-static const SCPI_err_t SCPI_err_171;
-static const SCPI_err_t SCPI_err_220;
-static const SCPI_err_t SCPI_err_222;
-static const SCPI_err_t SCPI_err_223;
-static const SCPI_err_t SCPI_err_321;
-static const SCPI_err_t SCPI_err_361;
-static const SCPI_err_t SCPI_err_362;
-static const SCPI_err_t SCPI_err_363;
 
 static const char SCPI_version_P[] PROGMEM = "1999.0";
 

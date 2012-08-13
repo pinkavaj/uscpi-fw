@@ -3,17 +3,7 @@
 
 #include "scpi.h"
 
-/* SCPI Common Commands */
-SCPI_parse_t SCPI_CC_cls(char c);
-SCPI_parse_t SCPI_CC_ese(char c);
-SCPI_parse_t SCPI_CC_esr(char c);
-SCPI_parse_t SCPI_CC_idn(char c);
-SCPI_parse_t SCPI_CC_opc(char c);
-SCPI_parse_t SCPI_CC_rst(char c);
-SCPI_parse_t SCPI_CC_sre(char c);
-SCPI_parse_t SCPI_CC_stb(char c);
-SCPI_parse_t SCPI_CC_tst(char c);
-SCPI_parse_t SCPI_CC_wai(char c);
+extern uint8_t SCPI_params_count;
 
 /* SCPI Instrument Commands */
 SCPI_parse_t SCPI_IC_stat_oper_cond(char c);

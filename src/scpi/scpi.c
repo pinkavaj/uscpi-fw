@@ -24,10 +24,6 @@ static SCPI_parse_t SCPI_parse_param_nostr(char c);
 static SCPI_parse_t SCPI_parse_param_end(char c);
 static void SCPI_parser_reset_(void) ;
 
-/* Ancillyary macros to create string from something and join it together */
-#define STR(s) STR_(s)
-#define STR_(s) #s
-
 /* num_suffix - numeric suffix after keyword (-1) internaly numbered from 0 */
 #define NUM_SUFFIX_MAX 15
 static union {
@@ -41,15 +37,14 @@ static const SCPI_branch_item_t *SCPI_branch;
 
 /* used to identify type of parameter */
 #define SCPI_PARAMS_MAX 16
-static uint8_t SCPI_params_count;
+uint8_t SCPI_params_count;
 static uint8_t SCPI_param_in_buf_idx;
 
 /* Current parser, changes during different stages of parsing input */
 static SCPI_parse_t (*_SCPI_parser)(char);
 
 #include "scpi_tree.c"
-#include "scpi_cmd_cc.c"
-#include "scpi_cmd_ic.c"
+#include "scpi_ic.c"
 #include "scpi_cmd_tools.c"
 
 /* Get SCPI keyword [a-zA-Z] or skip to next parser */
