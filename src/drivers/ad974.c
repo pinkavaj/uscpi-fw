@@ -1,8 +1,6 @@
-#include <string.h>
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
-#include "config.h"
 #include "iodef.h"
 #include "spi.h"
 #include "ad974.h"

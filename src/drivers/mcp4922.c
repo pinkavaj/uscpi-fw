@@ -1,11 +1,9 @@
 /*****************************************************************************/
 /*        ****  Digital-to-Analog Converter MCP4922  ****
  */
-#include <string.h>
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
-#include "config.h"
 #include "iodef.h"
 #include "spi.h"
 #include "mcp4922.h"
@@ -51,7 +49,7 @@ static void mcp4922_send_(uint16_t datastring)
 {
 	PORT_MODIFY(MCP4922_PORT, MCP4922_CS, 0);
 	/* send new value to latch, Hi Lo */ 
-	SPI_transfer8b(datastring >>8);
+	SPI_transfer8b(datastring >> 8);
 	SPI_transfer8b(datastring);
 	/* send latch to output 40ns to setup, 100ns width */
 	PORT_MODIFY(MCP4922_PORT, MCP4922_LD, 0);
@@ -63,11 +61,12 @@ static void mcp4922_send_(uint16_t datastring)
 /*****************************************************************************/
 void mcp4922_write_channel(uint8_t ch, uint16_t val)
 {
-	val |= MCP4922_GAIN_1 | MCP4922_OUTPUT_ON | MCP4922_BUF_DIS;
+#define _MCP4922_CFG_ (MCP4922_GAIN_1 | MCP4922_OUTPUT_ON | MCP4922_BUF_DIS)
 	if (ch == 0)
-		val |= MCP4922_CH_A;
+		val |= MCP4922_CH_A | _MCP4922_CFG_;
 	if (ch == 1)
-		val |= MCP4922_CH_B;
+		val |= MCP4922_CH_B | _MCP4922_CFG_;
+#undef _MCP4922_CFG_
 
 	mcp4922_send_(val);
 }
