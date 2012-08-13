@@ -2,8 +2,8 @@
 #define __THERMOMETER_PT_H__
 
 #include <inttypes.h>
+#include "lib/math_cust.h"
 
-typedef uint16_t FP_2_14_t;
 // Temperature with precision 1/20 °C
 typedef uint16_t temp_1_20_t;
 
