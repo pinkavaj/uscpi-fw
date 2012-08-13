@@ -45,17 +45,6 @@ uint8_t SCPI_opts;
 #define _SCPI_PARSE_PARAM_PREF_set() (SCPI_opts |= (1<<4))
 #define _SCPI_PARSE_PARAM_PREF_reset() (SCPI_opts &= ~(1<<4))
 
-/* Allow marking function parameters as unused to quaiet warnings, this
- * also force that this parameter really cannot be used */
-#ifdef UNUSED
-#elif defined(__GNUC__)
-# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-# define UNUSED(x) /*@unused@*/ x
-#else
-# define UNUSED(x) x
-#endif
-
 /* Ancillyary macros to create string from something and join it together */
 #define STR(s) STR_(s)
 #define STR_(s) #s

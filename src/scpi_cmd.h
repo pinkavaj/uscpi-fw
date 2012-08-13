@@ -105,6 +105,8 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char c);
 static SCPI_parse_t SCPI_IC_syst_err_next(char c);
 static SCPI_parse_t SCPI_IC_syst_vers(char c);
 
+static SCPI_parse_t SCPI_IC_test(char c);
+
 /* SCPI Tools */
 static SCPI_parse_t SCPI_in_uint8(uint8_t *x);
 static SCPI_parse_t SCPI_in_uint16(uint16_t *x);

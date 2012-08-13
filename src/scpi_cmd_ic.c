@@ -67,6 +67,17 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 	return SCPI_parse_end;
 }
 
+#include "spi.h"
+static SCPI_parse_t SCPI_IC_test(char UNUSED(c))
+{
+	uint16_t val = 0x55aa;
+
+	SPI_select_dev(0);
+	SPI_transfer(&val, NULL, sizeof(val));
+	SCPI_out_uint(val);
+	return SCPI_parse_end;
+}
+
 /* Get (next) error from error queue */
 static SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 {

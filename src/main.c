@@ -1,5 +1,6 @@
 #include "config.h"
 #include "timer.h"
+#include "spi.h"
 #include "usart.h"
 
 #include <avr/interrupt.h>
@@ -24,29 +25,16 @@
  * function */
 /* BADISR_vect */
 
-// Example of DAQ cycle
-void x(void)
-{
-	SPIN_LOCK(timer1A_spinlock);
-	// neco
-	SPIN_LOCK(timer1B_spinlock);
-	// DAQ 1
-	SPIN_LOCK(timer1B_spinlock);
-	// DAQ 2
-	SPIN_LOCK(timer1B_spinlock);
-	// neco
-}
-
 void main(void)
 {
 	TIMER1_init();
 	USART0_init();
+	SPI_init();
 
 	TIMER1_start();
 	
 	sei();
 	do {	
-		x();
 		set_sleep_mode(SLEEP_MODE_IDLE);
 		sleep_mode();
 	} while(1);
