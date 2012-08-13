@@ -27,7 +27,7 @@
 
 volatile uint8_t period_counter;	// 0-31 (4x 8x 31.25 ms = 1000 ms)
 volatile uint32_t time_sec;
-volatile uint8_t timer1A_spinlock;
+volatile uint8_t timer1_period_sl;
 volatile uint8_t timer1B_spinlock;
 
 /*****************************************************************************/
@@ -49,7 +49,7 @@ void TIMER1_init(void)
 	time_sec = 0;
 	period_counter = 0;
 
-	timer1A_spinlock = 0;
+	timer1_period_sl = 0;
 	timer1B_spinlock = 0;
 }
 
@@ -89,6 +89,15 @@ void TIMER1_delay_rel_reset(void)
 	OCR1B = TCNT1;
 }
 
+uint8_t TIMER1_new_period(void)
+{
+        if (timer1_period_sl) {
+                timer1_period_sl = 0;
+                return 1;
+        }
+        return 0;
+}
+
 /*****************************************************************************/
 /* Called in 1.25ms interval */
 ISR(TIMER1_COMPB_vect)
@@ -101,7 +110,7 @@ ISR(TIMER1_COMPB_vect)
 ISR(TIMER1_COMPA_vect)
 //ISR(TIMER1_OVF_vect)
 {
-	timer1A_spinlock = 1;
+	timer1_period_sl = 1;
 	period_counter++;
 	if (period_counter == TIMER1_PERIODS_PER_SEC) {
 		period_counter = 0;

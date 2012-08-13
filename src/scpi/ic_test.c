@@ -130,7 +130,7 @@ SCPI_parse_t SCPI_IC_test_time(void)
 
 SCPI_parse_t SCPI_IC_test_heat(void)
 {
-        for(uint8_t channel = 0; channel < HEAT_CHANNELS; channel++)
+        for(uint8_t channel = 0; channel < TEMP_CHANNELS; channel++)
         {
 		temp_data_IU_t temp_data_IU;
 

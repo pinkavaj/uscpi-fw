@@ -3,7 +3,7 @@
 
 #include "lib/pic16.h"
 
-#define HEAT_CHANNELS 2
+#define TEMP_CHANNELS 2
 
 typedef struct {
 	uint16_t I;

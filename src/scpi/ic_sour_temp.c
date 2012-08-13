@@ -159,7 +159,7 @@ const SCPI_cmd_t SCPI_cmd_sour_temp_P PROGMEM = {
         .set_P = 1,
         .set_params_min_P = 1,
         .set_params_atonce_P = 1,
-	.num_suffix_max_P = HEAT_CHANNELS - 1,
+	.num_suffix_max_P = TEMP_CHANNELS - 1,
 };
 
 #define _SCPI_BRANCH_(k, c, b) { .key_P = &k, .cmd_P = c, .branch_P = b, }

@@ -1,10 +1,14 @@
-
 #include <inttypes.h>
 #include <avr/eeprom.h>
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
+#include "lib/math_cust.h"
 #include "lib/temp.h"
 #include "lib/thermometer_pt.h"
+
+/* Module is constructed to use this number of channels, regardless of amout
+ * real channels used. */
+#define TEMP_CHANNELS_INTERNAL 8
 
 /* temperature DAQ device to measure I and U */
 typedef struct {
@@ -49,11 +53,11 @@ typedef struct {
         uint32_t R_0;
 } temp_conf_t;
 
-temp_t channels[HEAT_CHANNELS];
-static const temp_conf_t EEMEM temp_conf_E[HEAT_CHANNELS] = {
+temp_t temp_data[TEMP_CHANNELS];
+static const temp_conf_t EEMEM temp_conf_E[TEMP_CHANNELS] = {
         {
                 .R_0 = 0,
-                .R_slope = 0,
+                .R_slope = 0x0023A147,
 		.correct_IU = {
 			.I_offs = 0,
 			.U_offs = 0,
@@ -74,7 +78,7 @@ static const temp_conf_t EEMEM temp_conf_E[HEAT_CHANNELS] = {
         },
         {
                 .R_0 = 0,
-                .R_slope = 0,
+                .R_slope = 0x0023A147,
 		.correct_IU = {
 			.I_offs = 0,
 			.U_offs = 0,
@@ -118,15 +122,16 @@ void temp_pic_params_set(uint8_t channel, pic16_param_t pic_param)
 
 temp_data_IU_t temp_meas_IU(uint8_t channel)
 {
-	temp_data_IU_t daq_data;
-	int32_t I = 0;
-	int32_t U = 0;
+	temp_data_IU_t data_IU;
+	int32_t I = 0, U = 0;
 	const temp_conf_t *conf_E;
+	uint8_t spi_dev_num;
+	uint8_t Ichannel, Uchannel;
 
 	conf_E = &temp_conf_E[channel];
-	uint8_t Ichannel = eeprom_read_byte(&conf_E->dev_AD.Ichannel);
-	uint8_t Uchannel = eeprom_read_byte(&conf_E->dev_AD.Uchannel);
-	uint8_t spi_dev_num = eeprom_read_byte(&conf_E->dev_AD.spi_dev_num);
+	spi_dev_num = eeprom_read_byte(&conf_E->dev_AD.spi_dev_num);
+	Ichannel = eeprom_read_byte(&conf_E->dev_AD.Ichannel);
+	Uchannel = eeprom_read_byte(&conf_E->dev_AD.Uchannel);
 	
         SPI_dev_select(spi_dev_num);
 #define DAQ_SAMPLES 8
@@ -140,35 +145,45 @@ temp_data_IU_t temp_meas_IU(uint8_t channel)
 		TIMER1_delay_rel(TIMER1_TICKS_PER_PLC / DAQ_READS);
 	}
 
-	daq_data.I = I / (DAQ_SAMPLES * DAQ_READS);
-	daq_data.U = U / (DAQ_SAMPLES * DAQ_READS);
+	data_IU.I = I / (DAQ_SAMPLES * DAQ_READS);
+	data_IU.U = U / (DAQ_SAMPLES * DAQ_READS);
 
-	return daq_data;
+	return data_IU;
 }
 
 /* Make correction above I nad U from acqusition */
-static temp_data_IU_t temp_correct_IU(temp_data_IU_t daq_data, uint8_t channel)
+static temp_data_IU_t temp_correct_IU(temp_data_IU_t data_IU, uint8_t channel)
 {
 	int8_t offs;
 	const temp_conf_t *conf_E;
 
 	conf_E = &temp_conf_E[channel];
 	offs = eeprom_read_byte((uint8_t *)&conf_E->correct_IU.U_offs);
-	daq_data.I -= offs;
+	data_IU.I -= offs;
 	offs = eeprom_read_byte((uint8_t *)&conf_E->correct_IU.I_offs);
-	daq_data.U -= offs;
+	data_IU.U -= offs;
 
-	return daq_data;
+	return data_IU;
 }
 
 static void temp_shortcut(uint8_t channel)
 {
-        channel = channel;
+        uint8_t spi_dev_num;
+        uint8_t DAchannel;
+	const temp_dev_DA_t *dev_DA_E;
+
+	dev_DA_E = &temp_conf_E[channel].dev_DA;
+	spi_dev_num = eeprom_read_byte(&dev_DA_E->spi_dev_num);
+	DAchannel = eeprom_read_byte(&dev_DA_E->channel);
+        
+        SPI_dev_select(spi_dev_num);
+        /* FIXME: value */
+        SPI_dev_DA_set_output(DAchannel, 0);
 }
 
-static temp_status_IU_t temp_status_IU(temp_data_IU_t daq_data)
+static temp_status_IU_t temp_status_IU(temp_data_IU_t data_IU)
 {
-#define IMAX 0
+#define IMAX 2**15-128
 /* FIXME: DAQ data status */
 #define DAQ_STAT_I_OVER (1<<0)
 #define DAQ_STAT_I_UNDER (2<<0)
@@ -179,38 +194,83 @@ static temp_status_IU_t temp_status_IU(temp_data_IU_t daq_data)
 
 //        Imin = pgm_r
 
-        if (daq_data.I > Imax) {
-                if (daq_data.U < Umin) {
+        if (data_IU.I > Imax) {
+                if (data_IU.U < Umin) {
                         status = daq_status_shortcut;
                 }
                 else
                         status = daq_status_invalid;
 
-        } else if (daq_data.I < Imin) {
+        } else if (data_IU.I < Imin) {
         }*/
-        daq_data = daq_data;
-        status = temp_status_IU_invalid;
+        data_IU = data_IU;
+        //status = temp_status_IU_invalid;
+        status = temp_status_IU_valid;
 
         return status;
 }
 
+static uint32_t temp_get_R(temp_data_IU_t data_IU, uint8_t channel)
+{
+        uint64_t tmp64;
+        uint32_t R, R_slope;
+
+        R_slope = eeprom_read_dword(&temp_conf_E[channel].R_slope);
+        /* R = U * R_slope / I;
+         * R_norm = R / R_0 */
+        tmp64 = math_mul_32_32_r64(data_IU.U, R_slope);
+        R = math_div_64_32_r32(tmp64, data_IU.I);
+
+        return R;
+}
+
+#include "lib/iobuf.h"
+static void temp_loop_(uint8_t channel)
+{
+        temp_data_IU_t data_IU;
+        temp_status_IU_t status;
+
+        putc('A'+channel);
+        data_IU = temp_meas_IU(channel);
+        status = temp_status_IU(data_IU);
+        if (status == temp_status_IU_disconnected) {
+                temp_shortcut(channel);
+                return;
+        }
+        if (status == temp_status_IU_invalid) {
+                temp_shortcut(channel);
+                return;
+        }
+        if (status == temp_status_IU_shortcut) {
+                temp_shortcut(channel);
+                return;
+        }
+        data_IU = temp_correct_IU(data_IU, channel);
+        temp_get_R(data_IU, channel);
+
+        uint16_t e;
+
+        pic16(&temp_data[channel].pic, e, &temp_conf_E[channel].pic);
+        TIMER1_jiff_alarm(TIMER1_ALARM_SEND);
+        /* TODO:  Regulujeme */
+}
+
 void temp_loop(void)
 {
-/*        uint8_t channel = 0;
-        temp_data_IU_t daq_data;
-        temp_status_IU_t status;*/
+        static uint8_t channel;
 
-        /* Check time - is time to start new regulation? */
-/*        daq_data = temp_meas_IU(channel);
-        daq_data = temp_correct_IU(daq_data, channel);
-        status = temp_status_IU(daq_data);
-        if (status == temp_status_IU_disconnected)
-                temp_shortcut(channel);
-        else if (status == temp_status_IU_disconnected)
-                temp_shortcut(channel);
-        else if (status == temp_status_IU_invalid)
-                temp_shortcut(channel);
-        else if (status == temp_status_IU_shortcut)
-                temp_shortcut(channel);*/
+        if (!TIMER1_new_period())
+                return;
+
+        if (channel < TEMP_CHANNELS)
+                temp_loop_(channel);
+        else {
+                if (channel >= TEMP_CHANNELS_INTERNAL) {
+                        channel = 0;
+                        return;
+                }
+        }
+
+        channel++;
 }
 
