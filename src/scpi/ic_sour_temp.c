@@ -21,11 +21,23 @@ static uint8_t get_temp_channel(void)
 SCPI_parse_t SCPI_IC_sour_temp_dwel(void)
 {
         uint8_t channel;
+        uint16_t dwel;
+        SCPI_parse_t ret;
 
         channel = get_temp_channel();
-        SCPI_err_set(&SCPI_err_1);
+        if (_SCPI_CMD_IS_QUEST()) {
+                dwel = temp_dwel_get(channel);
+                SCPI_print_uint16(dwel);
 
-        /* TODO: ... */
+                return SCPI_parse_end;
+        }
+
+        ret = SCPI_in_uint16(&dwel);
+        if (ret == SCPI_parse_err)
+                return ret;
+        /* TODO: TEMP_DWEL_MAX */
+        temp_dwel_set(channel, dwel);
+
         return SCPI_parse_err;
 }
 

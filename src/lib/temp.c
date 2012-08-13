@@ -53,6 +53,7 @@ typedef enum {
  * T_slope      - slope of ramp to reach T_dest in units: °C*20/(sec*4)
  * T_want       - requested value of regulation */
 typedef struct {
+        uint16_t dwel;
         temp_mode_t mode;
         pic16_data_t pic;
         FP_2_14_t R;
@@ -204,6 +205,23 @@ static temp_data_IU_t temp_correct_IU(uint8_t channel, temp_data_IU_t data_IU)
 	data_IU.U -= offs;
 
 	return data_IU;
+}
+
+uint16_t temp_dwel_get(uint8_t channel)
+{
+        return temp_data[channel].dwel;
+}
+
+void temp_dwel_set(uint8_t channel, uint16_t dwel)
+{
+//        temp_1_20_t slope;
+
+        temp_data[channel].dwel = dwel;
+        
+        /* TODO:
+        dwel *= 4;
+        slope = (dT + dwel - 1) / dwel;
+        temp_data[channel].slope = slop;*/
 }
 
 temp_mode_t temp_mode_get(uint8_t channel)
@@ -418,6 +436,7 @@ void temp_init(void)
                 channel--;
                 temp_output_DA(channel, 0);
                 temp_data[channel].T_slope = 1 * 20 / 4; /* 1°C/sec */
+                temp_data[channel].dwel = 60;
         }
 }
 

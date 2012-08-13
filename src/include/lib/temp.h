@@ -5,6 +5,7 @@
 #include "lib/thermometer_pt.h"
 
 #define TEMP_CHANNELS 1
+#define TEMP_DWEL_MAX ((65535/4))
 
 typedef struct {
 	uint16_t I;
@@ -22,6 +23,8 @@ void temp_loop(void);
 
 temp_1_20_t temp_get(uint8_t channel);
 temp_data_IU_t temp_meas_IU(uint8_t channel);
+uint16_t temp_dwel_get(uint8_t channel);
+void temp_dwel_set(uint8_t channel, uint16_t dwel);
 temp_mode_t temp_mode_get(uint8_t channel);
 void temp_mode_set(uint8_t channel, temp_mode_t mode);
 pic16_param_t temp_pic_params_get(uint8_t channel);
