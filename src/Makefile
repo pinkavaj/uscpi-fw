@@ -2,7 +2,7 @@
 #####     Customize these for your project     #####
 
 # port where JTAG programmer is connected
-PROG_PORT=/dev/ttyUSB1
+PROG_PORT=/dev/ttyUSB0
 
 # Name of target controller
 # (see the available avr-gcc mmcu options for possible values)

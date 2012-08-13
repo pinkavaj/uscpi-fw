@@ -6,9 +6,10 @@
 #include <inttypes.h>
 
 /* indexes for SPI devices, use continous numbering to get optimal C code */
-#define SPI_DEV_NONE 0xff
 #define SPI_DEV_AD974_0 0
 #define SPI_DEV_MCP4922_0 1
+/* this shoul have number last_num + 2 */
+#define SPI_DEV_NONE 2
 
 void SPI_init(void);
 void SPI_select_dev(uint8_t dev_num);

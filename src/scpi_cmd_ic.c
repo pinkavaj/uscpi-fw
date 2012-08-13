@@ -70,7 +70,7 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 #include "spi.h"
 static SCPI_parse_t SCPI_IC_test(char UNUSED(c))
 {
-	uint16_t val = 0x55aa;
+	uint16_t val;
 
 	SPI_select_dev(SPI_DEV_AD974_0);
 	SPI_transfer(&val, NULL, sizeof(val));
