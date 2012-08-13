@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "scpi_cmd_tools.h"
+#include "cmd_tools.h"
+
+uint8_t SCPI_params_count;
+uint8_t SCPI_param_in_buf_idx;
 
 /* Shortcut to exit with error 108 - too much parameters */
 SCPI_parse_t SCPI_cmd_err_108(void)

@@ -20,6 +20,7 @@ INC=-I. -Iinclude -I/usr/lib/avr/include/ -Iscpi/include
 SRC=-c main.c
 SRC+=lib/temp.c lib/iobuf.c lib/math_cust.S lib/pic16.c lib/thermometer_pt.c
 SRC+=scpi/scpi.c \
+     scpi/cmd_tools.c \
      scpi/scpi_cc.c \
      scpi/ic_test.c \
      scpi/ic_stat.c \

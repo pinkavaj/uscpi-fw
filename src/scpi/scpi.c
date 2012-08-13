@@ -7,6 +7,7 @@
 #include "scpi.h"
 #include "scpi_parser.h"
 #include "scpi_cmd.h"
+#include "cmd_tools.h"
 #include "scpi_err.c"
 #include "scpi_tree.h"
 
@@ -35,17 +36,11 @@ static const SCPI_cmd_t *SCPI_cmd;
 /* current branch table where to find recieved keyword */
 static const SCPI_branch_item_t *SCPI_branch;
 
-/* used to identify type of parameter */
-#define SCPI_PARAMS_MAX 16
-uint8_t SCPI_params_count;
-static uint8_t SCPI_param_in_buf_idx;
-
 /* Current parser, changes during different stages of parsing input */
 static SCPI_parse_t (*_SCPI_parser)(char);
 
 #include "scpi_tree.c"
-//#include "scpi_ic.c"
-#include "scpi_cmd_tools.c"
+//#include "scpi_cmd_tools.c"
 
 /* Get SCPI keyword [a-zA-Z] or skip to next parser */
 static SCPI_parse_t SCPI_parse_keyword(char c)
