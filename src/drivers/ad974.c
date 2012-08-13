@@ -31,8 +31,13 @@ void ad974_io_init(void)
 }
 
 /*****************************************************************************/
+//#pragma GCC diagnostic ignored "-Winit-self"
 static uint16_t ad974_get_sample_(void)
 {
+	/* Is used as input variable, but does not mather about the content,
+	 * just hackou out warning: 'val' is used uninitialized ... */
+	uint16_t val = val;
+
 	BIT_CLR(AD974_PORT, AD974_CS);
 	/* start conversion, 10ns CS->RC */
 	BIT_CLR(AD974_PORT, AD974_RC);
@@ -43,12 +48,10 @@ static uint16_t ad974_get_sample_(void)
 	/* data acquisition 1us + few ns to set up signals */
 	BIT_SET(AD974_PORT, AD974_RC);
 	_delay_us(1.2);
-	uint8_t valHi = SPI_transfer8b(0);
-	uint8_t valLo = SPI_transfer8b(0);
+	val = SPI_transfer16b(val);
 
 	BIT_SET(AD974_PORT, AD974_CS);
-
-	return (valHi<<8) + valLo;
+	return val;
 }
 
 /*****************************************************************************/

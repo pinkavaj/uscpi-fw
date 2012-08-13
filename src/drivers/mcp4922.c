@@ -63,8 +63,7 @@ static void mcp4922_write(uint16_t datastring)
 {
 	BIT_CLR(MCP4922_PORT, MCP4922_CS);
 	/* send new value to latch, Hi Lo */ 
-	SPI_transfer8b(datastring >> 8);
-	SPI_transfer8b(datastring);
+	SPI_transfer16b(datastring);
 	/* send latch to output 40ns to setup, 100ns width */
 	BIT_CLR(MCP4922_PORT, MCP4922_LD);
 	_delay_loop_1(1);

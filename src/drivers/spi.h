@@ -32,6 +32,7 @@ void SPI_init(void);
 void SPI_dummy_clk(void);
 void SPI_set_mode(uint8_t mode);
 uint8_t SPI_transfer8b(uint8_t val);
+uint16_t SPI_transfer16b(uint16_t val);
 
 #endif
 

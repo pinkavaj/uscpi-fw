@@ -33,3 +33,27 @@ uint8_t SPI_transfer8b(uint8_t val)
 	return SPDR;
 }
 
+uint16_t SPI_transfer16b(uint16_t val)
+{
+	/* This is due to optimalization. Operation above SPDR is marked as 
+	 * volatile and thus default optimalization have some problems. */
+	union {
+		uint16_t val16;
+		uint8_t val8[2];
+	} val_u;
+
+	/* This actualy do nothigh,  */
+	val_u.val16 = val;
+
+	/* val8[1] is in the same place in registers as high byte of val16 ... */
+	SPDR = val_u.val8[1];
+	loop_until_bit_is_set(SPSR, SPIF);
+	val_u.val8[1] = SPDR;
+
+	SPDR = val_u.val8[0];
+	loop_until_bit_is_set(SPSR, SPIF);
+	val_u.val8[0] = SPDR;
+
+	return val_u.val16;
+}
+
