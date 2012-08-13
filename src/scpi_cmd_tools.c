@@ -161,7 +161,8 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 {
 	char *c = SCPI_in;
 	int8_t sig_neg;
-	uint32_t y = 0;
+ 	uint32_t y = 0;
+	uint32_t y_ = 0;
 	SCPI_param_type_t pt = SCPI_param_types[0];
 
 	sig_neg = pt & (SCPI_PAR_NUM_SIG & ~SCPI_PAR_TYPE);
@@ -174,9 +175,10 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 	}
 	if ((pt & SCPI_PAR_NUM_INT_TYPE) == SCPI_PAR_NUM_INT_DEC) {
 		do {
-			if (y > (((uint32_t)0xffffffff - 11)/10))
+			if (y < y_)
 				break;
-			y = y * 10 + (*c - '0');
+			y_ = y;
+			y = y * 10 + (uint8_t)(*c - '0');
 		} while(*++c);
 	} else {
 		SCPI_err_set(&SCPI_err_1);
@@ -190,7 +192,7 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 		k = k >> 24;
 	else if (flags & SCPI_atoi_2B)
 		k = k >> 16;
-	if (*c || (y & k) != y) {
+	if (*c || (y & k) != y || y < y_) {
 		if (sig_neg)
 			k++;
 		if (*c || k != y) {
@@ -217,8 +219,8 @@ static SCPI_parse_t SCPI_out_uint32(uint32_t x)
 	char buf[10];
 	char *c = buf + sizeof(buf);
 	do {
-		*--c = (x % 10) + '0';
-		x /= 10;
+		*--c = (x % (uint8_t)10) + '0';
+		x /= (uint8_t)10;
 	} while (x);
 	SCPI_printn(c, sizeof(buf) - (c - buf));
 	return SCPI_parse_end;
