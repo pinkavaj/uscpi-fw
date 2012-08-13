@@ -8,13 +8,15 @@
 
 #define DEVICE_IMPA444_ASU 1
 #define DEVICE_MSA_HCU814 2
+#define DEVICE_TAN_ASU 3
 
 /* Select device and aparatus */
 //#define DEVICE_NAME DEVICE_IMPA444_ASU
-#define DEVICE_NAME DEVICE_MSA_HCU814
+//#define DEVICE_NAME DEVICE_MSA_HCU814
+#define DEVICE_NAME DEVICE_TAN_ASU
 
 /* If defined SCPI is build including tests */
-//#define SCPI_TEST
+#define SCPI_TEST
 
 /* Configuration for IMPA444_ASU */
 #if (DEVICE_NAME == DEVICE_IMPA444_ASU)
@@ -23,6 +25,10 @@
 /* Configuration for MSA_HCU814 */
 #elif (DEVICE_NAME == DEVICE_MSA_HCU814)
 #define INFO_MODEL HCU-8H14
+
+/* Configuration for TAN_ASU */
+#elif (DEVICE_NAME == DEVICE_TAN_ASU)
+#define INFO_MODEL TAN-ASU
 
 #else
 #error "No target device selected."
@@ -34,7 +40,7 @@
 #define VER_MAJ 0
 #define VER_MINOR 0
 #define VER_REV 0
-#define VER_BUILD 807M
+#define VER_BUILD 808M
 #define INFO_AUTHOR Lukas-Kucera_Jiri-Pinkava
 #define INFO_COMPANY VSCHT
 #ifndef INFO_MODEL

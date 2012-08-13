@@ -26,6 +26,7 @@
 #define SPI_DEV_DA_0 SPI_DEV_TLV5610_0
 #endif
 
+/*
 static SCPI_parse_t SCPI_IC_test_adc(void)
 {
 	if (_SCPI_CMD_IS_QUEST()) {
@@ -53,7 +54,7 @@ static SCPI_parse_t SCPI_IC_test_adc(void)
 		SPI_dev_DA_set_output(1, val);
 	} 
 	return SCPI_parse_end;
-}
+}*/
 
 static SCPI_parse_t SCPI_IC_test_func_div(void)
 {
@@ -165,12 +166,12 @@ static SCPI_parse_t SCPI_IC_test_time(void)
         return SCPI_parse_end;
 }*/
 
-static const SCPI_cmd_t SCPI_cmd_test_adc_P PROGMEM = {
+/*static const SCPI_cmd_t SCPI_cmd_test_adc_P PROGMEM = {
         .get_P = 1,
         .set_P = 1,
         .set_params_min_P = 2,
         .parser_P = SCPI_IC_test_adc,
-};
+};*/
 
 static const SCPI_cmd_t SCPI_cmd_test_func_dec_P PROGMEM = {
         .get_P = 1,
@@ -232,7 +233,7 @@ static const SCPI_branch_item_t SCPI_bt_test_func_P[] PROGMEM = {
 };
 
 const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
+//	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(key_func_P, NULL, SCPI_bt_test_func_P),
 //	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
 	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),

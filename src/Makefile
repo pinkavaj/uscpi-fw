@@ -33,6 +33,7 @@ SRC+=scpi/scpi.c \
      scpi/cmd_tools.c \
      scpi/cmd_tree.c \
      scpi/cmd/cc.c \
+     scpi/cmd/ic_cont.c \
      scpi/cmd/ic_meas.c \
      scpi/cmd/ic_test.c \
      scpi/cmd/ic_sens_list.c \
@@ -45,9 +46,12 @@ SRC+=drivers/usart.c drivers/timer.c
 SRC+=drivers/spi_dev.c \
 	 drivers/spi.c \
 	 drivers/ad974.c \
-	 drivers/max1068.c \
-	 drivers/mcp4922.c \
-	 drivers/tlv5610.c
+	 drivers/valves.c \
+	 drivers/valves_raw.c
+
+#	 drivers/mcp4922.c \
+#	 drivers/max1068.c \
+#	 drivers/tlv5610.c \
 
 OBJ=main.o math_cust.o
 CC=avr-gcc

@@ -20,7 +20,9 @@ _key_(tst, "TST", SHORT3B);
 _key_(wai, "WAI", SHORT3B);
 
 /* SCPI Instrument Commands, list of keywords */
+_key_(clos, "CLOSE",        SHORT4B);
 _key_(cond, "CONDITION",    SHORT4B);
+_key_(cont, "CONTROL",      SHORT4B);
 _key_(coun, "COUNT",        SHORT4B);
 _key_(der,  "DERIVATIVE",   SHORT3B);
 _key_(dwel, "DWELL",        SHORT4B);
@@ -37,6 +39,7 @@ _key_(list, "LIST",         SHORT4B);
 _key_(meas, "MEASURE",      SHORT4B);
 _key_(mode, "MODE",         SHORT4B);
 _key_(next, "NEXT",         SHORT4B);
+_key_(open, "OPEN",         SHORT4B);
 _key_(oper, "OPERATION",    SHORT4B);
 _key_(poin, "POINTS",       SHORT4B);
 _key_(pres, "PRESET",       SHORT4B);
@@ -54,6 +57,7 @@ _key_(syst, "SYSTEM",       SHORT4B);
 _key_(temp, "TEMPERATURE",  SHORT4B);
 _key_(test, "TEST",         SHORT4B);
 _key_(trg,  "TRG",          SHORT3B);
+_key_(valv, "VALVE",        SHORT4B);
 _key_(vers, "VERSION",      SHORT4B);
 
 #ifdef SCPI_TEST

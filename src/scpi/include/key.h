@@ -28,7 +28,9 @@ extern const SCPI_key_t key_stb_P PROGMEM;
 extern const SCPI_key_t key_tst_P PROGMEM;
 extern const SCPI_key_t key_wai_P PROGMEM;
  
+extern const SCPI_key_t key_clos_P PROGMEM;
 extern const SCPI_key_t key_cond_P PROGMEM;
+extern const SCPI_key_t key_cont_P PROGMEM;
 extern const SCPI_key_t key_coun_P PROGMEM;
 extern const SCPI_key_t key_dwel_P PROGMEM;
 extern const SCPI_key_t key_enab_P PROGMEM;
@@ -44,6 +46,7 @@ extern const SCPI_key_t key_list_P PROGMEM;
 extern const SCPI_key_t key_meas_P PROGMEM;
 extern const SCPI_key_t key_mode_P PROGMEM;
 extern const SCPI_key_t key_next_P PROGMEM;
+extern const SCPI_key_t key_open_P PROGMEM;
 extern const SCPI_key_t key_oper_P PROGMEM;
 extern const SCPI_key_t key_poin_P PROGMEM;
 extern const SCPI_key_t key_pres_P PROGMEM;
@@ -61,6 +64,7 @@ extern const SCPI_key_t key_syst_P PROGMEM;
 extern const SCPI_key_t key_temp_P PROGMEM;
 extern const SCPI_key_t key_test_P PROGMEM;
 extern const SCPI_key_t key_trg_P PROGMEM;
+extern const SCPI_key_t key_valv_P PROGMEM;
 extern const SCPI_key_t key_vers_P PROGMEM;
  
 extern const SCPI_key_t key_adc_P PROGMEM;

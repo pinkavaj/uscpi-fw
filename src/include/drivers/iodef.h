@@ -1,6 +1,8 @@
 #ifndef __IODEF_H__
 #define __IODEF_H__
 
+#include "config.h"
+
 /* Tools */
 #define BIT_CLR(port, bit) (port &= ~bit)
 #define BIT_SET(port, bit) (port |= bit)
@@ -9,7 +11,7 @@
 #define DDR_OUT(b) (b)
 
 
-#if DEVICE_NAME == DEVICE_IMPA444_ASU
+#if (DEVICE_NAME == DEVICE_IMPA444_ASU)
 /* AD974 */
 #define AD974_PORT	PORTA
 #define AD974_DDR	DDRA
@@ -35,7 +37,7 @@
 #define MCP4922_LD _BV(PA7)
 #define MCP4922_MASK (MCP4922_CS | MCP4922_LD)
 
-#elif DEVICE_NAME == DEVICE_MSA_HCU814
+#elif (DEVICE_NAME == DEVICE_MSA_HCU814)
 
 /* DAQ8H = DAQ subsystem for HCU814 
    2x MAX1068 + 1x TLV5610 */
@@ -62,6 +64,18 @@
 #define TLV5610_LD   _BV(PA5) // out, 1
 #define TLV5610_MASK	( TLV5610_CS | TLV5610_CLR | TLV5610_LD)
 
+#elif (DEVICE_NAME == DEVICE_TAN_ASU)
+
+#define VALVE_RAW0x_PORT	PORTC
+#define VALVE_RAW0x_DDR		DDRC
+#define VALVE_RAW00_PIN		_BV(0)
+#define VALVE_RAW01_PIN		_BV(1)
+#define VALVE_RAW02_PIN		_BV(2)
+#define VALVE_RAW0x_MASK	(VALVE_RAW00_PIN | VALVE_RAW01_PIN | \
+			VALVE_RAW02_PIN)
+
+#else
+#error "Device not defined"
 #endif
 
 #endif
