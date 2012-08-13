@@ -61,7 +61,6 @@ const SCPI_branch_item_t SCPI_CC_ROOT[] PROGMEM = {
 #define _SCPI_CMD_(p, n, g, s) \
 	static const SCPI_cmd_t SCPI_cmd_ ## p ## _P PROGMEM = \
 	{.parser_P = SCPI_IC_ ## p, g, s, .num_suffix_max_P = n}
-
 /* SCPI Instrument Commands */
 _SCPI_CMD_(stat_oper_cond, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(stat_oper_enab, 0, GET(YES, PARAMS_N), SET(YES, 
@@ -75,16 +74,6 @@ _SCPI_CMD_(stat_ques_enab, 0, GET(YES, PARAMS_N), SET(YES,
 _SCPI_CMD_(stat_ques_even, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_err_next, 0,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_vers, 0,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-
-_SCPI_CMD_(test_adc, 0,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0)));
-_SCPI_CMD_(test_func_dec, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_func_div, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_func_int, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_func_mul, 0,  GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-//_SCPI_CMD_(test_heat, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_temp, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_temp_res, 0, GET(YES, PARAMS_Y), SET(NO_, PARAMS_N));
-_SCPI_CMD_(test_time, 0, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
 /* SCPI Instrument Command tree tables */
 static const SCPI_branch_item_t SCPI_bt_sens_P[] PROGMEM = {
@@ -132,34 +121,15 @@ static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
-static const SCPI_branch_item_t SCPI_bt_test_temp_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_res_P, &SCPI_cmd_test_temp_res_P, NULL),
-	_SCPI_branch_END_,
-};
-
-static const SCPI_branch_item_t SCPI_bt_test_func_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_dec_P, &SCPI_cmd_test_func_dec_P, NULL),
-	_SCPI_BRANCH_(key_div_P, &SCPI_cmd_test_func_div_P, NULL),
-	_SCPI_BRANCH_(key_int_P, &SCPI_cmd_test_func_int_P, NULL),
-	_SCPI_BRANCH_(key_mul_P, &SCPI_cmd_test_func_mul_P, NULL),
-};
-
-static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
-	_SCPI_BRANCH_(key_adc_P, &SCPI_cmd_test_adc_P, NULL),
-	_SCPI_BRANCH_(key_func_P, NULL, SCPI_bt_test_func_P),
-//	_SCPI_BRANCH_(key_heat_P, &SCPI_cmd_test_heat_P, NULL),
-	_SCPI_BRANCH_(key_temp_P, &SCPI_cmd_test_temp_P, SCPI_bt_test_temp_P),
-	_SCPI_BRANCH_(key_time_P, &SCPI_cmd_test_time_P, NULL),
-	_SCPI_branch_END_,
-};
-
 const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
 	_SCPI_BRANCH_(key_meas_P, NULL, SCPI_bt_meas_P),
 	_SCPI_BRANCH_(key_sens_P, NULL, SCPI_bt_sens_P),
 	_SCPI_BRANCH_(key_sour_P, NULL, SCPI_bt_sour_P),
 	_SCPI_BRANCH_(key_stat_P, NULL, SCPI_bt_stat_P),
 	_SCPI_BRANCH_(key_syst_P, NULL, SCPI_bt_syst_P),
+#ifdef SCPI_TEST
 	_SCPI_BRANCH_(key_test_P, NULL, SCPI_bt_test_P),
+#endif
 	_SCPI_branch_END_,
 };
 

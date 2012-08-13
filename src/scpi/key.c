@@ -1,3 +1,4 @@
+#include "config.h"
 #include "key.h"
 
 #define SHORT3B 3
@@ -55,12 +56,14 @@ _key_(test, "TEST",         SHORT4B);
 _key_(trg,  "TRG",          SHORT3B);
 _key_(vers, "VERSION",      SHORT4B);
 
+#ifdef SCPI_TEST
 _key_(adc, "ADC",  SHORT3B);
 _key_(dec, "DEC",  SHORT3B);
 _key_(div, "DIV",  SHORT3B);
 _key_(heat,"HEAT", SHORT4B);
 _key_(mul, "MUL",  SHORT3B);
 _key_(time,"TIME", SHORT4B);
+#endif
 
 uint8_t keycmp_P(const char *s, prog_SCPI_key_t key)
 {

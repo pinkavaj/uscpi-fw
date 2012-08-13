@@ -5,6 +5,9 @@
 #include "ic_meas.h"
 #include "ic_sens_list.h"
 #include "ic_sour_temp.h"
+#ifdef SCPI_TEST
+#include "ic_test.h"
+#endif
 
 extern uint8_t SCPI_params_count;
 
@@ -18,18 +21,6 @@ SCPI_parse_t SCPI_IC_stat_ques_enab(void);
 SCPI_parse_t SCPI_IC_stat_ques_even(void);
 SCPI_parse_t SCPI_IC_syst_err_next(void);
 SCPI_parse_t SCPI_IC_syst_vers(void);
-
-#ifdef SCPI_TEST
-SCPI_parse_t SCPI_IC_test_adc(void);
-SCPI_parse_t SCPI_IC_test_func_dec(void);
-SCPI_parse_t SCPI_IC_test_func_div(void);
-SCPI_parse_t SCPI_IC_test_func_int(void);
-SCPI_parse_t SCPI_IC_test_func_mul(void);
-SCPI_parse_t SCPI_IC_test_heat(void);
-SCPI_parse_t SCPI_IC_test_temp(void);
-SCPI_parse_t SCPI_IC_test_temp_res(void);
-SCPI_parse_t SCPI_IC_test_time(void);
-#endif
 
 #endif
 /* :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab */
