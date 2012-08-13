@@ -105,13 +105,15 @@ static SCPI_parse_t SCPI_IC_stat_ques_even(char c);
 static SCPI_parse_t SCPI_IC_syst_err_next(char c);
 static SCPI_parse_t SCPI_IC_syst_vers(char c);
 
-static SCPI_parse_t SCPI_IC_test(char c);
+static SCPI_parse_t SCPI_IC_test_adc(char c);
+static SCPI_parse_t SCPI_IC_test_div(char c);
 
 /* SCPI Tools */
 static SCPI_parse_t SCPI_in_uint8(uint8_t *x);
 static SCPI_parse_t SCPI_in_uint16(uint16_t *x);
+static SCPI_parse_t SCPI_in_uint32(uint32_t *x);
 /* static void SCPI_out_int(int i); */
-static SCPI_parse_t SCPI_out_uint(unsigned int i);
+static SCPI_parse_t SCPI_out_uint32(uint32_t x);
 static SCPI_parse_t SCPI_out_1(void);
 static SCPI_parse_t SCPI_cmd_err_108(void);
 

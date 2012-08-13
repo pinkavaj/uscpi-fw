@@ -148,6 +148,12 @@ static SCPI_parse_t SCPI_in_uint16(uint16_t *x)
 	return SCPI_atoi(x, SCPI_atoi_UNSIGNED | SCPI_atoi_2B);
 }
 
+/* Wraper around SCPI_atoi, parse and return integer */
+static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
+{
+	return SCPI_atoi(x, SCPI_atoi_UNSIGNED | SCPI_atoi_4B);
+}
+
 /* Parse integer value, if parsed sucessfully, set value of *x, othervise
  * set error code and exit with SCPI_parse_err, flags specify data type 
  * and lenght, see top of this file */
@@ -158,7 +164,7 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 	uint32_t y = 0;
 	SCPI_param_type_t pt = SCPI_param_types[0];
 
-	sig_neg = pt & SCPI_PAR_NUM_SIG & ~SCPI_PAR_NUM;
+	sig_neg = pt & (SCPI_PAR_NUM_SIG & ~SCPI_PAR_TYPE);
 	/* Check parameter type */
 	if ((pt & SCPI_PAR_NUM_TYPE) != SCPI_PAR_NUM_INT ||
 			(sig_neg && (flags & SCPI_atoi_UNSIGNED)))
@@ -170,8 +176,7 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 		do {
 			if (y > (((uint32_t)0xffffffff - 11)/10))
 				break;
-			y = y * 10;
-			y += (*c - '0');
+			y = y * 10 + (*c - '0');
 		} while(*++c);
 	} else {
 		SCPI_err_set(&SCPI_err_1);
@@ -206,15 +211,16 @@ static SCPI_parse_t SCPI_atoi(void *x, uint8_t flags)
 }
 
 /* Print unisgned int to output */
-static SCPI_parse_t SCPI_out_uint(unsigned int i)
+static SCPI_parse_t SCPI_out_uint32(uint32_t x)
 {
-	char buf[5];
-	char *c = buf + 5;
+	// maximal amount of digits for uint32 is 10
+	char buf[10];
+	char *c = buf + sizeof(buf);
 	do {
-		*--c = (i % 10) + '0';
-		i /= 10;
-	} while (i);
-	SCPI_printn(c, 5 - (c - buf));
+		*--c = (x % 10) + '0';
+		x /= 10;
+	} while (x);
+	SCPI_printn(c, sizeof(buf) - (c - buf));
 	return SCPI_parse_end;
 }
 

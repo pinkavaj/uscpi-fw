@@ -142,6 +142,8 @@ static const char SCPI_kw_syst_P[] PROGMEM = "SYSTEM";
 static const char SCPI_kw_vers_P[] PROGMEM = "VERSION";
 
 static const char SCPI_kw_test_P[] PROGMEM = "TEST";
+static const char SCPI_kw_adc_P[] PROGMEM = "ADC";
+static const char SCPI_kw_div_P[] PROGMEM = "DIV";
        
 _SCPI_key_(cond, SHORT4B);
 _SCPI_key_(enab, SHORT4B);
@@ -156,6 +158,8 @@ _SCPI_key_(syst, SHORT4B);
 _SCPI_key_(vers, SHORT4B);
 
 _SCPI_key_(test, SHORT4B);
+_SCPI_key_(adc, SHORT3B);
+_SCPI_key_(div, SHORT3B);
 
 #undef _SCPI_CMD_
 #define _SCPI_CMD_(p, g, s) \
@@ -176,7 +180,8 @@ _SCPI_CMD_(stat_ques_even, GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_err_next,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 _SCPI_CMD_(syst_vers,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
 
-_SCPI_CMD_(test,      GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_adc,  GET(YES, PARAMS_N), SET(NO_, PARAMS_N));
+_SCPI_CMD_(test_div,  GET(YES, PARAMS_N), SET(YES, PARAMS(2, OPT_0, ATONCE_Y)));
 
 /* SCPI Instrument Command tree tables */
 static const SCPI_branch_item_t SCPI_bt_syst_err_P[] PROGMEM = {
@@ -214,11 +219,17 @@ static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
 	_SCPI_branch_END_,
 };
 
+static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
+//	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
+	_SCPI_BRANCH_(SCPI_key_div_P, &SCPI_cmd_test_div_P, NULL),
+	_SCPI_branch_END_,
+};
+
 static const SCPI_branch_item_t SCPI_bt_ROOT[] PROGMEM = {
 	_SCPI_BRANCH_(SCPI_key_stat_P, NULL, SCPI_bt_stat_P),
 	_SCPI_BRANCH_(SCPI_key_syst_P, NULL, SCPI_bt_syst_P),
 
-	_SCPI_BRANCH_(SCPI_key_test_P, &SCPI_cmd_test_P, NULL),
+	_SCPI_BRANCH_(SCPI_key_test_P, NULL, SCPI_bt_test_P),
 	_SCPI_branch_END_,
 };
 

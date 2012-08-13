@@ -7,7 +7,7 @@
 /* Value of OPERationas Status Register */
 static SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
 {
-	SCPI_out_uint(SCPI_OPER_cond);
+	SCPI_out_uint32(SCPI_OPER_cond);
 	return SCPI_parse_end;
 }
 
@@ -15,7 +15,7 @@ static SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
 static SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint(SCPI_OPER_enab);
+		SCPI_out_uint32(SCPI_OPER_enab);
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
@@ -28,7 +28,7 @@ static SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
 /* Value of SCPI OPERation Event register */
 static SCPI_parse_t SCPI_IC_stat_oper_even(char UNUSED(c))
 {
-	SCPI_out_uint(SCPI_OPER_even_get());
+	SCPI_out_uint32(SCPI_OPER_even_get());
 	return SCPI_parse_end;
 }
 
@@ -44,14 +44,14 @@ static SCPI_parse_t SCPI_IC_stat_pres(char UNUSED(c))
 
 static SCPI_parse_t SCPI_IC_stat_ques_cond(char UNUSED(c))
 {
-	SCPI_out_uint(SCPI_QUES_cond);
+	SCPI_out_uint32(SCPI_QUES_cond);
 	return SCPI_parse_end;
 }
 
 static SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint(SCPI_QUES_enab);
+		SCPI_out_uint32(SCPI_QUES_enab);
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
@@ -63,20 +63,40 @@ static SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 
 static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 {
-	SCPI_out_uint(SCPI_QUES_even_get());
+	SCPI_out_uint32(SCPI_QUES_even_get());
 	return SCPI_parse_end;
 }
 
 #include "spi.h"
-static SCPI_parse_t SCPI_IC_test(char UNUSED(c))
+static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {
 	uint16_t val;
 
 	SPI_select_dev(SPI_DEV_AD974_0);
 	SPI_transfer(&val, NULL, sizeof(val));
-	SCPI_out_uint(val);
+	SCPI_out_uint32(val);
 	return SCPI_parse_end;
 }
+
+#include "math.h"
+static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
+{
+	static uint32_t val1, val2;
+	static uint64_t val;
+
+	if (_SCPI_CMD_IS_QUEST()) {
+//		val_ = math_mul_32_32_r64(val1, val2);
+		val1 = math_div_64_32_r32(val, val2);
+		SCPI_out_uint32(val1);
+	} else {
+		SCPI_in_uint32(&val1);
+		SCPI_in_uint32(&val2);
+
+		val = (uint64_t)val1 * val2;
+	}
+	return SCPI_parse_end;
+}
+
 
 /* Get (next) error from error queue */
 static SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
