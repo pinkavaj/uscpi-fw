@@ -12,8 +12,8 @@ typedef uint8_t USART0_in_len_t;
  * conserve memory, but different modules use internaly different names to 
  * acces them, so below is defined series of #define(s) to rename them. */
 #define USART0_IN_LEN 128
-char USART0_in[USART0_IN_LEN];
-volatile USART0_in_len_t USART0_in_len;
+extern char USART0_in[USART0_IN_LEN];
+extern volatile USART0_in_len_t USART0_in_len;
 
 void USART0_init(void);
 void USART0_start_sending(void);

@@ -27,7 +27,7 @@ static SCPI_parse_t SCPI_CC_cls(char UNUSED(c))
 static SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint32(SCPI_SESR_enab);
+		print_uint32(SCPI_SESR_enab);
 		return SCPI_parse_end;
 	} 
 	if (SCPI_params_count != 1)
@@ -40,7 +40,7 @@ static SCPI_parse_t SCPI_CC_ese(char UNUSED(c))
 /* Event Status Register Query */
 static SCPI_parse_t SCPI_CC_esr(char UNUSED(c))
 {
-	SCPI_out_uint32(SCPI_SESR_get());
+	print_uint32(SCPI_SESR_get());
 	return SCPI_parse_end;
 }
 
@@ -54,7 +54,7 @@ static SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
 		STR(VER_MINOR) "." STR(VER_REV) "." STR(VER_BUILD)
 		"-avr_libc-" __AVR_LIBC_VERSION_STRING__ ;
 
-	SCPI_print_P(IDN_P);
+	print_P(IDN_P);
 	return SCPI_parse_end;
 }
 
@@ -63,7 +63,7 @@ static SCPI_parse_t SCPI_CC_idn(char UNUSED(c))
 static SCPI_parse_t SCPI_CC_opc(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_1();
+		putc('1');
 		return SCPI_parse_end;
 	}
 	SCPI_SESR_set(SCPI_SESR_OPC);
@@ -81,7 +81,7 @@ static SCPI_parse_t SCPI_CC_rst(char UNUSED(c))
 static SCPI_parse_t SCPI_CC_sre(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint32(SCPI_SRE_);
+		print_uint32(SCPI_SRE_);
 		return SCPI_parse_end;
 	}
 	SCPI_parse_t ret = SCPI_in_uint8(&SCPI_SRE_);
@@ -95,14 +95,14 @@ static SCPI_parse_t SCPI_CC_stb(char UNUSED(c))
 	uint8_t x = SCPI_STB & SCPI_SRE_;
 	if (x)
 		x |= SCPI_STB_RQS;
-	SCPI_out_uint32(x);
+	print_uint32(x);
 	return SCPI_parse_end;
 }
 
 /* Self-Test Query  */
 static SCPI_parse_t SCPI_CC_tst(char UNUSED(c))
 {
-	SCPI_out_1();
+	putc('1');
 	return SCPI_parse_end;
 }
 

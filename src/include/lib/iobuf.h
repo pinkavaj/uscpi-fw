@@ -20,8 +20,10 @@ char popc(void);
 void putc(char c);
 void printn(const char *str, uint8_t len);
 void print_P(PGM_P str_P);
-void print_int32(int32_t x, uint8_t digits);
-void print_uint32(uint32_t x, uint8_t digits);
+void print_int32(int32_t x);
+void print_int32f(int32_t x, uint8_t digits);
+void print_uint32(uint32_t x);
+void print_uint32f(uint32_t x, uint8_t digits);
 //#endif
 
 #endif

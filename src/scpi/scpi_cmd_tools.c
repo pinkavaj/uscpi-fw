@@ -151,47 +151,4 @@ static SCPI_parse_t SCPI_in_uint32(uint32_t *x)
 	return SCPI_parse_end;
 }
 
-/* Print unisgned int to output */
-static SCPI_parse_t SCPI_out_uint32f(uint32_t x, uint8_t digits)
-{
-	// maximal amount of digits for uint32 is 10
-	char buf[10];
-	char *c = buf + sizeof(buf);
-	do {
-		*--c = (x % (uint8_t)10) + '0';
-		x /= (uint8_t)10;
-		if (digits)
-			digits--;
-	} while (x);
-	
-	while(digits) {
-		*--c = '0';
-		digits--;
-	}
-	SCPI_printn(c, sizeof(buf) - (c - buf));
-	return SCPI_parse_end;
-}
-
-static SCPI_parse_t SCPI_out_uint32(uint32_t x)
-{
-	return SCPI_out_uint32f(x, 0);
-}
-
-/* Print int to output */
-/*static void SCPI_out_i(int i)
-{
-	if (i < 0) {
-		SCPI_putc('-');
-		i = -i;
-	}
-	SCPI_out_ui((unsigned int)i);
-}*/
-
-/* Print 1 as result value */
-static SCPI_parse_t SCPI_out_1(void)
-{
-	SCPI_putc('1');
-	return SCPI_parse_end;
-}
-
 // :set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab

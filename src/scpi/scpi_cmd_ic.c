@@ -7,7 +7,7 @@
 /* Value of OPERation Status Register */
 static SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
 {
-	SCPI_out_uint32(SCPI_OPER_cond);
+	print_uint32(SCPI_OPER_cond);
 	return SCPI_parse_end;
 }
 
@@ -15,7 +15,7 @@ static SCPI_parse_t SCPI_IC_stat_oper_cond(char UNUSED(c))
 static SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint32(SCPI_OPER_enab);
+		print_uint32(SCPI_OPER_enab);
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
@@ -28,7 +28,7 @@ static SCPI_parse_t SCPI_IC_stat_oper_enab(char UNUSED(c))
 /* Value of SCPI OPERation Event register */
 static SCPI_parse_t SCPI_IC_stat_oper_even(char UNUSED(c))
 {
-	SCPI_out_uint32(SCPI_OPER_even_get());
+	print_uint32(SCPI_OPER_even_get());
 	return SCPI_parse_end;
 }
 
@@ -44,14 +44,14 @@ static SCPI_parse_t SCPI_IC_stat_pres(char UNUSED(c))
 
 static SCPI_parse_t SCPI_IC_stat_ques_cond(char UNUSED(c))
 {
-	SCPI_out_uint32(SCPI_QUES_cond);
+	print_uint32(SCPI_QUES_cond);
 	return SCPI_parse_end;
 }
 
 static SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 {
 	if (_SCPI_CMD_IS_QUEST()) {
-		SCPI_out_uint32(SCPI_QUES_enab);
+		print_uint32(SCPI_QUES_enab);
 		return SCPI_parse_end;
 	}
 	if (SCPI_params_count != 1)
@@ -63,7 +63,7 @@ static SCPI_parse_t SCPI_IC_stat_ques_enab(char UNUSED(c))
 
 static SCPI_parse_t SCPI_IC_stat_ques_even(char UNUSED(c))
 {
-	SCPI_out_uint32(SCPI_QUES_even_get());
+	print_uint32(SCPI_QUES_even_get());
 	return SCPI_parse_end;
 }
 
@@ -77,13 +77,13 @@ static SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 			uint16_t sample;
 
 			sample = SPI_dev_AD_get_sample(channel);
-			SCPI_out_uint32(sample);
-			SCPI_putc(',');
+			print_uint32(sample);
+			putc(',');
 			sample = SPI_dev_AD_get_sample(channel);
-			SCPI_out_uint32(sample);
+			print_uint32(sample);
 			if (channel == 3)
 				break;
-			SCPI_putc(',');
+			putc(',');
 		}
 	} else {
 		uint16_t val;
@@ -107,7 +107,7 @@ static SCPI_parse_t SCPI_IC_test_div(char UNUSED(c))
 
 	if (_SCPI_CMD_IS_QUEST()) {
 		uint32_t val = math_div_64_32_r32(nom, num);
-		SCPI_out_uint32(val);
+		print_uint32(val);
 	} else {
 		uint32_t *p = (void *)&nom;
 		SCPI_in_uint32(p+1);
@@ -126,9 +126,9 @@ static SCPI_parse_t SCPI_IC_test_mul(char UNUSED(c))
 
 		val = math_mul_32_32_r64(val1, val2);
 		uint32_t *p = (void*)&val;
-		SCPI_out_uint32(*(p+1));
-		SCPI_putc(',');
-		SCPI_out_uint32(val);
+		print_uint32(*(p+1));
+		putc(',');
+		print_uint32(val);
 	} else {
 		SCPI_in_uint32(&val1);
 		SCPI_in_uint32(&val2);
@@ -141,7 +141,7 @@ static SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 	static uint32_t val;
 
 	if (_SCPI_CMD_IS_QUEST())
-		SCPI_out_uint32(val);
+		print_uint32(val);
 	else
 		return SCPI_in_uint32(&val);
 	return SCPI_parse_end;
@@ -150,7 +150,7 @@ static SCPI_parse_t SCPI_IC_test_num(char UNUSED(c))
 #include "drivers/timer.h"
 static SCPI_parse_t SCPI_IC_test_time(char UNUSED(c))
 {
-	SCPI_out_uint32(time_sec);
+	print_uint32(time_sec);
 	return SCPI_parse_end;
 }
 
@@ -174,13 +174,13 @@ static SCPI_parse_t SCPI_IC_syst_err_next(char UNUSED(c))
 				SCPI_STB_reset(SCPI_STB_EEQ);
 		}
 	}
-	SCPI_print_P((const char*)pgm_read_word(&e->str_P));
+	print_P((const char*)pgm_read_word(&e->str_P));
 	return SCPI_parse_end;
 }
 
 static SCPI_parse_t SCPI_IC_syst_vers(char UNUSED(c))
 {
-	SCPI_print_P(SCPI_version_P);
+	print_P(SCPI_version_P);
 	return SCPI_parse_end;
 }
 

@@ -7,6 +7,12 @@
 #include <avr/pgmspace.h>
 #include <util/atomic.h>
 
+/* FXIME: hack, rework to iobuf */
+#include "drivers/usart.h"
+#define SCPI_in USART0_in
+#define SCPI_in_len USART0_in_len
+#define SCPI_in_len_ USART0_in_len_
+
 /*
  * SCPI_parse_more - continue recieving, need more data
  * SCPI_parse_drop_all - drop all data in buffer, continue recieving

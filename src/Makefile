@@ -17,7 +17,7 @@ PROJECT=uSCPIfw
 # (NOT .s !!!) for assembly source code files.
 INC=-I. -Iinclude -I/usr/lib/avr/include/
 
-SRC=-c main.c scpi_io.c
+SRC=-c main.c
 SRC+=lib/heating.c lib/iobuf.c lib/math_cust.S lib/pic16.c
 SRC+=scpi/scpi.c
 SRC+=drivers/usart.c drivers/timer.c

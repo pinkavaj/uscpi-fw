@@ -71,7 +71,13 @@ void printn(const char *str, uint8_t len)
 }
 
 /*****************************************************************************/
-void print_int32(int32_t x, uint8_t digits)
+void print_int32(int32_t x)
+{
+	print_int32f(x, 0);
+}
+
+/*****************************************************************************/
+void print_int32f(int32_t x, uint8_t digits)
 {
 	if (x < 0)
 	{
@@ -80,12 +86,18 @@ void print_int32(int32_t x, uint8_t digits)
 			digits--;
 		x = -x;
 	}
-	print_uint32(x, digits);
+	print_uint32f(x, digits);
+}
+
+/*****************************************************************************/
+void print_uint32(uint32_t x)
+{
+	print_uint32f(x, 0);
 }
 
 /*****************************************************************************/
 /* print unisgned int to output */
-void print_uint32(uint32_t x, uint8_t digits)
+void print_uint32f(uint32_t x, uint8_t digits)
 {
 	/* maximal number of digits for uint32 is 10 */
 #define print_uint32_BUF_LEN 10

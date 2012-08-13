@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "config.h"
+#include "lib/iobuf.h"
 #include "scpi.h"
-#include "scpi_io.h"
 #include "scpi_cmd.h"
 #include "scpi_err.c"
 #include "scpi_tree.h"
@@ -121,7 +121,7 @@ static SCPI_parse_t SCPI_parse_keyword_question(char c)
 	if (c == '?') {
 		_SCPI_CMD_IS_QUEST_set();
 		if (_SCPI_PREV_RESULT())
-			SCPI_putc(';');
+			putc(';');
 		else
 			_SCPI_PREV_RESULT_set();
 		return SCPI_parse_drop_last;
@@ -302,8 +302,8 @@ static SCPI_parse_t SCPI_parse_end_(SCPI_parse_t ret)
 	/* TODO: mark parser as reset neede */
 	if (_SCPI_PREV_RESULT())
 	{
-		SCPI_putc('\r');
-		SCPI_putc('\n');
+		putc('\r');
+		putc('\n');
 	}
 	return ret;
 }
