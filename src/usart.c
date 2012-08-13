@@ -21,6 +21,16 @@
 #define CHAR_ERR_OVERFLOW ((char)_BV(3))
 #define CHAR_ERR_PARITY ((char)_BV(2))
 
+#if FE0 != 4
+#warning "FE0 != CHAR_ERR_FRAMING, this might lead to a bit larger code."
+#endif
+#if DOR0 != 3
+#warning "DOR0 != CHAR_ERR_OVERFLOW, this might lead to a bit larger code."
+#endif
+#if UPE0 != 2
+#warning "UPE0 != CHAR_ERR_PARITY, this might lead to a bit larger code."
+#endif
+
 /* Input buffer for asynchronous data recieving */
 char USART0_in[USART0_IN_LEN];
 /* USART0 input buffer state */
@@ -47,8 +57,9 @@ ISR(USART0_RXC_vect)
 	/* Get USART error and then coresponding char */
 	uerr = UCSR0A & (_BV(FE0) | _BV(DOR0) | _BV(UPE0));
 	c = UDR0;
-	if (c == CHAR_RESET && !uerr)
-		__asm__(" jmp __vectors ");
+	if (c == CHAR_RESET && !uerr) {
+		__asm__(" jmp 0x0 ");
+	}
 	do {
 		/* buffer totaly full */
 		if (USART0_in_len_ >= (USART0_IN_LEN - 1))
@@ -61,7 +72,7 @@ ISR(USART0_RXC_vect)
 				c |= CHAR_ERR_PARITY;
 			if (uerr & _BV(FE0))
 				c |= CHAR_ERR_FRAMING;
-			if (uerr & _BV(DOR0) || USART0_in_len_ >= (USART0_IN_LEN - 2))
+			if (uerr & _BV(DOR0) || USART0_in_len_ == (USART0_IN_LEN - 2))
 				c |= CHAR_ERR_OVERFLOW;
 			
 			USART0_in[USART0_in_len_++] = c;
@@ -74,7 +85,7 @@ ISR(USART0_RXC_vect)
 			break;
 		}
 		USART0_in[USART0_in_len_++] = c;
-		if (!c) {
+		if (c == CHAR_ERR_ESC) {
 			if (USART0_in_len_ >= (USART0_IN_LEN - 2)) {
 				USART0_in[USART0_in_len_++] = CHAR_ERR_OVERFLOW;
 				break;
@@ -89,20 +100,16 @@ ISR(USART0_RXC_vect)
 
 /* USART0_TXC_vect */
 
-/* Send data from output buffer, activated by int. enabling */
+/* Send data from output buffer, enable interrupt UDRIE to start */
 ISR(USART0_UDRE_vect)
 {
-	do {
-		UDR0 = USART0_out[USART0_out_len_++];
-		/* No more data to send, stop sending, reset buffer */
-		if (USART0_out_len == USART0_out_len_) {
-			UCSR0B &= ~_BV(UDRIE0);
-			USART0_out_len = 0;
-			USART0_out_len_ = 0;
-			return;
-		}
-		/* until we may put something to send buffer */
-	} while(UCSR0A & _BV(UDRE0));
+	UDR0 = USART0_out[USART0_out_len_++];
+	/* No more data to send, stop sending, reset buffer */
+	if (USART0_out_len == USART0_out_len_) {
+		UCSR0B &= ~_BV(UDRIE0);
+		USART0_out_len = 0;
+		USART0_out_len_ = 0;
+	}
 }
 
 /* USART1_RXC_vect
@@ -128,10 +135,15 @@ void USART0_init(void)
 	UCSR0C = _BV(URSEL0) | _BV(UCSZ00) | _BV(UCSZ01);
 	/* enable Tx, Rx and Recieve Complete Interrupt */
 	UCSR0B = _BV(TXEN0) | _BV(RXEN0) | _BV(RXCIE0);
+	SCPI_parser_reset();
+	// drop all bytes waiting in buffer
+	do {
+		uint8_t x = UDR0;
+	} while (!(UCSR0A & _BV(RXC0)));
 }
 
 /* Print len bytes into output buffer */
-void USART0_printn(const char *c, int len)
+void USART0_printn(const char *c, unsigned int len)
 {
 	if (!len)
 		return;
@@ -181,7 +193,9 @@ USART0_printn_put:
 			}
 			USART0_out[USART0_out_len++] = c_;
 		} while (USART0_out_len < USART0_OUT_LEN);
-	} 
+	}
+// TODO: udělat samostatnou proceduru čekající na ulovnění potřebného místa v
+// bufferu. v printech nic nekontrolovat
 	do {
 		if (USART0_out_len_ > 0) {
 			memmove((char *)USART0_out, 
@@ -213,9 +227,9 @@ static void USART0_in_process(void)
 	USART0_in_process_lock++;
 	while (USART0_in_len < USART0_in_len_) {
 		c = USART0_in[USART0_in_len++];
-		if (!c) {
+		if (c == CHAR_ERR_ESC) {
 			c = USART0_in[USART0_in_len++];
-			if (c) {
+			if (c != CHAR_ERR_ESC) {
 				char_err = c;
 				if (char_err & CHAR_ERR_PARITY)
 					SCPI_err_set(&SCPI_err_361);

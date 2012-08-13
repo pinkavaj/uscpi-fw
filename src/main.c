@@ -1,12 +1,10 @@
 #include "config.h"
-#include "timer.h"
 #include "spi.h"
+#include "timer.h"
 #include "usart.h"
 
 #include <avr/interrupt.h>
-//#include <avr/io.h>
 #include <avr/sleep.h>
-//#include <util/atomic.h>
 
 /* ** Interrupt vector ** */
 /*
@@ -27,6 +25,7 @@
 
 void main(void)
 {
+	cli();
 	TIMER1_init();
 	USART0_init();
 	SPI_init();
