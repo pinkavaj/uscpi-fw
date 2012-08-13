@@ -220,7 +220,7 @@ static const SCPI_branch_item_t SCPI_bt_syst_P[] PROGMEM = {
 };
 
 static const SCPI_branch_item_t SCPI_bt_test_P[] PROGMEM = {
-//	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
+	_SCPI_BRANCH_(SCPI_key_adc_P, &SCPI_cmd_test_adc_P, NULL),
 	_SCPI_BRANCH_(SCPI_key_div_P, &SCPI_cmd_test_div_P, NULL),
 	_SCPI_branch_END_,
 };
