@@ -20,8 +20,9 @@
 /*****************************************************************************/
 void max1068_io_init(void)
 {
-/*	PORT_MODIFY(MAX1068_PORT, 
-	PORT_MODIFY(AD974_PORT, AD974_MASK, (AD974_RC | AD974_WR | AD974_CS));*/
+	PORT_MODIFY(MAX1068_DDR, MAX1068_MASK, 
+			DDR_OUT(MAX1068_0_CS | MAX1068_1_CS));
+	PORT_MODIFY(MAX1068_PORT, MAX1068_MASK, (MAX1068_0_CS | MAX1068_1_CS));
 }
 
 void max1068_X_select(void)
@@ -32,15 +33,19 @@ void max1068_X_select(void)
 
 uint16_t max1068_get_sample(uint8_t channel)
 {
-        /* FIXME: cele zkontrolovat a přidat  do Makefile */
         uint16_t result;
 
         BIT_CLR(MAX1068_PORT, MAX1068_0_CS);
-        channel =<< 5;  // send address in form AAA00001
-        channel |= 1;
+	
+	#define MAX1068_SETTINGS 0x01
+	/* single channel, no scan; always on; internal clock */
+        channel =<< 5;		// send address in form AAAsssss
+        channel |= MAX1068_SETTINGS;
+
         SPI_transfer8b(channel);
-        _delay_us(8);    // wait for conversion
+        _delay_us(8);		// wait for conversion
         result = SPI_transfer16b(0);
+
         BIT_SET(MAX1068_PORT, MAX1068_0_CS);
 
         return result;
