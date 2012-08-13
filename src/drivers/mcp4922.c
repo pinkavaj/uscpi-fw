@@ -1,5 +1,5 @@
 /*****************************************************************************
- *        ****  Digital-to-Analog Converter MCP4922  ****
+ *     ***  Digital-to-Analog Converter MCP4922  ***
  *
  * Copyright (c) 2010 Lukas Kucera <kuceral@vscht.cz>, 
  * 	Jiri Pinkava <jiri.pinkava@vscht.cz>

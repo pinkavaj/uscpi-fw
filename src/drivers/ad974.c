@@ -55,7 +55,6 @@ static uint16_t ad974_get_sample_(void)
 //	loop_until_bit_is_set(AD974_PORT, AD974_BUSY);
 	/* data acquisition 1us + few ns to set up signals */
 	BIT_SET(AD974_PORT, AD974_RC);
-	ad974_set_channel(0);
 	_delay_us(1.5);
 	// read result
 	val = SPI_transfer8b(0) << 8;
@@ -73,9 +72,10 @@ uint16_t ad974_get_sample(uint8_t channel)
 
 void ad974_get_samples(uint8_t channel, uint32_t *val, uint8_t count)
 {
-	// dummy read
 	ad974_set_channel(channel);
+	/* dummy read */
 	ad974_get_sample_();
+
 	while(count--)
 		*val += ad974_get_sample_();
 }
