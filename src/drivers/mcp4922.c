@@ -1,13 +1,20 @@
-/*****************************************************************************/
-/*        ****  Digital-to-Analog Converter MCP4922  ****
- */
+/*****************************************************************************
+ *        ****  Digital-to-Analog Converter MCP4922  ****
+ *
+ * Copyright (c) 2010 Lukas Kucera <kuceral@vscht.cz>, 
+ * 	Jiri Pinkava <jiri.pinkava@vscht.cz>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *****************************************************************************/
+
 #include <util/delay.h>
 #include <util/delay_basic.h>
 
 #include "iodef.h"
 #include "spi.h"
 #include "mcp4922.h"
-
 
 #define MCP4922_OUTPUT 12
 #define MCP4922_OUTPUT_ON (1<<MCP4922_OUTPUT)
@@ -25,7 +32,6 @@
 #define MCP4922_CH_A (0<<MCP4922_CH)
 #define MCP4922_CH_B (1<<MCP4922_CH)
 
-
 /*****************************************************************************/
 void mcp4922_io_init(void)
 {
@@ -34,6 +40,7 @@ void mcp4922_io_init(void)
 	PORT_MODIFY(MCP4922_PORT, MCP4922_MASK, (MCP4922_CS | MCP4922_LD));
 }
 
+/*****************************************************************************/
 uint8_t mcp4922_spi_cfg(void)
 {
 	return SPI_CLOCK_1_4 |
