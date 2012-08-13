@@ -9,6 +9,8 @@
 /* Module is constructed to use this number of channels, regardless of amout
  * real channels used. */
 #define TEMP_CHANNELS_INTERNAL 8
+/* Minimal (bottom) DA output value (even is shortcut or so!) */
+#define TEMP_OUTP_DA_MIN 4096
 
 /* temperature DAQ device to measure I and U */
 typedef struct {
@@ -176,20 +178,33 @@ static temp_data_IU_t temp_correct_IU(temp_data_IU_t data_IU, uint8_t channel)
 	return data_IU;
 }
 
-/* TODO: přepracovat na obecnou output stage, s nastavením na minimum ... */
-static void temp_send_DA(uint8_t channel, uint16_t output)
+static void temp_output_DA(uint8_t channel, uint16_t output)
 {
         uint8_t spi_dev_num;
         uint8_t channel_dev_DA;
+        uint8_t DA_width;
 	const temp_dev_DA_t *dev_DA_E;
+
+        /* At AD output must be allways voltage, in order to measure 
+         * resistence, detect shortcut or disconnection. */
+        if (output < TEMP_OUTP_DA_MIN)
+                output = TEMP_OUTP_DA_MIN;
 
 	dev_DA_E = &temp_conf_E[channel].dev_DA;
 	spi_dev_num = eeprom_read_byte(&dev_DA_E->spi_dev_num);
 	channel_dev_DA = eeprom_read_byte(&dev_DA_E->channel);
         
         SPI_dev_select(spi_dev_num);
-        /* TODO: device specific range */
-        output = output >> 4;
+        DA_width = SPI_dev_DA_width();
+        if (DA_width > 0) {
+                /* Rounding */
+                if (output < 0xffff) {
+                        output >>= 16 - 1 - DA_width;
+                        output++;
+                        output >>= 1;
+                } else
+                        output >>= 16 - DA_width;
+        }
         SPI_dev_DA_set_output(channel_dev_DA, output);
 }
 
@@ -253,15 +268,15 @@ static void temp_loop_(uint8_t channel)
         status = temp_status_IU(data_IU);
         if (status == temp_status_IU_disconnected) {
                 /* FIXME: value */
-                temp_send_DA(channel, 0);
+                temp_output_DA(channel, 0);
                 return;
         }
         if (status == temp_status_IU_invalid) {
-                temp_send_DA(channel, 0);
+                temp_output_DA(channel, 0);
                 return;
         }
         if (status == temp_status_IU_shortcut) {
-                temp_send_DA(channel, 0);
+                temp_output_DA(channel, 0);
                 return;
         }
         data_IU = temp_correct_IU(data_IU, channel);
@@ -278,7 +293,7 @@ static void temp_loop_(uint8_t channel)
 
         TIMER1_jiff_alarm(TIMER1_ALARM_SEND);
         output = temp_data[channel].pic.output >> 16;
-        temp_send_DA(channel, output);
+        temp_output_DA(channel, output);
 }
 
 void temp_loop(void)
@@ -315,6 +330,6 @@ void temp_init(void)
         for(uint8_t channel = TEMP_CHANNELS; channel;)
         {
                 channel--;
-                /* set-up DA ... */
+                temp_output_DA(0, channel);
         }
 }

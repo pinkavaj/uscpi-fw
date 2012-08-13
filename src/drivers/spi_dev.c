@@ -61,6 +61,18 @@ void SPI_dev_DA_set_output(uint8_t channel, uint16_t output)
 	}
 }
 
+uint8_t SPI_dev_DA_width(void)
+{
+        switch(SPI_dev_current)
+        {
+                case SPI_DEV_MCP4922_0:
+                        return mcp4922_width();
+                default:
+                        break;
+        }
+        return 0;
+}
+
 void SPI_dev_init(void) {
 	SPI_dev_current = SPI_DEV_NONE;
 	SPI_init();
