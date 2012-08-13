@@ -8,8 +8,8 @@
 
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
-#include "lib/heating.h"
 #include "lib/math_cust.h"
+#include "lib/temp.h"
 
 SCPI_parse_t SCPI_IC_test_adc(char UNUSED(c))
 {

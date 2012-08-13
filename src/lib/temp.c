@@ -1,7 +1,7 @@
 
 #include <inttypes.h>
 #include <avr/eeprom.h>
-#include "lib/heating.h"
+#include "lib/temp.h"
 #include "lib/pic16.h"
 #include "drivers/spi_dev.h"
 #include "drivers/timer.h"
