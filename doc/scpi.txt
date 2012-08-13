@@ -1,0 +1,74 @@
+uSCPIfw user documentation
+Jiří Pinkava
+2010
+
+%!encoding: utf8
+%!style(tex): babel
+%!postproc(tex): {babel} [english]{babel}
+%!postproc(tex): "°"  "$^\circ$"
+
+= SCPI commands =
+
+== Common Command ==
+
+=== *RTS ===
+
+=== *TRG ===
+
+=== *OPC? ===
+
+== Instrument commands ==
+
+=== MEASure ===
+
+==== MEASure:TEMPerature? ====
+
+=== SENSe ===
+
+==== SENSe:LIST ====
+
+==== SENSe:LIST:COUNt <numeric_value> ====
+Controls the number of times the sequence list is scanned when a trigger is 
+received.
+
+===== SENSe:LIST:DWELl =====
+
+Specifies the dwell time points of the lists. The units are in seconds.
+
+This specifies the amount of time spent at each point.
+
+===== SENSe:LIST:DWELl:POINts? =====
+
+Returns the number of points currently in the DWELl list.
+
+===== SENSe:LIST:SLOPe =====
+
+Specifies the slope points of the lists. The units are in °C/sec.
+
+This specifies slope for temperature regulation used to reach set point.
+
+===== SENSe:LIST:SLOPe:POINts? =====
+
+Returns the number of points currently in the SLOPe list.
+
+===== SENSe:LIST:SPOint ====
+
+Specifies the set points if the list. The units are in °C.
+
+The SPOint command specifies list of target temperatures of the environmental 
+chamber.
+
+===== SENSe:LIST:SPOint:POINts? ====
+
+Returns the number of points currently in the SPOint list.
+
+=== SOURce ===
+
+==== SOURce:TEMPerature ====
+
+===== SOURce:TEMPerature:DWELl =====
+
+===== SOURce:TEMPerature:SLOPe =====
+
+===== SOURce:TEMPerature:SPOint =====
+
