@@ -318,7 +318,7 @@ static SCPI_parse_t SCPI_parse(char c)
 }
 
 /* Start processing bytes in input buffer,
- * suppose tath interrupts are disabled, but can be enabled. */
+ * suppose no interrupts happend, but it can!?. */
 void SCPI_loop(void)
 {
 	static uint8_t char_err = 0;
